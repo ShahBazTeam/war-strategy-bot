@@ -54,7 +54,7 @@ function applyLossesToEq(eq, map) {
 }
 
 function isDoNothing(plan) {
-  const phrases = ['هیچ کاری نمیکنم', 'هیچ کاری نمی کنم', 'هیچ اقدامی نمیکنم', 'pass', 'nothing', 'ندارم', 'نمیخوام', 'نمی‌خوام', 'عدم', 'صبر', 'منتظر', 'هیچ', 'خالی', 'بدون برنامه', 'without plan', 'do nothing', 'no action', 'no plan', 'idle', 'vacant'];
+  const phrases = ['هیچ کاری نمیکنم', 'هیچ کاری نمی کنم', 'هیچ اقدامی نمیکنم', 'نمیکنم', 'نمی کنم', 'نمی‌کنم', 'pass', 'nothing', 'ندارم', 'نمیخوام', 'نمی‌خوام', 'نمیخوام', 'نمی‌خوام', 'ندارم', 'نداریم', 'خالی', 'عدم', 'صبر', 'منتظر', 'هیچ', 'بدون برنامه', 'without plan', 'do nothing', 'no action', 'no plan', 'idle', 'vacant', 'defend nothing', 'بدون دفاع', 'دفاع نمیکنم', 'دفاع نمی‌کنم', 'حمله نمیکنم', 'حمله نمی‌کنم', 'اقدام نمیکنم', 'اقدام نمی‌کنم', 'کاری نمیکنم', 'کاری نمی‌کنم'];
   const lower = plan.toLowerCase().trim();
   return phrases.some(p => lower.includes(p));
 }
@@ -591,15 +591,17 @@ export function registerHandlers(bot) {
         return;
       }
 
-      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuclear_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
+      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuke_def_') || d.startsWith('war_tactic_bio_def_') || d.startsWith('war_tactic_cyber_def_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
         const wid = parseInt(d.split('_').pop());
         let tactic = 'defend';
-        if (d.includes('_nuclear_')) tactic = 'nuclear';
-        else if (d.includes('_counter_')) tactic = 'counter';
+        if (d.includes('_counter_')) tactic = 'counter';
         else if (d.includes('_ambush_def_')) tactic = 'ambush';
+        else if (d.includes('_nuke_def_')) tactic = 'nuclear';
+        else if (d.includes('_bio_def_')) tactic = 'bio_def';
+        else if (d.includes('_cyber_def_')) tactic = 'cyber_def';
         else if (d.includes('_emp_def_')) tactic = 'emp_def';
         else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
-        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی', emp_def: '🛡️ سپر الکترومغناطیسی', napalm_def: '🔥 آتش متقابل' };
+        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ ضد هسته‌ای', bio_def: '🧬 ضد بیولوژیک', cyber_def: '💻 ضد سایبری', emp_def: '⚡ پوشش الکترومغناطیس', napalm_def: '🔥 ضد ناپالم' };
         const u = getUserRaw(uid);
         const lang = u.language || 'fa';
         const eq = u.equipment.filter(eq => eq.count > 0);
@@ -613,18 +615,19 @@ export function registerHandlers(bot) {
         return;
       }
 
-      if (d.startsWith('war_tactic_heavy_') || d.startsWith('war_tactic_precise_') || d.startsWith('war_tactic_ambush_') || d.startsWith('war_tactic_air_') || d.startsWith('war_tactic_naval_') || d.startsWith('war_tactic_emp_') || d.startsWith('war_tactic_bio_') || d.startsWith('war_tactic_cyber_') || d.startsWith('war_tactic_napalm_')) {
+      if (d.startsWith('war_tactic_heavy_') || d.startsWith('war_tactic_precise_') || d.startsWith('war_tactic_ambush_') || d.startsWith('war_tactic_air_') || d.startsWith('war_tactic_naval_') || d.startsWith('war_tactic_nuke_') || d.startsWith('war_tactic_emp_') || d.startsWith('war_tactic_bio_') || d.startsWith('war_tactic_cyber_') || d.startsWith('war_tactic_napalm_')) {
         const wid = parseInt(d.split('_').pop());
         let tactic = 'heavy';
         if (d.includes('_precise_')) tactic = 'precise';
         else if (d.includes('_ambush_')) tactic = 'ambush';
         else if (d.includes('_air_')) tactic = 'air_raid';
         else if (d.includes('_naval_')) tactic = 'naval';
+        else if (d.includes('_nuke_')) tactic = 'nuclear';
         else if (d.includes('_emp_')) tactic = 'emp';
         else if (d.includes('_bio_')) tactic = 'bio';
         else if (d.includes('_cyber_')) tactic = 'cyber';
         else if (d.includes('_napalm_')) tactic = 'napalm';
-        const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی', emp: '⚡ حمله الکترومغناطیسی', bio: '💀 حمله بیولوژیکی', cyber: '🛡️ حمله سایبری', napalm: '🔥 حمله آتش‌زا' };
+        const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی', nuclear: '☢️ حمله هسته‌ای', emp: '⚡ حمله الکترومغناطیسی', bio: '🧬 حمله بیولوژیکی', cyber: '💻 حمله سایبری', napalm: '🔥 حمله ناپالم' };
         const u = getUserRaw(uid);
         const lang = u.language || 'fa';
         const eq = u.equipment.filter(eq => eq.count > 0);

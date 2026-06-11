@@ -120,14 +120,34 @@ export function warActionKeyboard(wid, isAtt) {
   if (isAtt) {
     kb.text('📋 مشاهده نیروها', `war_forces_${wid}`);
     kb.row()
-       .text('✍️ نوشتن طرح حمله', `war_plan_${wid}`);
+       .text('💥 حمله سنگین', `war_tactic_heavy_${wid}`)
+       .text('🎯 حمله دقیق', `war_tactic_precise_${wid}`);
+    kb.row()
+       .text('🗡️ کمین', `war_tactic_ambush_${wid}`)
+       .text('✈️ حمله هوایی', `war_tactic_air_${wid}`);
+    kb.row()
+       .text('🚢 عملیات دریایی', `war_tactic_naval_${wid}`);
+    kb.row()
+       .text('☢️ حمله هسته‌ای', `war_tactic_nuke_${wid}`)
+       .text('🧬 بیولوژیک', `war_tactic_bio_${wid}`);
+    kb.row()
+       .text('💻 سایبری', `war_tactic_cyber_${wid}`)
+       .text('🔥 ناپالم', `war_tactic_napalm_${wid}`);
+    kb.row()
+       .text('⚡ الکترومغناطیس', `war_tactic_emp_${wid}`);
   } else {
     kb.text('📋 مشاهده نیروها', `war_forces_${wid}`);
     kb.row()
        .text('🛡️ دفاع موضعی', `war_tactic_defend_${wid}`)
        .text('⚔️ ضدحمله', `war_tactic_counter_${wid}`);
     kb.row()
-       .text('✍️ نوشتن طرح دفاع', `war_plan_${wid}`);
+       .text('☢️ ضد هسته‌ای', `war_tactic_nuke_def_${wid}`)
+       .text('🧬 ضد بیولوژیک', `war_tactic_bio_def_${wid}`);
+    kb.row()
+       .text('💻 ضد سایبری', `war_tactic_cyber_def_${wid}`)
+       .text('🔥 ضد ناپالم', `war_tactic_napalm_def_${wid}`);
+    kb.row()
+       .text('⚡ پوشش الکترومغناطیس', `war_tactic_emp_def_${wid}`);
   }
   kb.row()
     .text('📊 وضعیت نبرد', `war_detail_${wid}`)

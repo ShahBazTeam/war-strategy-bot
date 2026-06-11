@@ -187,7 +187,9 @@ function fallbackBattle(attName, defName, attEq, defEq, attTactic, defTactic, ro
     cyber: { att: 1.2, def: 0.6 },
     napalm: { att: 1.4, def: 0.7 },
     emp_def: { att: 0.6, def: 1.3 },
-    napalm_def: { att: 0.7, def: 1.2 }
+    napalm_def: { att: 0.7, def: 1.2 },
+    bio_def: { att: 0.7, def: 1.3 },
+    cyber_def: { att: 0.6, def: 1.4 }
   };
 
   const attMod = tacticMod[attTactic]?.att || 1.0;
