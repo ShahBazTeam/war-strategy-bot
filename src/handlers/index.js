@@ -59,6 +59,30 @@ function isDoNothing(plan) {
   return phrases.some(p => lower.includes(p));
 }
 
+function parseEquipmentInput(text, equipment) {
+  const lower = text.trim().toLowerCase();
+  if (lower === 'همه' || lower === 'all') {
+    const deploy = {};
+    equipment.filter(e => e.count > 0).forEach(e => { deploy[e.type] = e.count; });
+    return { ok: true, deploy };
+  }
+  const deploy = {};
+  const parts = text.split(/[,\n]+/).map(s => s.trim()).filter(s => s);
+  for (const part of parts) {
+    const match = part.match(/(\w+)\s+(\d+)/);
+    if (!match) continue;
+    const type = match[1].toLowerCase();
+    const count = parseInt(match[2]);
+    const eq = equipment.find(e => e.type === type);
+    if (!eq) return { ok: false, error: `❌ نوع تجهیزات "${type}" موجود نیست!` };
+    if (count > eq.count) return { ok: false, error: `❌ ${eq.model}: فقط ${eq.count.toLocaleString()} عدد داری، ${count.toLocaleString()} عدد نداری!` };
+    if (count <= 0) return { ok: false, error: `❌ تعداد باید مثبت باشد!` };
+    deploy[type] = (deploy[type] || 0) + count;
+  }
+  if (Object.keys(deploy).length === 0) return { ok: false, error: `❌ فرمت نامعتبر! مثال: infantry 5000, tank 200` };
+  return { ok: true, deploy };
+}
+
 function autoBattleResult(attUser, defUser, attName, defName, attTactic, defTactic, attIsPassive, defIsPassive) {
   const weights = { infantry: 1, tank: 8, artillery: 7, airdef: 6, missile: 10, fighter: 12, bomber: 14, helicopter: 5, destroyer: 15, submarine: 18, capital: 25 };
   const attPower = attUser.equipment.reduce((s, u) => s + (weights[u.type] || 1) * u.count, 0);
@@ -579,8 +603,16 @@ export function registerHandlers(bot) {
         else if (d.includes('_cyber_')) tactic = 'cyber';
         else if (d.includes('_napalm_')) tactic = 'napalm';
         const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی', emp: '⚡ حمله الکترومغناطیسی', bio: '💀 حمله بیولوژیکی', cyber: '🛡️ حمله سایبری', napalm: '🔥 حمله آتش‌زا' };
-        setState(uid, 'awaiting_attack_plan', JSON.stringify({ warId: wid, tactic }));
-        await safeEdit(ctx, `⚔️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح حمله:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً حمله هوایی، محاصره، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
+        const u = getUserRaw(uid);
+        const lang = u.language || 'fa';
+        const eq = u.equipment.filter(eq => eq.count > 0);
+        let equipText = `\n📦 **موجودی تجهیزات:**\n`;
+        eq.forEach(e => {
+          const d2 = UT[e.type];
+          equipText += `${d2?.icon || '🔫'} ${getModelName(e.model, lang)}: **${e.count.toLocaleString()}**\n`;
+        });
+        setState(uid, 'awaiting_attack_deploy', JSON.stringify({ warId: wid, tactic }));
+        await safeEdit(ctx, `⚔️ **${names[tactic]}** انتخاب شد.\n${equipText}\n━━━━━━━━━━━━━━━━━━\n📝 **تجهیزاتی که میخوای اعزام کنی رو بنویس:**\n\nمثال:\n\`infantry 5000, tank 200, fighter 30\`\nیا:\n\`همه\`\n\n⚠️ فقط تجهیزاتی که داری!`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
         return;
       }
 
@@ -593,8 +625,18 @@ export function registerHandlers(bot) {
         else if (d.includes('_emp_def_')) tactic = 'emp_def';
         else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
         const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی', emp_def: '🛡️ سپر الکترومغناطیسی', napalm_def: '🔥 آتش متقابل' };
-        setState(uid, 'awaiting_defense_plan', JSON.stringify({ warId: wid, tactic }));
-        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح دفاع:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً دفاع موضعی، ضدحمله، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
+        const u = getUserRaw(uid);
+        const lang = u.language || 'fa';
+        const eq = u.equipment.filter(eq => eq.count > 0);
+        let equipText = `\n📦 **موجودی تجهیزات:**\n`;
+        eq.forEach(e => {
+          const d2 = UT[e.type];
+          equipText += `${d2?.icon || '🔫'} ${getModelName(e.model, lang)}: **${e.count.toLocaleString()}**\n`;
+        });
+        setState(uid, 'awaiting_defense_deploy', JSON.stringify({ warId: wid, tactic }));
+        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n${equipText}\n━━━━━━━━━━━━━━━━━━\n📝 **تجهیزاتی که میخوای برای دفاع مستقر کنی رو بنویس:**\n\nمثال:\n\`infantry 3000, tank 100, airdef 50\`\nیا:\n\`همه\`\nیا:\n\`pass\` (بدون دفاع)\n\n⚠️ فقط تجهیزاتی که داری!`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+        return;
+      }
         return;
       }
 
@@ -899,6 +941,51 @@ export function registerHandlers(bot) {
       return;
     }
 
+    if (st.state === 'awaiting_attack_deploy') {
+      const w = getWarDetail(d.warId);
+      if (!w) { clearState(uid); return; }
+      const user = getUserRaw(uid);
+      const lang = user.language || 'fa';
+      const result = parseEquipmentInput(txt, user.equipment);
+      if (!result.ok) {
+        await ctx.reply(result.error, { reply_markup: backBtn() });
+        return;
+      }
+      const deployText = Object.entries(result.deploy).map(([type, count]) => {
+        const eq = user.equipment.find(e => e.type === type);
+        const d2 = UT[type];
+        return `${d2?.icon || '🔫'} ${getModelName(eq?.model || type, lang)}: ${count.toLocaleString()}`;
+      }).join('\n');
+      setState(uid, 'awaiting_attack_plan', JSON.stringify({ warId: d.warId, tactic: d.tactic, deploy: result.deploy }));
+      await safeEdit(ctx, `✅ **تجهیزات تایید شد:**\n${deployText}\n\n━━━━━━━━━━━━━━━━━━\n📝 **استراتژی حمله رو بنویس:**\n\n💡 فقط بنویس **چه کاری میخوای انجام بدهی**\n(مثلاً: حمله هوایی گسترده، محاصره بندر، و...)`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+      return;
+    }
+
+    if (st.state === 'awaiting_defense_deploy') {
+      const w = getWarDetail(d.warId);
+      if (!w) { clearState(uid); return; }
+      if (isDoNothing(txt)) {
+        setState(uid, 'awaiting_defense_plan', JSON.stringify({ warId: d.warId, tactic: d.tactic, deploy: {} }));
+        await safeEdit(ctx, `☠️ **بدون دفاع انتخاب شد.**\n\n⚠️ بدون دفاع، خسارات سنگینی متحمل میشی!\n\n📝 **دلیل یا توضیح بنویس** (اختیاری):`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+        return;
+      }
+      const user = getUserRaw(uid);
+      const lang = user.language || 'fa';
+      const result = parseEquipmentInput(txt, user.equipment);
+      if (!result.ok) {
+        await ctx.reply(result.error, { reply_markup: backBtn() });
+        return;
+      }
+      const deployText = Object.entries(result.deploy).map(([type, count]) => {
+        const eq = user.equipment.find(e => e.type === type);
+        const d2 = UT[type];
+        return `${d2?.icon || '🔫'} ${getModelName(eq?.model || type, lang)}: ${count.toLocaleString()}`;
+      }).join('\n');
+      setState(uid, 'awaiting_defense_plan', JSON.stringify({ warId: d.warId, tactic: d.tactic, deploy: result.deploy }));
+      await safeEdit(ctx, `✅ **تجهیزات تایید شد:**\n${deployText}\n\n━━━━━━━━━━━━━━━━━━\n📝 **استراتژی دفاع رو بنویس:**\n\n💡 فقط بنویس **چه کاری میخوای انجام بدهی**\n(مثلاً: دفاع موضعی در کوهستان، ضدحمله غافلگیرکننده، و...)`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+      return;
+    }
+
     if (st.state === 'awaiting_attack_plan') {
       const w = getWarDetail(d.warId);
       if (!w) { clearState(uid); return; }
@@ -908,14 +995,17 @@ export function registerHandlers(bot) {
         clearState(uid);
         return;
       }
-      addWarRound(w.id, w.current_round, txt, null, d.tactic || 'heavy', null, [], [], 'pending');
+      const strategyText = txt;
+      const deploySummary = d.deploy ? Object.entries(d.deploy).map(([type, count]) => `${type}: ${count}`).join(', ') : 'همه نیروها';
+      const fullAction = `[تجهیزات اعزامی: ${deploySummary}]\n[استراتژی: ${strategyText}]`;
+      addWarRound(w.id, w.current_round, fullAction, null, d.tactic || 'heavy', null, [], [], 'pending');
       clearState(uid);
       await ctx.reply(
-        `✅ **طرح حمله ثبت شد!**\n\n📝 "${txt}"\n\n⏳ منتظر طرح دفاع ${w.defender_flag} ${w.defender_name}...`,
+        `✅ **طرح حمله ثبت شد!**\n\n📝 "${strategyText}"\n\n⏳ منتظر طرح دفاع ${w.defender_flag} ${w.defender_name}...`,
         { reply_markup: warDetailKeyboard(w.id), parse_mode: 'Markdown' }
       );
       await safeSend(bot, w.defender_tid,
-        `⚔️ **${w.attacker_name}** طرح حمله نوشت!\n\n🛡️ **حالا تو دفاع کن!**\nطرح دفاع خود را بنویس:`,
+        `⚔️ **${w.attacker_name}** طرح حمله نوشت!\n\n🛡️ **حالا تو دفاع کن!**`,
         { reply_markup: warActionKeyboard(w.id, false) }
       );
       return;
@@ -935,7 +1025,12 @@ export function registerHandlers(bot) {
         clearState(uid);
         return;
       }
-      updateWarRoundDefense(w.id, round, txt);
+      const strategyText = txt;
+      const deploy = d.deploy || {};
+      const hasDeploy = Object.keys(deploy).length > 0;
+      const deploySummary = hasDeploy ? Object.entries(deploy).map(([type, count]) => `${type}: ${count}`).join(', ') : 'بدون دفاع';
+      const fullAction = hasDeploy ? `[تجهیزات مستقر: ${deploySummary}]\n[استراتژی: ${strategyText}]` : `[بدون دفاع]\n[توضیح: ${strategyText}]`;
+      updateWarRoundDefense(w.id, round, fullAction);
       await ctx.reply('🧠 **هوش مصنوعی در حال شبیه‌سازی نبرد...** ⏳', { parse_mode: 'Markdown' });
 
       const attUser = getUserRaw(w.attacker_tid);
@@ -945,16 +1040,40 @@ export function registerHandlers(bot) {
       const warTopicId = getWarTopicId(w.id);
 
       const attIsPassive = isDoNothing(ex.attacker_action);
-      const defIsPassive = isDoNothing(txt);
+      const defIsPassive = isDoNothing(fullAction);
+
+      function extractDeploy(actionText) {
+        const match = actionText.match(/\[تجهیزات (?:اعزامی|مستقر): ([^\]]+)\]/);
+        if (!match) return null;
+        const deploy = {};
+        match[1].split(', ').forEach(p => {
+          const [type, count] = p.split(': ');
+          if (type && count) deploy[type.trim()] = parseInt(count);
+        });
+        return Object.keys(deploy).length > 0 ? deploy : null;
+      }
+
+      function filterEquipmentByDeploy(equipment, deploy) {
+        if (!deploy) return equipment;
+        return equipment.map(e => ({
+          ...e,
+          count: deploy[e.type] !== undefined ? Math.min(deploy[e.type], e.count) : 0
+        }));
+      }
+
+      const attDeploy = extractDeploy(ex.attacker_action);
+      const defDeploy = extractDeploy(fullAction);
+      const attDeployEq = filterEquipmentByDeploy(attUser.equipment, attDeploy);
+      const defDeployEq = filterEquipmentByDeploy(defUser.equipment, defDeploy);
 
       let aiResult;
       if (attIsPassive || defIsPassive) {
         aiResult = autoBattleResult(attUser, defUser, attInfo.country_name, defInfo.country_name, ex.attacker_tactic || 'heavy', d.tactic || 'defend', attIsPassive, defIsPassive);
       } else {
         aiResult = await evaluateBattleRound(
-          ex.attacker_action, txt,
+          ex.attacker_action, fullAction,
           attInfo.country_name, defInfo.country_name,
-          attUser.equipment, defUser.equipment,
+          attDeployEq, defDeployEq,
           ex.attacker_tactic || 'heavy', d.tactic || 'defend', round
         );
       }
@@ -965,8 +1084,8 @@ export function registerHandlers(bot) {
 
       if (aiResult && aiResult.attacker_losses && aiResult.defender_losses) {
         const aMap = aiResult.attacker_losses, dMap = aiResult.defender_losses;
-        const maxAttLoss = (type) => Math.min(aMap[type] || 0, Math.floor((attUser.equipment.find(u => u.type === type)?.count || 0) * 0.35));
-        const maxDefLoss = (type) => Math.min(dMap[type] || 0, Math.floor((defUser.equipment.find(u => u.type === type)?.count || 0) * 0.40));
+        const maxAttLoss = (type) => Math.min(aMap[type] || 0, Math.floor((attDeployEq.find(u => u.type === type)?.count || 0) * 0.35));
+        const maxDefLoss = (type) => Math.min(dMap[type] || 0, Math.floor((defDeployEq.find(u => u.type === type)?.count || 0) * 0.40));
         const clampA = { infantry: maxAttLoss('infantry'), tank: maxAttLoss('tank'), artillery: maxAttLoss('artillery'), airdef: maxAttLoss('airdef'), missile: maxAttLoss('missile'), fighter: maxAttLoss('fighter'), bomber: maxAttLoss('bomber'), helicopter: maxAttLoss('helicopter'), destroyer: maxAttLoss('destroyer'), submarine: maxAttLoss('submarine'), capital: maxAttLoss('capital') };
         const clampD = { infantry: maxDefLoss('infantry'), tank: maxDefLoss('tank'), artillery: maxDefLoss('artillery'), airdef: maxDefLoss('airdef'), missile: maxDefLoss('missile'), fighter: maxDefLoss('fighter'), bomber: maxDefLoss('bomber'), helicopter: maxDefLoss('helicopter'), destroyer: maxDefLoss('destroyer'), submarine: maxDefLoss('submarine'), capital: maxDefLoss('capital') };
         attLosses = attUser.equipment.filter(u => (clampA[u.type] || 0) > 0)
