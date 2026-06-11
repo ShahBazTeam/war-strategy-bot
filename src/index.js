@@ -27,10 +27,6 @@ if (process.env.GROUP_ID) {
   console.log(`✅ GROUP_ID loaded from env: ${process.env.GROUP_ID}`);
 }
 
-if (process.env.BAYAIE_TOPIC_ID) {
-  console.log(`✅ BAYAIE_TOPIC_ID loaded from env: ${process.env.BAYAIE_TOPIC_ID}`);
-}
-
 const bot = new Bot(TOKEN);
 
 bot.catch((err) => {

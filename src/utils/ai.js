@@ -234,11 +234,3 @@ export async function generateWarSummary(warId, attName, defName, rounds, winner
   ], 300, 0.6);
   return text || `جنگ بین ${attName} و ${defName} پس از ${rounds} راند با پیروزی ${winner} پایان یافت.`;
 }
-
-export async function generateStatement(countryName, statementText) {
-  const text = await callAI([
-    { role: 'system', content: `You are a press secretary for ${countryName}. Write an official statement (biaane) based on this input. Write in Persian, formal tone, 3-4 sentences. Make it dramatic and official.` },
-    { role: 'user', content: statementText }
-  ], 300, 0.6);
-  return text || `📢 بیانیه رسمی ${countryName}:\n\n${statementText}`;
-}

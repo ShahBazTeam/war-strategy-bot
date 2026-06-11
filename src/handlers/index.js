@@ -18,7 +18,7 @@ import {
   techKeyboard, allianceKeyboard, allianceTargetKeyboard, allianceActionKeyboard,
   countrySelectKeyboard, languageSelectKeyboard
 } from '../keyboards/index.js';
-import { checkWarReason, evaluateBattleRound, generateUNResolutions, generateStatement } from '../utils/ai.js';
+import { checkWarReason, evaluateBattleRound, generateUNResolutions } from '../utils/ai.js';
 import { createForumTopic, setDetectedGroupId, getDetectedGroupId } from '../utils/telegram.js';
 import { getModelName, getUnitName } from '../utils/translations.js';
 import { formatEq, formatInd, calcMilitaryPower, calcDailyIncome, calcDailyExpenses } from '../game/index.js';
@@ -366,18 +366,6 @@ export function registerHandlers(bot) {
         const net = income - expenses;
         await safeEdit(ctx,
           `💰 **درآمد خودکار**\n\n📊 درآمد: ${income.toLocaleString()}💰\n💸 هزینه: ${expenses.toLocaleString()}💰\n✅ خالص: ${net >= 0 ? '+' : ''}${net.toLocaleString()}💰\n\n⏰ واریز خودکار هر ۱۲ ساعت`,
-          { reply_markup: backBtn() }
-        );
-        return;
-      }
-
-      if (d === 'make_statement') {
-        clearState(uid);
-        const u = getUserByTelegramId(uid);
-        if (!u) return;
-        setState(uid, 'awaiting_statement', '{}');
-        await safeEdit(ctx,
-          `📢 **بیانیه رسمی**\n\n🌍 ${u.country_flag} **${u.country_name}**\n\n📝 متن بیانیه خود را بنویس:`,
           { reply_markup: backBtn() }
         );
         return;
@@ -998,20 +986,6 @@ export function registerHandlers(bot) {
       await safeSend(bot, d.otherTid, `📦 ${u.country_flag} ${u.country_name} ${amount} ${unitType} برایت ارسال کرد.`);
       return;
     }
-
-    if (st.state === 'awaiting_statement') {
-      clearState(uid);
-      await ctx.reply('🧠 **در حال نوشتن بیانیه...** ⏳', { parse_mode: 'Markdown' });
-      const statement = await generateStatement(u.country_name, txt);
-      const msg = `📢 **بیانیه رسمی ${u.country_flag} ${u.country_name}**\n\n━━━━━━━━━━━━━━━━━━\n\n${statement}\n\n━━━━━━━━━━━━━━━━━━\n🖊️ ${u.first_name}`;
-      await ctx.reply(msg, { reply_markup: mainMenuKeyboard(), parse_mode: 'Markdown' });
-      const gid = getGroupChatId();
-      const bayaieTopicId = process.env.BAYAIE_TOPIC_ID;
-      if (gid && bayaieTopicId) {
-        await safeSend(bot, gid, msg, { message_thread_id: parseInt(bayaieTopicId) });
-      }
-      return;
-    }
   });
 
   // ============ GROUP HANDLERS ============
@@ -1044,16 +1018,12 @@ export function registerHandlers(bot) {
     }
 
     if (text === 'وضعیت' || text === 'status') {
-      const bayaieTopicId = process.env.BAYAIE_TOPIC_ID;
-      const warTopicCount = 0;
       let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
       info += `🆔 Chat ID: \`${chatId}\`\n`;
-      info += `📝 Topic ID پیام‌ها: ${ctx.message.message_thread_id || '通用'}\n`;
-      info += `📢 بیانیه Topic: ${bayaieTopicId || '❌ تنظیم نشده'}\n`;
+      info += `📝 Topic ID: ${ctx.message.message_thread_id || 'عمومی'}\n`;
       info += `━━━━━━━━━━━━━━━━━━\n`;
-      info += `💡 متغیرهای Railway:\n`;
+      info += `💡 برای تنظیم در Railway:\n`;
       info += `• GROUP_ID = \`${chatId}\`\n`;
-      if (bayaieTopicId) info += `• BAYAIE_TOPIC_ID = ${bayaieTopicId}\n`;
       await ctx.reply(info, { parse_mode: 'Markdown' });
       return;
     }
