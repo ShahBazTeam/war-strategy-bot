@@ -1,8 +1,8 @@
 import { getUnitDef, INDUSTRY_TYPES, calcDailyIncome as _calcDailyIncome, calcDailyExpenses, calcMilitaryPower } from './data.js';
 import { getUnitName, getModelName } from '../utils/translations.js';
 
-export function calcDailyIncome(industries, countryId = null) {
-  return _calcDailyIncome(industries, countryId);
+export function calcDailyIncome(industries, countryId = null, techEconomy = 0) {
+  return _calcDailyIncome(industries, countryId, techEconomy);
 }
 
 export { calcDailyExpenses, calcMilitaryPower };

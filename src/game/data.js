@@ -772,12 +772,16 @@ export function getIndustryByIdx(countryId, typeId) {
   return c.industries.find(i => i.type === typeId) || null;
 }
 
-export function calcDailyIncome(industries, countryId = null) {
+export function calcDailyIncome(industries, countryId = null, techEconomy = 0) {
   if (!industries) return 0;
   let baseIncome = industries.reduce((sum, ind) => {
     const def = getIndustryDef(ind.type);
     return sum + (def ? def.baseIncome * ind.level : 0);
   }, 0);
+  
+  // Tech economy multiplier: each level adds 10%
+  const techMultiplier = 1 + (techEconomy * 0.1);
+  baseIncome *= techMultiplier;
   
   // Bonus for weaker countries (skill-based advantage)
   if (countryId) {

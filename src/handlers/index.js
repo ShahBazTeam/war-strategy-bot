@@ -432,7 +432,7 @@ export function registerHandlers(bot) {
         clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
-        const income = calcDailyIncome(u.industries, u.country_id), exp = calcDailyExpenses(u.equipment, u.industries), net = income - exp;
+        const income = calcDailyIncome(u.industries, u.country_id, u.tech_economy || 1), exp = calcDailyExpenses(u.equipment, u.industries), net = income - exp;
         await safeEdit(ctx,
           `🏭 **صنایع ${u.country_name}**\n\n${formatInd(u.industries)}\n\n📊 **اقتصاد:**\n💰 درآمد: ${income.toLocaleString()} | 💸 هزینه: ${exp.toLocaleString()}\n📈 خالص: ${net >= 0 ? '+' : ''}${net.toLocaleString()}\n\n💎 ارتقاء:\n• نفت: ۲۰۰💰 | معدن: ۱۵۰💰 | کشاورزی: ۸۰💰\n• کارخانجات: ۱۸۰💰 | بانک: ۲۵۰💰`,
           { reply_markup: industriesKeyboard() }
@@ -455,14 +455,14 @@ export function registerHandlers(bot) {
         target.level += 1;
         setIndustries(uid, u.industries);
         const upd = getUserByTelegramId(uid);
-        await safeEdit(ctx, `✅ **${upgNames[d]}** → سطح ${target.level}!\n💰 درآمد: ${calcDailyIncome(upd.industries, upd.country_id).toLocaleString()}💰`, { reply_markup: industriesKeyboard() });
+        await safeEdit(ctx, `✅ **${upgNames[d]}** → سطح ${target.level}!\n💰 درآمد: ${calcDailyIncome(upd.industries, upd.country_id, upd.tech_economy || 1).toLocaleString()}💰`, { reply_markup: industriesKeyboard() });
         return;
       }
 
       if (d === 'daily_collect') {
         const u = getUserRaw(uid);
         if (!u) return;
-        const income = calcDailyIncome(u.industries, u.country_id);
+        const income = calcDailyIncome(u.industries, u.country_id, u.tech_economy || 1);
         const expenses = calcDailyExpenses(u.equipment, u.industries);
         const net = income - expenses;
         await safeEdit(ctx,
@@ -591,6 +591,28 @@ export function registerHandlers(bot) {
         return;
       }
 
+      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuclear_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
+        const wid = parseInt(d.split('_').pop());
+        let tactic = 'defend';
+        if (d.includes('_nuclear_')) tactic = 'nuclear';
+        else if (d.includes('_counter_')) tactic = 'counter';
+        else if (d.includes('_ambush_def_')) tactic = 'ambush';
+        else if (d.includes('_emp_def_')) tactic = 'emp_def';
+        else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
+        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی', emp_def: '🛡️ سپر الکترومغناطیسی', napalm_def: '🔥 آتش متقابل' };
+        const u = getUserRaw(uid);
+        const lang = u.language || 'fa';
+        const eq = u.equipment.filter(eq => eq.count > 0);
+        let equipText = `\n📦 **موجودی تجهیزات:**\n`;
+        eq.forEach(e => {
+          const d2 = UT[e.type];
+          equipText += `${d2?.icon || '🔫'} ${getModelName(e.model, lang)}: **${e.count.toLocaleString()}**\n`;
+        });
+        setState(uid, 'awaiting_defense_deploy', JSON.stringify({ warId: wid, tactic }));
+        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n${equipText}\n━━━━━━━━━━━━━━━━━━\n📝 **تجهیزاتی که میخوای برای دفاع مستقر کنی رو بنویس:**\n\nمثال:\n\`infantry 3000, tank 100, airdef 50\`\nیا:\n\`همه\`\nیا:\n\`pass\` (بدون دفاع)\n\n⚠️ فقط تجهیزاتی که داری!`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+        return;
+      }
+
       if (d.startsWith('war_tactic_heavy_') || d.startsWith('war_tactic_precise_') || d.startsWith('war_tactic_ambush_') || d.startsWith('war_tactic_air_') || d.startsWith('war_tactic_naval_') || d.startsWith('war_tactic_emp_') || d.startsWith('war_tactic_bio_') || d.startsWith('war_tactic_cyber_') || d.startsWith('war_tactic_napalm_')) {
         const wid = parseInt(d.split('_').pop());
         let tactic = 'heavy';
@@ -616,30 +638,6 @@ export function registerHandlers(bot) {
         return;
       }
 
-      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuclear_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
-        const wid = parseInt(d.split('_').pop());
-        let tactic = 'defend';
-        if (d.includes('_nuclear_')) tactic = 'nuclear';
-        else if (d.includes('_counter_')) tactic = 'counter';
-        else if (d.includes('_ambush_def_')) tactic = 'ambush';
-        else if (d.includes('_emp_def_')) tactic = 'emp_def';
-        else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
-        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی', emp_def: '🛡️ سپر الکترومغناطیسی', napalm_def: '🔥 آتش متقابل' };
-        const u = getUserRaw(uid);
-        const lang = u.language || 'fa';
-        const eq = u.equipment.filter(eq => eq.count > 0);
-        let equipText = `\n📦 **موجودی تجهیزات:**\n`;
-        eq.forEach(e => {
-          const d2 = UT[e.type];
-          equipText += `${d2?.icon || '🔫'} ${getModelName(e.model, lang)}: **${e.count.toLocaleString()}**\n`;
-        });
-        setState(uid, 'awaiting_defense_deploy', JSON.stringify({ warId: wid, tactic }));
-        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n${equipText}\n━━━━━━━━━━━━━━━━━━\n📝 **تجهیزاتی که میخوای برای دفاع مستقر کنی رو بنویس:**\n\nمثال:\n\`infantry 3000, tank 100, airdef 50\`\nیا:\n\`همه\`\nیا:\n\`pass\` (بدون دفاع)\n\n⚠️ فقط تجهیزاتی که داری!`, { reply_markup: backBtn(), parse_mode: 'Markdown' });
-        return;
-      }
-        return;
-      }
-
       if (d.startsWith('next_round_')) {
         const wid = parseInt(d.slice(11));
         const w = getWarDetail(wid);
@@ -649,7 +647,6 @@ export function registerHandlers(bot) {
           { reply_markup: warActionKeyboard(wid, true) });
         await safeSend(bot, w.defender_tid, `⏭️ راند ${w.current_round} شروع شد.`);
         await sendToGroup(bot, `➡️ **راند ${w.current_round} شروع شد**`, warTopicId);
-        return;
         return;
       }
 
@@ -682,7 +679,7 @@ export function registerHandlers(bot) {
             const votes = getUNResolutionVotes(r.id);
             const agree = votes.find(v => v.vote === 'agree')?.count || 0;
             const disagree = votes.find(v => v.vote === 'disagree')?.count || 0;
-            txt += `${i + 1}. **${r.title}**\n${r.desc}\n✅ ${agree} | ❌ ${disagree}\n\n`;
+            txt += `${i + 1}. **${r.title}**\n${r.description}\n✅ ${agree} | ❌ ${disagree}\n\n`;
           });
         } else {
           txt += `فعلاً قطعنامه فعالی نیست.\n`;
@@ -853,6 +850,11 @@ export function registerHandlers(bot) {
       }
 
       // ============ HELP ============
+
+      if (d === 'help_menu') {
+        await safeEdit(ctx, `❓ **راهنمای بازی**\n\nیکی از بخش‌ها رو انتخاب کن:`, { reply_markup: helpKeyboard() });
+        return;
+      }
 
       const HL = {
         help_rules: `📜 **قوانین بازی**\n\n۱. هر بازیکن یک کشور واقعی با تجهیزات واقعی\n۲. ۱۱ نوع یگان نظامی\n۳. ۵ صنعت با درآمد خودکار\n۴. جنگ نوبتی با نظارت AI\n۵. سیستم XP و سطح\n۶. سازمان ملل و قطعنامه\n۷. اتحاد با بازیکنان دیگر`,
@@ -1133,12 +1135,18 @@ export function registerHandlers(bot) {
       await sendToGroup(bot, rt, warTopicId);
 
       if (ended) {
-        const winId = attPow <= 0 ? w.defender_id : w.attacker_id;
+        let attackerWon;
+        if (attPow <= 0) attackerWon = false;
+        else if (defPow <= 0) attackerWon = true;
+        else if (attLostPct >= 0.75) attackerWon = false;
+        else if (defLostPct >= 0.75) attackerWon = true;
+        else attackerWon = attPow >= defPow;
+        const winId = attackerWon ? w.attacker_id : w.defender_id;
         endWar(w.id, winId);
-        updateWinLoss(w.attacker_tid, attPow > 0);
-        updateWinLoss(w.defender_tid, defPow > 0);
-        addXp(w.attacker_tid, attPow > 0 ? 50 : 10);
-        addXp(w.defender_tid, defPow > 0 ? 50 : 10);
+        updateWinLoss(w.attacker_tid, attackerWon);
+        updateWinLoss(w.defender_tid, !attackerWon);
+        addXp(w.attacker_tid, attackerWon ? 50 : 10);
+        addXp(w.defender_tid, !attackerWon ? 50 : 10);
         const newLvl1 = levelUpCheck(getUserRaw(w.attacker_tid)?.xp || 0);
         const newLvl2 = levelUpCheck(getUserRaw(w.defender_tid)?.xp || 0);
         updateLevel(w.attacker_tid, newLvl1, getUserRaw(w.attacker_tid)?.xp || 0);
@@ -1159,7 +1167,7 @@ export function registerHandlers(bot) {
             }
           }
           let unMsg = `🌐 **سازمان ملل**\n\n`;
-          unRes.forEach((r, i) => { unMsg += `${i + 1}. **${r.title}**\n${r.desc}\n\n`; });
+          unRes.forEach((r, i) => { unMsg += `${i + 1}. **${r.title}**\n${r.description}\n\n`; });
           unMsg += `🗳️ رأی‌گیری فعال است.`;
           await sendToGroup(bot, unMsg, unTopicId);
         }

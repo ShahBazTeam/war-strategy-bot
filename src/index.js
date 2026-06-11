@@ -4,9 +4,10 @@ import http from 'http';
 import { initDatabase } from './database/init.js';
 import { registerHandlers } from './handlers/index.js';
 import { mainMenuKeyboard, languageSelectKeyboard } from './keyboards/index.js';
-import { clearState, getUserByTelegramId } from './database/index.js';
+import { clearState, getUserByTelegramId, getAllUsersFull, updateResources } from './database/index.js';
 import { dashMsg } from './handlers/messages.js';
 import { setDetectedGroupId } from './utils/telegram.js';
+import { calcDailyIncome, calcDailyExpenses } from './game/index.js';
 
 const TOKEN = process.env.BOT_TOKEN;
 if (!TOKEN) { console.error('BOT_TOKEN not set!'); process.exit(1); }
@@ -49,6 +50,30 @@ async function startBot() {
     });
 
     console.log('🤖 Bot running');
+
+    // Income scheduler - every 12 hours
+    async function distributeIncome() {
+      try {
+        console.log('💰 Distributing income...');
+        const users = getAllUsersFull();
+        for (const u of users) {
+          const industries = JSON.parse(u.industries || '[]');
+          const equipment = JSON.parse(u.equipment || '[]');
+          const income = calcDailyIncome(industries, u.country_id, u.tech_economy || 1);
+          const expenses = calcDailyExpenses(equipment, industries);
+          const net = income - expenses;
+          if (net > 0) {
+            updateResources(u.telegram_id, { gold: net });
+            console.log(`  💰 ${u.name}: +${net} gold`);
+          }
+        }
+        console.log('✅ Income distributed');
+      } catch (err) {
+        console.error('Income distribution error:', err.message);
+      }
+    }
+    setInterval(distributeIncome, 12 * 60 * 60 * 1000); // Every 12 hours
+    console.log('⏰ Income scheduler started (every 12 hours)');
   } catch (err) {
     console.error('Startup failed:', err.message);
     console.error(err.stack);

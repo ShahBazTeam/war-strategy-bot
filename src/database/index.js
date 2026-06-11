@@ -172,9 +172,9 @@ export function updateWarRoundDefense(wid, round, defenderAction) {
   run('UPDATE war_rounds SET defender_action=? WHERE war_id=? AND round_number=?', [defenderAction, wid, round]);
 }
 
-export function updateWarRoundResult(wid, round, aLoss, dLoss, result) {
-  run('UPDATE war_rounds SET attacker_losses=?, defender_losses=?, result=? WHERE war_id=? AND round_number=?',
-    [JSON.stringify(aLoss), JSON.stringify(dLoss), result, wid, round]);
+export function updateWarRoundResult(wid, round, aLoss, dLoss, result, narrative = '') {
+  run('UPDATE war_rounds SET attacker_losses=?, defender_losses=?, result=?, ai_narrative=? WHERE war_id=? AND round_number=?',
+    [JSON.stringify(aLoss), JSON.stringify(dLoss), result, narrative, wid, round]);
 }
 
 export function getAllUsersFull() {
