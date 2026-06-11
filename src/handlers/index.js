@@ -120,15 +120,6 @@ export function registerHandlers(bot) {
     }
   });
 
-  // Test handler - responds to ANY message in group
-  bot.on('message', async (ctx) => {
-    const chat = ctx.message?.chat;
-    if (!chat) return;
-    if (chat.type !== 'group' && chat.type !== 'supergroup') return;
-    
-    console.log(`[GROUP MSG] type=${ctx.message.chat.type} id=${chat.id} thread=${ctx.message.message_thread_id || 'none'} from=${ctx.from?.id}`);
-  });
-
   bot.on('callback_query:data', async (ctx) => {
     const d = ctx.callbackQuery.data;
     const uid = ctx.from.id;
