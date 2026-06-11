@@ -59,42 +59,60 @@ export async function checkWarReason(reason, attackerCountry, defenderCountry) {
 
 export async function evaluateBattleRound(attackPlan, defensePlan, attName, defName, attEq, defEq, attTactic, defTactic, round) {
   const eqText = (eq) => eq.filter(u => u.count > 0).map(u => `${u.model}: ${u.count.toLocaleString()}`).join(', ');
+  const tacticDesc = {
+    heavy: 'حمله سنگین با تمام قوا - تمرکز روی شکستن خطوط دفاعی',
+    precise: 'حمله دقیق و هدفمند - هدف زیرساخت‌های حیاتی',
+    ambush: 'کمین و غافلگیری - استفاده از پوشش جنگلی و کوهستانی',
+    air_raid: 'حمله هوایی گسترده - بمباران مواضع دفاعی',
+    naval: 'عملیات دریایی - محاصره ساحلی و حمله ناوها',
+    defend: 'دفاع موضعی - استفاده از سنگرها و موانع',
+    counter: 'ضدحمله غافلگیرکننده - حمله ناگهانی در نقطه ضعف',
+    nuclear: 'تهدید هسته‌ای - آخرین گزینه'
+  };
 
-  const sysPrompt = `You are a war commander. Determine round ${round} result between ${attName} (attacker) and ${defName} (defender).
+  const sysPrompt = `You are a legendary war correspondent and military analyst. Write a CINEMATIC battle report for round ${round} of the war between ${attName} (attacker) and ${defName} (defender).
 
-ATTACKER: ${attName} — Tactic: ${attTactic}
-DEFENDER: ${defName} — Tactic: ${defTactic}
+CONTEXT:
+- Round ${round} of the battle
+- Attacker Tactic: ${attTactic} — ${tacticDesc[attTactic] || attTactic}
+- Defender Tactic: ${defTactic} — ${tacticDesc[defTactic] || defTactic}
 
-Attacker forces: ${eqText(attEq)}
-Defender forces: ${eqText(defEq)}
+ATTACKER FORCES (${attName}):
+${eqText(attEq)}
 
-Attack plan: ${attackPlan}
-Defense plan: ${defensePlan}
+DEFENDER FORCES (${defName}):
+${eqText(defEq)}
 
-RULES:
-1. Losses proportional to unit type and tactic
-2. Heavy attack: high defender losses, low attacker losses
-3. Precise attack: fewer but targeted losses
-4. Ambush: surprise, heavy attacker losses if defender uses it
-5. Counter-attack: high risk, high reward
-6. Defensive position: fewer defender losses
-7. Air raid: high infrastructure losses
-8. Naval operation: fleet losses
-9. The side with more total military power should generally have an advantage
-10. NEVER return all zeros for losses - at least some units must be lost in battle
+ATTACK PLAN (${attName}):
+${attackPlan}
+
+DEFENSE PLAN (${defName}):
+${defensePlan}
+
+IMPORTANT RULES:
+1. The description MUST be in PERSIAN (Farsi) and written like a dramatic war movie narration
+2. Use vivid, sensory details: sounds of explosions, smell of gunpowder, visual descriptions of destruction
+3. Include specific unit types in the narrative (e.g., "تانک‌های M1A2 آبرامز", "جنگنده‌های F-35")
+4. Mention the weather, terrain, and time of day for atmosphere
+5. Describe the emotional state of soldiers and commanders
+6. Include turning points, heroic moments, and tragic losses
+7. The narrative should be 8-12 sentences, NOT generic - make it unique and specific to this battle
+8. NEVER use the same phrases as previous rounds - each battle must feel fresh
+9. Losses must be realistic and proportional to the forces involved
+10. The side with more military power should generally have an advantage, but tactics and plans matter
 
 Return ONLY valid JSON (no markdown, no code blocks):
 {
   "result": "attacker_victory" or "defender_victory" or "draw",
   "attacker_losses": {"infantry": 0, "tank": 0, "artillery": 0, "airdef": 0, "missile": 0, "fighter": 0, "bomber": 0, "helicopter": 0, "destroyer": 0, "submarine": 0, "capital": 0},
   "defender_losses": {"infantry": 0, "tank": 0, "artillery": 0, "airdef": 0, "missile": 0, "fighter": 0, "bomber": 0, "helicopter": 0, "destroyer": 0, "submarine": 0, "capital": 0},
-  "description": "Cinematic battle description in Persian (5-8 sentences). Include attack details, casualties, key moments."
+  "description": "8-12 sentence cinematic battle narrative in PERSIAN. Must be unique, dramatic, and specific to this battle. Include unit names, weather, terrain, emotions, and turning points."
 }`;
 
   const text = await callAI([
     { role: 'system', content: sysPrompt },
-    { role: 'user', content: 'Determine the battle result. Return ONLY JSON.' }
-  ], 800, 0.4);
+    { role: 'user', content: `Write a CINEMATIC battle report for round ${round}. Return ONLY JSON with the battle result, losses, and a dramatic Persian narrative.` }
+  ], 1200, 0.7);
 
   if (text) {
     try {
@@ -102,7 +120,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
       const jsonEnd = text.lastIndexOf('}');
       if (jsonStart >= 0 && jsonEnd > jsonStart) {
         const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
-        if (parsed.result && parsed.attacker_losses && parsed.defender_losses) {
+        if (parsed.result && parsed.attacker_losses && parsed.defender_losses && parsed.description) {
           return parsed;
         }
       }
@@ -160,10 +178,18 @@ function fallbackBattle(attName, defName, attEq, defEq, attTactic, defTactic, ro
   if (ratio > 0.58) result = 'attacker_victory';
   else if (ratio < 0.42) result = 'defender_victory';
 
+  const tacticNames = {
+    heavy: 'سنگین', precise: 'دقیق', ambush: 'کمین', air_raid: 'هوایی',
+    naval: 'دریایی', defend: 'موضعی', counter: 'ضدحمله', nuclear: 'اتمی'
+  };
+
   const narratives = [
-    `در راند ${round} نبرد، ${attName} حمله‌ای ${attTactic === 'heavy' ? 'سنگین' : attTactic === 'precise' ? 'دقیق' : 'گسترده'} را علیه ${defName} آغاز کرد. نیروهای مهاجم با تاکتیک ${attTactic} وارد میدان شدند و درگیری‌های شدیدی در خط مقدم رخ داد. ${defName} با تاکتیک ${defTactic} در برابر حمله مقاومت کرد. تلفات قابل توجهی از هر دو طرف گزارش شد. نبرد ساعت‌ها ادامه داشت و هر دو طرف خسارات سنگینی متحمل شدند.`,
-    `راند ${round} نبرد با حمله غافلگیرکننده ${attName} شروع شد. ${defName} که از قبل مواضع دفاعی خود را آماده کرده بود، با مقاومت سختی پاسخ داد. آسمان پر از دود و آتش شد و صدای انفجارها منطقه را پر کرد. ${attName} تلاش کرد خطوط دفاعی ${defName} را بشکند ولی دفاع مستحکم مانع پیشروی شد. در پایان راند هر دو طرف تلفات سنگینی را تجربه کردند.`,
-    `جنگ میان ${attName} و ${defName} در راند ${round} به اوج خود رسید. ${attName} با تمام قوا حمله کرد و ${defName} نیز با قدرت تمام دفاع نمود. نبرد خیابانی شدیدی درگرفت و تلفات انسانی و تجهیزاتی بالا بود. هیچ‌کدام از طرفین نتوانست برتری کامل پیدا کند. میدان نبرد پر از لاشه تانک‌ها و تجهیزات نظامی شد.`
+    `☀️ صبح راند ${round} با صدای غرش توپخانه ${attName} آغاز شد. ${attName} با تاکتیک ${tacticNames[attTactic] || attTactic} حمله‌ای ${attTactic === 'heavy' ? 'گسترده و ویرانگر' : attTactic === 'precise' ? 'حساب‌شده و دقیق' : 'غافلگیرکننده'} را آغاز کرد. آسمان از دود انفجارها سیاه شد و زمین زیر پای سربازان می‌لرزید. ${defName} با تاکتیک ${tacticNames[defTactic] || defTactic} مقاومت سختی کرد و خطوط دفاعی‌اش را حفظ نمود. نبرد خیابانی شدیدی درگرفت و صدای فریاد سربازان با غرش تانک‌ها درهم آمیخت. ${attTactic === 'ambush' ? 'کمین‌گران ' + attName + ' از پشت سنگرها حمله کردند و دشمن را غافلگیر کردند.' : 'نیروهای مهاجم تلاش کردند دفاع را بشکنند ولی مقاومت سخت بود.'} در پایان راند ${result === 'attacker_victory' ? attName + ' توانست بخشی از مواضع دفاعی را تصرف کند' : result === 'defender_victory' ? defName + ' موفقانه حمله را دفع کرد' : 'هر دو طرف در بن‌بست گیر کردند'} و تلفات قابل توجهی از هر دو طرف گزارش شد.`,
+    `🌙 راند ${round} در تاریکی شب شروع شد. ${attName} از تاریکی شب برای ${attTactic === 'ambush' ? 'کمین' : 'پیشروی'} استفاده کرد و نیروهایش با سکوت وارد میدان شدند. ${defName} که از قبل هوشیار بود، ${defTactic === 'defend' ? 'سنگرهای محکمی ساخته بود' : 'نیروهایش را در موقعیت‌های استراتژیک مستقر کرده بود'}. ناگهان آسمان از نور موشک‌ها و راکت‌ها روشن شد و انفجارهای پیاپی منطقه را لرزاند. ${attName} ${attTactic === 'heavy' ? 'با تمام قوا حمله کرد و خط اول دفاعی را شکست' : 'با حمله‌ای دقیق زیرساخت‌های حیاتی را هدف گرفت'}. ${defName} ${defTactic === 'counter' ? 'ضدحمله‌ای غافلگیرکننده آغاز کرد' : 'با مقاومت سخت حمله را دفع نمود'}. صدای آژیر آمبولانس‌ها و فریاد فرماندهان فضا را پر کرد. در نهایت ${result === 'attacker_victory' ? 'مهاجمین پیروز شدند' : result === 'defender_victory' ? 'مدافعان سربلند ماندند' : 'جنگ به بن‌بست رسید'} و میدان نبرد پر از لاشه تجهیزات و آثار جنگ شد.`,
+    `🌧️ باران شدیدی در راند ${round} بارید و میدان نبرد را به باتلاقی مرطوب تبدیل کرد. ${attName} با تاکتیک ${tacticNames[attTactic] || attTactic} ${attTactic === 'air_raid' ? 'حمله هوایی گسترده‌ای را آغاز کرد' : attTactic === 'naval' ? 'عملیات دریایی را شروع کرد' : 'نیروهای زمینی‌اش را به خط مقدم فرستاد'}. ${defName} ${defTactic === 'defend' ? 'در سنگرهای آماده منتظر بود' : 'نیروهایش را برای مقابله آماده کرده بود'}. باران شدید دید را محدود کرد و نبرد را سخت‌تر نمود. ${attName} ${attTactic === 'heavy' ? 'با آتش سنگین توپخانه دفاع دشمن را هدف گرفت' : 'با تاکتیک ${tacticNames[attTactic]} پیشروی کرد'}. ${defName} ${defTactic === 'counter' ? 'ضدحمله‌ای ناگهانی انجام داد' : 'با مقاومت سخت حمله را دفع کرد'}. درگیری‌های شدیدی در باتلاق و زیر باران شدید رخ داد. ${result === 'attacker_victory' ? attName + ' توانست با قبول تلفات سنگین پیشروی کند' : result === 'defender_victory' ? defName + ' موفقانه دفاع کرد' : 'هر دو طرف خسته و فرسوده شدند'}. صدای رعد و برق با صدای انفجارها درهم آمیخت و میدان نبرد به صحنه‌ای دلهره‌آور تبدیل شد.`,
+    `🏜️ راند ${round} در گرمای شدید صحرایی آغاز شد. ${attName} ${attTactic === 'heavy' ? 'با حمله‌ای گسترده و تمام‌عیار' : attTactic === 'precise' ? 'با حمله‌ای دقیق و حساب‌شده' : 'با تاکتیک ${tacticNames[attTactic]}'} حمله را شروع کرد. ${defName} ${defTactic === 'defend' ? 'در سنگرهای آفتاب‌خورده منتظر بود' : 'نیروهایش را برای مقابله آماده کرده بود'}. گرمای شدید هر دو طرف را خسته کرد و آب در حال تمام شدن بود. ${attName} ${attTactic === 'air_raid' ? 'با پشتیبانی هوایی حمله را تقویت کرد' : 'نیروهای زمینی‌اش را به خط مقدم فرستاد'}. ${defName} ${defTactic === 'counter' ? 'ضدحمله‌ای غافلگیرکننده آغاز کرد' : 'با مقاومت سخت حمله را دفع نمود'}. شن‌های روان با باد شدید بلند شد و دید را محدود کرد. ${result === 'attacker_victory' ? attName + ' توانست در گرمای طاقت‌فرسا پیشروی کند' : result === 'defender_victory' ? defName + ' موفقانه دفاع کرد' : 'جنگ به بن‌بست رسید'} و تلفات سنگینی از هر دو طرف گزارش شد.`,
+    `❄️ راند ${round} در سرمای سوزان زمستانی آغاز شد. ${attName} ${attTactic === 'heavy' ? 'با حمله‌ای سنگین و گسترده' : attTactic === 'precise' ? 'با حمله‌ای دقیق و حساب‌شده' : 'با تاکتیک ${tacticNames[attTactic]}'} حمله را شروع کرد. ${defName} ${defTactic === 'defend' ? 'در سنگرهای یخ‌زده مقاومت می‌کرد' : 'نیروهایش را برای مقابله آماده کرده بود'}. برف سنگینی می‌بارید و زمین یخ‌زده بود. ${attName} ${attTactic === 'ambush' ? 'از کمین‌های برفی استفاده کرد' : 'نیروهایش در سرما پیشروی کردند'}. ${defName} ${defTactic === 'counter' ? 'ضدحمله‌ای ناگهانی در برف آغاز کرد' : 'با مقاومت سخت حمله را دفع نمود'}. سرما و برف هر دو طرف را فرسوده کرد و تجهیزات در یخ گیر کرد. ${result === 'attacker_victory' ? attName + ' توانست در سرمای شدید پیشروی کند' : result === 'defender_victory' ? defName + ' موفقانه دفاع کرد' : 'جنگ به بن‌بست رسید'} و تلفات سنگینی از هر دو طرف گزارش شد.`,
+    `🌊 راند ${round} با موج‌های بلند دریا آغاز شد. ${attName} ${attTactic === 'naval' ? 'با عملیات دریایی گسترده' : 'با حمله‌ای ${tacticNames[attTactic]}'} حمله را شروع کرد. ${defName} ${defTactic === 'defend' ? 'با دفاع ساحلی مقاومت می‌کرد' : 'نیروهایش را برای مقابله آماده کرده بود'}. موج‌های بلند کشتی‌ها را تکان می‌داد و دید را محدود کرد. ${attName} ${attTactic === 'air_raid' ? 'با پشتیبانی هوایی حمله را تقویت کرد' : 'نیروهای دریایی‌اش را به خط مقدم فرستاد'}. ${defName} ${defTactic === 'counter' ? 'ضدحمله‌ای ناگهانی در دریا آغاز کرد' : 'با مقاومت سخت حمله را دفع نمود'}. درگیری‌های شدیدی در دریا و ساحل رخ داد. ${result === 'attacker_victory' ? attName + ' توانست خطوط دریایی را شکست دهد' : result === 'defender_victory' ? defName + ' موفقانه ساحل را حفظ کرد' : 'جنگ به بن‌بست رسید'} و تلفات سنگینی از هر دو طرف گزارش شد.`
   ];
 
   return {

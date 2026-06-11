@@ -107,6 +107,7 @@ export function registerHandlers(bot) {
 
     try {
       if (d === 'main_menu') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (u) await safeEdit(ctx, dashMsg(u), { reply_markup: mainMenuKeyboard() });
         else await safeEdit(ctx, '💎 **جهان مدرن**\n🧊 شروع بازی:', { reply_markup: new InlineKeyboard().text('🚀 شروع', 'start_game') });
@@ -176,12 +177,14 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'profile') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (u) await safeEdit(ctx, profileMsg(u), { reply_markup: backBtn() });
         return;
       }
 
       if (d === 'leaderboard') {
+        clearState(uid);
         const all = getAllUsersFull();
         if (!all.length) { await safeEdit(ctx, '🏆 رتبه‌بندی خالی است.', { reply_markup: backBtn() }); return; }
         const sorted = all.map(u => ({ ...u, power: calcMilitaryPower(u.equipment) })).sort((a, b) => b.power - a.power);
@@ -196,6 +199,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'tech_menu') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         const xpNeeded = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500];
@@ -228,6 +232,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'shop_guide') {
+        clearState(uid);
         await safeEdit(ctx,
           `📖 **راهنمای تسلیحات**\n━━━━━━━━━━━━━━━━━━\n\n`
           + `🎯 **پیاده** (infantry): ${UT.infantry.cost}💰 | ⚔️${UT.infantry.atk} 🛡️${UT.infantry.def}\n`
@@ -247,6 +252,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'shop') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         await safeEdit(ctx,
@@ -318,6 +324,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'industries') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         const income = calcDailyIncome(u.industries, u.country_id), exp = calcDailyExpenses(u.equipment, u.industries), net = income - exp;
@@ -361,6 +368,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'make_statement') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         setState(uid, 'awaiting_statement', '{}');
@@ -374,6 +382,7 @@ export function registerHandlers(bot) {
       // ============ WAR ============
 
       if (d === 'declare_war') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         const all = getAllUsers(uid);
@@ -392,6 +401,7 @@ export function registerHandlers(bot) {
       }
 
       if (d === 'war_status') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         const wars = getWarsByUser(uid);
@@ -462,11 +472,27 @@ export function registerHandlers(bot) {
           await safeEdit(ctx, '⏳ قبلاً طرح دفاع ثبت شده!', { reply_markup: warDetailKeyboard(wid) });
           return;
         }
+
+        // Show current equipment first
+        const user = isA ? getUserRaw(w.attacker_tid) : getUserRaw(w.defender_tid);
+        const flag = isA ? w.attacker_flag : w.defender_flag;
+        const country = isA ? w.attacker_name : w.defender_name;
+        const lang = user.language || 'fa';
+        let eqText = `🎖️ **تجهیزات فعلی ${flag} ${country}:**\n\n`;
+        user.equipment.forEach(eq => {
+          const def = UT[eq.type];
+          if (def && eq.count > 0) {
+            eqText += `${def.icon} **${getModelName(eq.model, lang)}**: ${eq.count.toLocaleString()} (${getUnitName(eq.type, lang)})\n   ⚔️ ${def.atk} | 🛡️ ${def.def}\n`;
+          }
+        });
+        eqText += `\n━━━━━━━━━━━━━━━━━━\n`;
+
         setState(uid, isA ? 'awaiting_attack_plan' : 'awaiting_defense_plan', JSON.stringify({ warId: wid }));
         await safeEdit(ctx,
-          isA
-            ? `💥 **طرح حمله — راند ${w.current_round}**\n\n${w.attacker_flag} → ${w.defender_flag}\n\n📝 طرح حمله را بنویس.`
-            : `🛡️ **طرح دفاع — راند ${w.current_round}**\n\n${w.defender_flag} در برابر ${w.attacker_flag}\n\n📝 طرح دفاع را بنویس.`,
+          eqText +
+          (isA
+            ? `💥 **طرح حمله — راند ${w.current_round}**\n\n${w.attacker_flag} → ${w.defender_flag}\n\n📝 طرح حمله خود را بنویس.`
+            : `🛡️ **طرح دفاع — راند ${w.current_round}**\n\n${w.defender_flag} در برابر ${w.attacker_flag}\n\n📝 طرح دفاع خود را بنویس.`),
           { reply_markup: backBtn() }
         );
         return;
@@ -523,6 +549,7 @@ export function registerHandlers(bot) {
       // ============ UN ============
 
       if (d === 'un_menu') {
+        clearState(uid);
         const resolutions = getActiveUNResolutions();
         let txt = `🌐 **سازمان ملل**\n━━━━━━━━━━━━━━━━━━\n\n`;
         if (resolutions.length) {
@@ -571,6 +598,7 @@ export function registerHandlers(bot) {
       // ============ ALLIANCE ============
 
       if (d === 'alliance_menu') {
+        clearState(uid);
         const u = getUserByTelegramId(uid);
         if (!u) return;
         const pending = getPendingAlliances(uid);
