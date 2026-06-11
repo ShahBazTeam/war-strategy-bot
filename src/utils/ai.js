@@ -4,10 +4,16 @@ dotenv.config();
 
 const AI_PROVIDERS = [
   {
-    name: 'freemodel.dev',
-    url: process.env.AI_API_URL || 'https://api.freemodel.dev/v1/chat/completions',
-    key: process.env.AI_API_KEY,
-    model: 'gpt-4o-mini'
+    name: 'opencode-zen',
+    url: 'https://opencode.ai/zen/v1/chat/completions',
+    key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
+    model: 'deepseek-v4-flash-free'
+  },
+  {
+    name: 'opencode-zen-mimo',
+    url: 'https://opencode.ai/zen/v1/chat/completions',
+    key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
+    model: 'mimo-v2.5-free'
   },
   {
     name: 'groq',
