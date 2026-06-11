@@ -48,13 +48,19 @@ async function callAI(messages, maxTokens = 200, temp = 0.3) {
 
 export async function checkWarReason(reason, attackerCountry, defenderCountry) {
   const text = await callAI([
-    { role: 'system', content: `You are an international war judge. Check if the war reason from ${attackerCountry} against ${defenderCountry} is logical.\n\nAcceptable: border violation, military attack, security threat, territorial dispute\nUnacceptable: cultural differences, economic competition only\n\nReply only with APPROVED or REJECTED.` },
-    { role: 'user', content: `War reason: ${reason}` }
-  ], 10);
-  if (!text) return { approved: true, message: '✅ دلیل جنگ قابل قبول است. (حالت آفلاین)' };
-  return text.toUpperCase().includes('APPROVED')
-    ? { approved: true, message: '✅ هوش مصنوعی دلیل جنگ را تأیید کرد.' }
-    : { approved: false, message: '❌ هوش مصنوعی دلیل جنگ را رد کرد. دلیل منطقی‌تری ارائه بده.' };
+    { role: 'system', content: `You are a war judge for a strategy game. The attacker ${attackerCountry} wants to declare war on ${defenderCountry}.
+
+Reason provided: "${reason}"
+
+RULES: Be VERY lenient. Almost any reason should be APPROVED. Only reject if the reason is completely empty, gibberish, or offensive slurs. Things like "attack", "invasion", "retaliation", "territory", "resources", "revenge", "because I want to", "just because" are ALL acceptable.
+
+Reply ONLY with one word: APPROVED or REJECTED` },
+    { role: 'user', content: `Reason: ${reason}` }
+  ], 20);
+  if (!text) return { approved: true, message: '✅ دلیل جنگ قابل قبول است.' };
+  const upper = text.toUpperCase().trim();
+  if (upper.includes('REJECTED')) return { approved: false, message: '❌ دلیل جنگ رد شد. دلیل دیگه‌ای بنویس.' };
+  return { approved: true, message: '✅ دلیل جنگ تأیید شد.' };
 }
 
 export async function evaluateBattleRound(attackPlan, defensePlan, attName, defName, attEq, defEq, attTactic, defTactic, round) {

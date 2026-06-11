@@ -809,8 +809,13 @@ export function calcDailyExpenses(units, industries) {
 
 export function calcMilitaryPower(units) {
   if (!units) return 0;
+  if (typeof units === 'string') {
+    try { units = JSON.parse(units); } catch (e) { return 0; }
+  }
+  if (!Array.isArray(units)) return 0;
   return units.reduce((sum, u) => {
     const def = getUnitDef(u.type);
-    return sum + (def ? def.atk * u.count : 0);
+    if (!def) return sum;
+    return sum + ((def.atk + def.def) * u.count);
   }, 0);
 }
