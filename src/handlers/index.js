@@ -744,6 +744,38 @@ export function registerHandlers(bot) {
     const txt = ctx.message.text;
     if (txt.startsWith('/')) return;
 
+    // Group message detection - must be before user check
+    const chat = ctx.message?.chat;
+    if (chat && (chat.type === 'group' || chat.type === 'supergroup')) {
+      const chatId = chat.id;
+      const currentGid = getGroupChatId();
+      if (!currentGid || currentGid !== chatId) {
+        setDetectedGroupId(chatId);
+        console.log(`Group detected: ${chatId} (${chat.title || 'unknown'})`);
+      }
+      if (txt === 'وضعیت' || txt === 'status') {
+        let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
+        info += `🆔 Chat ID: \`${chatId}\`\n`;
+        info += `📝 Topic ID: ${ctx.message.message_thread_id || 'عمومی'}\n`;
+        info += `━━━━━━━━━━━━━━━━━━\n`;
+        info += `💡 برای تنظیم در Railway:\n`;
+        info += `• GROUP_ID = \`${chatId}\`\n`;
+        await ctx.reply(info, { parse_mode: 'Markdown' });
+        return;
+      }
+      if (txt.startsWith('/start')) {
+        await ctx.reply(
+          `🎮 **جهان مدرن — Modern World**\n\n`
+          + `این یک بازی استراتژیک تلگرامیه!\n`
+          + `برای شروع، ربات رو در پیویت دایرکت کن:\n`
+          + `👉 @${ctx.me.username}`,
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+      return;
+    }
+
     const u = getUserByTelegramId(uid);
     if (!u) return;
     const st = getState(uid);
@@ -984,47 +1016,6 @@ export function registerHandlers(bot) {
       clearState(uid);
       await ctx.reply(`✅ ${amount} ${unitType} به ${d.otherName} ارسال شد.`, { reply_markup: allianceKeyboard() });
       await safeSend(bot, d.otherTid, `📦 ${u.country_flag} ${u.country_name} ${amount} ${unitType} برایت ارسال کرد.`);
-      return;
-    }
-  });
-
-  // ============ GROUP HANDLERS ============
-
-  bot.on('message', async (ctx) => {
-    const chat = ctx.message?.chat;
-    if (!chat) return;
-    const chatType = chat.type;
-    if (chatType !== 'group' && chatType !== 'supergroup') return;
-
-    const chatId = chat.id;
-    const currentGid = getGroupChatId();
-    if (!currentGid || currentGid !== chatId) {
-      setDetectedGroupId(chatId);
-      console.log(`Group detected: ${chatId} (${chat.title || 'unknown'})`);
-    }
-
-    const text = ctx.message.text;
-    if (!text) return;
-
-    if (text.startsWith('/start')) {
-      await ctx.reply(
-        `🎮 **جهان مدرن — Modern World**\n\n`
-        + `این یک بازی استراتژیک تلگرامیه!\n`
-        + `برای شروع، ربات رو در پیویت دایرکت کن:\n`
-        + `👉 @${ctx.me.username}`,
-        { parse_mode: 'Markdown' }
-      );
-      return;
-    }
-
-    if (text === 'وضعیت' || text === 'status') {
-      let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
-      info += `🆔 Chat ID: \`${chatId}\`\n`;
-      info += `📝 Topic ID: ${ctx.message.message_thread_id || 'عمومی'}\n`;
-      info += `━━━━━━━━━━━━━━━━━━\n`;
-      info += `💡 برای تنظیم در Railway:\n`;
-      info += `• GROUP_ID = \`${chatId}\`\n`;
-      await ctx.reply(info, { parse_mode: 'Markdown' });
       return;
     }
   });
