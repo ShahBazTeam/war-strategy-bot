@@ -127,11 +127,6 @@ export function registerHandlers(bot) {
     if (chat.type !== 'group' && chat.type !== 'supergroup') return;
     
     console.log(`[GROUP MSG] type=${ctx.message.chat.type} id=${chat.id} thread=${ctx.message.message_thread_id || 'none'} from=${ctx.from?.id}`);
-    
-    // Only respond in the general topic or if no thread
-    if (!ctx.message.message_thread_id) {
-      await ctx.reply(`🤖 ربات فعال است!\nChat ID: ${chat.id}`).catch(() => {});
-    }
   });
 
   bot.on('callback_query:data', async (ctx) => {
