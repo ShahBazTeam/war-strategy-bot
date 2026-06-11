@@ -53,6 +53,67 @@ function applyLossesToEq(eq, map) {
   return eq.map(u => ({ ...u, count: Math.max(0, u.count - (map[u.type] || 0)) }));
 }
 
+function isDoNothing(plan) {
+  const phrases = ['هیچ کاری نمیکنم', 'هیچ کاری نمی کنم', 'هیچ اقدامی نمیکنم', 'pass', 'nothing', 'ندارم', 'نمیخوام', 'نمی‌خوام', 'عدم', 'صبر', 'منتظر', 'هیچ', 'خالی', 'بدون برنامه', 'without plan', 'do nothing', 'no action', 'no plan', 'idle', 'vacant'];
+  const lower = plan.toLowerCase().trim();
+  return phrases.some(p => lower.includes(p));
+}
+
+function autoBattleResult(attUser, defUser, attName, defName, attTactic, defTactic, attIsPassive, defIsPassive) {
+  const weights = { infantry: 1, tank: 8, artillery: 7, airdef: 6, missile: 10, fighter: 12, bomber: 14, helicopter: 5, destroyer: 15, submarine: 18, capital: 25 };
+  const attPower = attUser.equipment.reduce((s, u) => s + (weights[u.type] || 1) * u.count, 0);
+  const defPower = defUser.equipment.reduce((s, u) => s + (weights[u.type] || 1) * u.count, 0);
+
+  let attLossPct, defLossPct, result;
+
+  if (attIsPassive && defIsPassive) {
+    attLossPct = 0.02; defLossPct = 0.02; result = 'draw';
+  } else if (attIsPassive) {
+    attLossPct = 0.35; defLossPct = 0.02; result = 'defender_victory';
+  } else if (defIsPassive) {
+    attLossPct = 0.05; defLossPct = 0.38; result = 'attacker_victory';
+  } else {
+    const ratio = attPower / (attPower + defPower || 1);
+    attLossPct = Math.min(0.25, (1 - ratio) * 0.3);
+    defLossPct = Math.min(0.3, ratio * 0.3);
+    result = ratio > 0.55 ? 'attacker_victory' : ratio < 0.45 ? 'defender_victory' : 'draw';
+  }
+
+  const calcLosses = (eq, pct) => {
+    const losses = {};
+    eq.forEach(u => {
+      if (u.count > 0) {
+        const loss = Math.max(1, Math.floor(u.count * pct * (0.7 + Math.random() * 0.6)));
+        losses[u.type] = Math.min(loss, u.count);
+      }
+    });
+    return losses;
+  };
+
+  const attLossMap = calcLosses(attUser.equipment, attLossPct);
+  const defLossMap = calcLosses(defUser.equipment, defLossPct);
+
+  const narratives = {
+    passive_def: `☠️ در راند ${Math.ceil(Math.random() * 10)}، ${defName} هیچ اقدام دفاعی انجام نداد. ${attName} بدون مقاومت، خطوط دفاعی ${defName} را در هم شکست. سربازان ${defName} در سنگرهای خالی غافلگیر شدند و تلفات سنگینی متحمل شدند. فرماندهان ${defName} در شوک بودند و نیروها فرار کردند. ${attName} با قدرت کامل پیشروی کرد.`,
+    passive_att: `☠️ ${attName} هیچ حمله‌ای انجام نداد و منتظر ماند. ${defName} از این فرصت استفاده کرد و مواضع ${attName} را شناسایی کرد. نیروهای ${attName} بدون آمادگی غافلگیر شدند. ${defName} ضدحمله‌ای غافلگیرکننده آغاز کرد و خسارات سنگینی به ${attName} وارد کرد.`,
+    passive_both: `☠️ هر دو طرف هیچ اقدامی انجام ندادند. نبرد بدون درگیری به پایان رسید.`,
+    normal: null
+  };
+
+  let narrative;
+  if (attIsPassive && defIsPassive) narrative = narratives.passive_both;
+  else if (attIsPassive) narrative = narratives.passive_att;
+  else if (defIsPassive) narrative = narratives.passive_def;
+  else narrative = `⚔️ راند نبرد با تاکتیک ${attTactic} در برابر ${defTactic} آغاز شد. ${attName} حمله‌ای ${attTactic === 'heavy' ? 'سنگین و گسترده' : attTactic === 'precise' ? 'دقیق و حساب‌شده' : attTactic === 'ambush' ? 'غافلگیرکننده' : attTactic === 'air_raid' ? 'هوایی' : 'دریایی'} را آغاز کرد. ${defName} با تاکتیک ${defTactic} مقاومت کرد. نبرد شدیدی درگرفت و تلفات قابل توجهی از هر دو طرف گزارش شد.`;
+
+  return {
+    result,
+    attacker_losses: attLossMap,
+    defender_losses: defLossMap,
+    description: narrative
+  };
+}
+
 function levelUpCheck(xp) {
   const thresholds = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500];
   let lvl = 1;
@@ -506,19 +567,32 @@ export function registerHandlers(bot) {
         return;
       }
 
-      if (d.startsWith('war_tactic_heavy_') || d.startsWith('war_tactic_precise_') || d.startsWith('war_tactic_ambush_') || d.startsWith('war_tactic_air_') || d.startsWith('war_tactic_naval_')) {
+      if (d.startsWith('war_tactic_heavy_') || d.startsWith('war_tactic_precise_') || d.startsWith('war_tactic_ambush_') || d.startsWith('war_tactic_air_') || d.startsWith('war_tactic_naval_') || d.startsWith('war_tactic_emp_') || d.startsWith('war_tactic_bio_') || d.startsWith('war_tactic_cyber_') || d.startsWith('war_tactic_napalm_')) {
         const wid = parseInt(d.split('_').pop());
-        const tactic = d.includes('_heavy_') ? 'heavy' : d.includes('_precise_') ? 'precise' : d.includes('_ambush_') ? 'ambush' : d.includes('_air_') ? 'air_raid' : 'naval';
-        const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی' };
+        let tactic = 'heavy';
+        if (d.includes('_precise_')) tactic = 'precise';
+        else if (d.includes('_ambush_')) tactic = 'ambush';
+        else if (d.includes('_air_')) tactic = 'air_raid';
+        else if (d.includes('_naval_')) tactic = 'naval';
+        else if (d.includes('_emp_')) tactic = 'emp';
+        else if (d.includes('_bio_')) tactic = 'bio';
+        else if (d.includes('_cyber_')) tactic = 'cyber';
+        else if (d.includes('_napalm_')) tactic = 'napalm';
+        const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی', emp: '⚡ حمله الکترومغناطیسی', bio: '💀 حمله بیولوژیکی', cyber: '🛡️ حمله سایبری', napalm: '🔥 حمله آتش‌زا' };
         setState(uid, 'awaiting_attack_plan', JSON.stringify({ warId: wid, tactic }));
         await safeEdit(ctx, `⚔️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح حمله:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً حمله هوایی، محاصره، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
         return;
       }
 
-      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuclear_')) {
+      if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuclear_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
         const wid = parseInt(d.split('_').pop());
-        const tactic = d.includes('_nuclear_') ? 'nuclear' : d.includes('_counter_') ? 'counter' : d.includes('_ambush_def_') ? 'ambush' : 'defend';
-        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی' };
+        let tactic = 'defend';
+        if (d.includes('_nuclear_')) tactic = 'nuclear';
+        else if (d.includes('_counter_')) tactic = 'counter';
+        else if (d.includes('_ambush_def_')) tactic = 'ambush';
+        else if (d.includes('_emp_def_')) tactic = 'emp_def';
+        else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
+        const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی', emp_def: '🛡️ سپر الکترومغناطیسی', napalm_def: '🔥 آتش متقابل' };
         setState(uid, 'awaiting_defense_plan', JSON.stringify({ warId: wid, tactic }));
         await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح دفاع:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً دفاع موضعی، ضدحمله، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
         return;
@@ -870,12 +944,20 @@ export function registerHandlers(bot) {
       const defInfo = getUserByInternalId(w.defender_id);
       const warTopicId = getWarTopicId(w.id);
 
-      const aiResult = await evaluateBattleRound(
-        ex.attacker_action, txt,
-        attInfo.country_name, defInfo.country_name,
-        attUser.equipment, defUser.equipment,
-        ex.attacker_tactic || 'heavy', d.tactic || 'defend', round
-      );
+      const attIsPassive = isDoNothing(ex.attacker_action);
+      const defIsPassive = isDoNothing(txt);
+
+      let aiResult;
+      if (attIsPassive || defIsPassive) {
+        aiResult = autoBattleResult(attUser, defUser, attInfo.country_name, defInfo.country_name, ex.attacker_tactic || 'heavy', d.tactic || 'defend', attIsPassive, defIsPassive);
+      } else {
+        aiResult = await evaluateBattleRound(
+          ex.attacker_action, txt,
+          attInfo.country_name, defInfo.country_name,
+          attUser.equipment, defUser.equipment,
+          ex.attacker_tactic || 'heavy', d.tactic || 'defend', round
+        );
+      }
       clearState(uid);
 
       let attLosses = [], defLosses = [], resultText = '⚖️ بن‌بست', narrative = '';

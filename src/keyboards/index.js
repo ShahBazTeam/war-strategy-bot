@@ -145,12 +145,21 @@ export function warTacticKeyboard(wid, isAtt) {
        .text('✈️ حمله هوایی', `war_tactic_air_${wid}`);
     kb.row()
        .text('🚢 عملیات دریایی', `war_tactic_naval_${wid}`);
+    kb.row()
+       .text('⚡ حمله الکترومغناطیسی', `war_tactic_emp_${wid}`)
+       .text('💀 حمله بیولوژیکی', `war_tactic_bio_${wid}`);
+    kb.row()
+       .text('🛡️ حمله سایبری', `war_tactic_cyber_${wid}`)
+       .text('🔥 حمله آتش‌زا', `war_tactic_napalm_${wid}`);
   } else {
     kb.text('🛡️ دفاع موضعی', `war_tactic_defend_${wid}`)
        .text('⚔️ ضدحمله', `war_tactic_counter_${wid}`);
     kb.row()
        .text('🗡️ کمین', `war_tactic_ambush_def_${wid}`)
        .text('☢️ حمله اتمی', `war_tactic_nuclear_${wid}`);
+    kb.row()
+       .text('🛡️ سپر الکترومغناطیسی', `war_tactic_emp_def_${wid}`)
+       .text('🔥 آتش متقابل', `war_tactic_napalm_def_${wid}`);
   }
   return kb;
 }

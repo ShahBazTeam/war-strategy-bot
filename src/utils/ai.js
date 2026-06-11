@@ -67,7 +67,13 @@ export async function evaluateBattleRound(attackPlan, defensePlan, attName, defN
     naval: 'عملیات دریایی - محاصره ساحلی و حمله ناوها',
     defend: 'دفاع موضعی - استفاده از سنگرها و موانع',
     counter: 'ضدحمله غافلگیرکننده - حمله ناگهانی در نقطه ضعف',
-    nuclear: 'تهدید هسته‌ای - آخرین گزینه'
+    nuclear: 'تهدید هسته‌ای - آخرین گزینه - خسارات گسترده',
+    emp: 'حمله الکترومغناطیسی - از کار انداختن رادارها و سیستم‌های الکترونیکی دشمن - تلفات کم اما تخریب زیرساخت',
+    bio: 'حمله بیولوژیکی - استفاده از سلاح‌های شیمیایی/بیولوژیکی - تلفات گسترده نیروی انسانی',
+    cyber: 'حمله سایبری - هک سیستم‌های فرماندهی و کنترل دشمن - اختلال در ارتباطات',
+    napalm: 'حمله آتش‌زا - بمباران با بمب‌های آتش‌زا - تخریب گسترده تجهیزات و مناطق',
+    emp_def: 'سپر الکترومغناطیسی - محافظت از سیستم‌های الکترونیکی در برابر حمله EMP',
+    napalm_def: 'آتش متقابل - استفاده از آتش برای جلوگیری از پیشروی دشمن'
   };
 
   const sysPrompt = `You are a legendary war correspondent and military analyst. Write a CINEMATIC battle report for round ${round} of the war between ${attName} (attacker) and ${defName} (defender).
@@ -88,6 +94,12 @@ ${attackPlan}
 
 DEFENSE PLAN (${defName}):
 ${defensePlan}
+
+⚠️⚠️⚠️ EQUIPMENT VALIDATION (MOST IMPORTANT RULE) ⚠️⚠️⚠️
+THE EQUIPMENT COUNTS LISTED ABOVE ARE THE ONLY REAL NUMBERS.
+If the attack plan says "120 bombers" but ATTACKER FORCES shows "bomber: 70", then USE 70 NOT 120.
+If the defense plan says "500 tanks" but DEFENDER FORCES shows "tank: 300", then USE 300 NOT 500.
+NEVER use numbers from the plan text. ONLY use numbers from ATTACKER FORCES and DEFENDER FORCES sections above.
 
 CRITICAL RULES:
 1. Losses MUST be realistic and proportional to the forces involved
@@ -163,7 +175,13 @@ function fallbackBattle(attName, defName, attEq, defEq, attTactic, defTactic, ro
     naval: { att: 1.0, def: 1.0 },
     defend: { att: 0.7, def: 1.4 },
     counter: { att: 1.3, def: 0.8 },
-    nuclear: { att: 1.5, def: 1.8 }
+    nuclear: { att: 1.5, def: 1.8 },
+    emp: { att: 1.4, def: 0.5 },
+    bio: { att: 1.3, def: 0.7 },
+    cyber: { att: 1.2, def: 0.6 },
+    napalm: { att: 1.4, def: 0.7 },
+    emp_def: { att: 0.6, def: 1.3 },
+    napalm_def: { att: 0.7, def: 1.2 }
   };
 
   const attMod = tacticMod[attTactic]?.att || 1.0;
@@ -192,7 +210,9 @@ function fallbackBattle(attName, defName, attEq, defEq, attTactic, defTactic, ro
 
   const tacticNames = {
     heavy: 'سنگین', precise: 'دقیق', ambush: 'کمین', air_raid: 'هوایی',
-    naval: 'دریایی', defend: 'موضعی', counter: 'ضدحمله', nuclear: 'اتمی'
+    naval: 'دریایی', defend: 'موضعی', counter: 'ضدحمله', nuclear: 'اتمی',
+    emp: 'الکترومغناطیسی', bio: 'بیولوژیکی', cyber: 'سایبری', napalm: 'آتش‌زا',
+    emp_def: 'سپر الکترومغناطیسی', napalm_def: 'آتش متقابل'
   };
 
   const narratives = [
