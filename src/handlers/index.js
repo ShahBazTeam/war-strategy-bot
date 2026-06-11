@@ -104,6 +104,22 @@ export function registerHandlers(bot) {
     await ctx.reply('✅ عملیات لغو شد.', { reply_markup: mainMenuKeyboard() });
   });
 
+  bot.command('status', async (ctx) => {
+    const chat = ctx.message?.chat;
+    if (chat && (chat.type === 'group' || chat.type === 'supergroup')) {
+      const chatId = chat.id;
+      const threadId = ctx.message.message_thread_id;
+      let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
+      info += `🆔 Chat ID: \`${chatId}\`\n`;
+      info += `📝 Thread ID: ${threadId || 'ندارد'}\n`;
+      info += `━━━━━━━━━━━━━━━━━━\n`;
+      info += `💡 برای تنظیم در Railway:\n`;
+      info += `• GROUP_ID = \`${chatId}\`\n`;
+      await ctx.reply(info, { parse_mode: 'Markdown' });
+      return;
+    }
+  });
+
   bot.on('callback_query:data', async (ctx) => {
     const d = ctx.callbackQuery.data;
     const uid = ctx.from.id;
@@ -744,33 +760,27 @@ export function registerHandlers(bot) {
     const txt = ctx.message.text;
     if (txt.startsWith('/')) return;
 
-    // Group message detection - must be before user check
+    // Group message detection
     const chat = ctx.message?.chat;
     if (chat && (chat.type === 'group' || chat.type === 'supergroup')) {
       const chatId = chat.id;
+      const threadId = ctx.message.message_thread_id;
+      console.log(`[GROUP] chat=${chatId} thread=${threadId} user=${uid} text="${txt}"`);
+
       const currentGid = getGroupChatId();
       if (!currentGid || currentGid !== chatId) {
         setDetectedGroupId(chatId);
         console.log(`Group detected: ${chatId} (${chat.title || 'unknown'})`);
       }
+
       if (txt === 'وضعیت' || txt === 'status') {
         let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
         info += `🆔 Chat ID: \`${chatId}\`\n`;
-        info += `📝 Topic ID: ${ctx.message.message_thread_id || 'عمومی'}\n`;
+        info += `📝 Thread ID: ${threadId || 'ندارد'}\n`;
         info += `━━━━━━━━━━━━━━━━━━\n`;
         info += `💡 برای تنظیم در Railway:\n`;
         info += `• GROUP_ID = \`${chatId}\`\n`;
         await ctx.reply(info, { parse_mode: 'Markdown' });
-        return;
-      }
-      if (txt.startsWith('/start')) {
-        await ctx.reply(
-          `🎮 **جهان مدرن — Modern World**\n\n`
-          + `این یک بازی استراتژیک تلگرامیه!\n`
-          + `برای شروع، ربات رو در پیویت دایرکت کن:\n`
-          + `👉 @${ctx.me.username}`,
-          { parse_mode: 'Markdown' }
-        );
         return;
       }
       return;
