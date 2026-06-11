@@ -4,16 +4,16 @@ dotenv.config();
 
 const AI_PROVIDERS = [
   {
-    name: 'opencode-zen',
+    name: 'opencode-nemotron',
     url: 'https://opencode.ai/zen/v1/chat/completions',
     key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
-    model: 'deepseek-v4-flash-free'
+    model: 'nemotron-3-ultra-free'
   },
   {
-    name: 'opencode-zen-mimo',
+    name: 'opencode-bigpickle',
     url: 'https://opencode.ai/zen/v1/chat/completions',
     key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
-    model: 'mimo-v2.5-free'
+    model: 'big-pickle'
   },
   {
     name: 'groq',
