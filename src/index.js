@@ -38,9 +38,6 @@ async function startBot() {
     await initDatabase();
     console.log('✅ Database initialized');
 
-    registerHandlers(bot);
-    console.log('✅ Handlers registered');
-
     bot.api.setMyCommands([]).catch(() => {});
 
     bot.command('start', async (ctx) => {
@@ -67,6 +64,9 @@ async function startBot() {
       clearState(ctx.from.id);
       await ctx.reply('✅ عملیات لغو شد.', { reply_markup: mainMenuKeyboard() });
     });
+
+    registerHandlers(bot);
+    console.log('✅ Handlers registered');
 
     bot.start({ drop_pending_updates: true }).then(() => {
       console.log('✅ Bot polling started');
