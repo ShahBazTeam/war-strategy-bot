@@ -220,7 +220,6 @@ export function allianceKeyboard() {
     .text('📋 درخواست‌های ورودی', 'alliance_pending')
     .row()
     .text('✅ اتحادهای فعال', 'alliance_active')
-    .text('❌ لغو اتحاد', 'alliance_cancel')
     .row()
     .text('🔙 بازگشت', 'main_menu');
 }

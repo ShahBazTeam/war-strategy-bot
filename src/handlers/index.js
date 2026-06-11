@@ -638,7 +638,7 @@ export function registerHandlers(bot) {
         const kb = new InlineKeyboard();
         pending.forEach((a) => {
           txt += `${a.other_flag} ${a.other_name}\n`;
-          kb.text(`🤝 ${a.other_flag} ${a.other_name}`, `alliance_view_${a.id}`);
+          kb.text(`👁️ مشاهده ${a.other_flag} ${a.other_name}`, `alliance_view_${a.id}`);
           kb.row();
         });
         kb.text('🔙 بازگشت', 'alliance_menu');
@@ -654,15 +654,23 @@ export function registerHandlers(bot) {
 
       if (d.startsWith('alliance_accept_')) {
         const allianceId = parseInt(d.slice(16));
+        const u = getUserByTelegramId(uid);
+        const pending = getPendingAlliances(uid);
+        const alliance = pending.find(a => a.id === allianceId);
         acceptAlliance(allianceId);
         await safeEdit(ctx, '✅ **اتحاد قبول شد!**', { reply_markup: allianceKeyboard() });
+        if (alliance && u) await safeSend(bot, alliance.other_tid, `🤝 ${u.country_flag} ${u.country_name} درخواست اتحادت رو قبول کرد!`);
         return;
       }
 
       if (d.startsWith('alliance_reject_')) {
         const allianceId = parseInt(d.slice(16));
+        const u = getUserByTelegramId(uid);
+        const pending = getPendingAlliances(uid);
+        const alliance = pending.find(a => a.id === allianceId);
         rejectAlliance(allianceId);
         await safeEdit(ctx, '❌ **اتحاد رد شد.**', { reply_markup: allianceKeyboard() });
+        if (alliance && u) await safeSend(bot, alliance.other_tid, `❌ ${u.country_flag} ${u.country_name} درخواست اتحادت رو رد کرد.`);
         return;
       }
 
@@ -842,12 +850,16 @@ export function registerHandlers(bot) {
 
       if (aiResult && aiResult.attacker_losses && aiResult.defender_losses) {
         const aMap = aiResult.attacker_losses, dMap = aiResult.defender_losses;
-        attLosses = attUser.equipment.filter(u => (aMap[u.type] || 0) > 0)
-          .map(u => ({ type: u.type, model: u.model, lost: Math.min(aMap[u.type] || 0, u.count) }));
-        defLosses = defUser.equipment.filter(u => (dMap[u.type] || 0) > 0)
-          .map(u => ({ type: u.type, model: u.model, lost: Math.min(dMap[u.type] || 0, u.count) }));
-        newAttEq = applyLossesToEq(attUser.equipment, aMap);
-        newDefEq = applyLossesToEq(defUser.equipment, dMap);
+        const maxAttLoss = (type) => Math.min(aMap[type] || 0, Math.floor((attUser.equipment.find(u => u.type === type)?.count || 0) * 0.35));
+        const maxDefLoss = (type) => Math.min(dMap[type] || 0, Math.floor((defUser.equipment.find(u => u.type === type)?.count || 0) * 0.40));
+        const clampA = { infantry: maxAttLoss('infantry'), tank: maxAttLoss('tank'), artillery: maxAttLoss('artillery'), airdef: maxAttLoss('airdef'), missile: maxAttLoss('missile'), fighter: maxAttLoss('fighter'), bomber: maxAttLoss('bomber'), helicopter: maxAttLoss('helicopter'), destroyer: maxAttLoss('destroyer'), submarine: maxAttLoss('submarine'), capital: maxAttLoss('capital') };
+        const clampD = { infantry: maxDefLoss('infantry'), tank: maxDefLoss('tank'), artillery: maxDefLoss('artillery'), airdef: maxDefLoss('airdef'), missile: maxDefLoss('missile'), fighter: maxDefLoss('fighter'), bomber: maxDefLoss('bomber'), helicopter: maxDefLoss('helicopter'), destroyer: maxDefLoss('destroyer'), submarine: maxDefLoss('submarine'), capital: maxDefLoss('capital') };
+        attLosses = attUser.equipment.filter(u => (clampA[u.type] || 0) > 0)
+          .map(u => ({ type: u.type, model: u.model, lost: Math.min(clampA[u.type] || 0, u.count) }));
+        defLosses = defUser.equipment.filter(u => (clampD[u.type] || 0) > 0)
+          .map(u => ({ type: u.type, model: u.model, lost: Math.min(clampD[u.type] || 0, u.count) }));
+        newAttEq = applyLossesToEq(attUser.equipment, clampA);
+        newDefEq = applyLossesToEq(defUser.equipment, clampD);
         resultText = aiResult.result === 'attacker_victory' ? '🎖️ **پیروزی مهاجم**' :
                      aiResult.result === 'defender_victory' ? '🎖️ **پیروزی مدافع**' : '⚖️ **بن‌بست**';
         narrative = aiResult.description || '';
@@ -859,17 +871,30 @@ export function registerHandlers(bot) {
 
       const attPow = calcMilitaryPower(newAttEq);
       const defPow = calcMilitaryPower(newDefEq);
-      const ended = attPow <= 0 || defPow <= 0;
-      const winnerName = attPow <= 0 ? `${w.defender_flag} ${w.defender_name}` :
-                         defPow <= 0 ? `${w.attacker_flag} ${w.attacker_name}` : null;
+      const origAttPow = calcMilitaryPower(attUser.equipment);
+      const origDefPow = calcMilitaryPower(defUser.equipment);
+      const attLostPct = origAttPow > 0 ? (1 - attPow / origAttPow) : 0;
+      const defLostPct = origDefPow > 0 ? (1 - defPow / origDefPow) : 0;
+
+      const ended = attPow <= 0 || defPow <= 0 || attLostPct >= 0.75 || defLostPct >= 0.75;
+      let winnerName = null;
+      if (attPow <= 0) winnerName = `${w.defender_flag} ${w.defender_name}`;
+      else if (defPow <= 0) winnerName = `${w.attacker_flag} ${w.attacker_name}`;
+      else if (attLostPct >= 0.75) winnerName = `${w.defender_flag} ${w.defender_name}`;
+      else if (defLostPct >= 0.75) winnerName = `${w.attacker_flag} ${w.attacker_name}`;
 
       const attLang = attUser.language || 'fa';
-      let rt = `🎯 **راند ${round} — نتیجه نبرد**\n━━━━━━━━━━━━━━━━━━\n\n`;
-      rt += `${resultText}\n\n`;
-      if (narrative) rt += `📜 ${narrative}\n\n`;
-      rt += `🔴 ${w.attacker_flag} **${w.attacker_name}**\n${(attLosses.length ? fmtLosses(attLosses, attLang) : '✅ بدون تلفات')}\n\n`;
-      rt += `🔵 ${w.defender_flag} **${w.defender_name}**\n${(defLosses.length ? fmtLosses(defLosses, attLang) : '✅ بدون تلفات')}\n\n`;
-      rt += `━━━━━━━━━━━━━━━━━━\n⚔️ ${attPow.toLocaleString()} vs ${defPow.toLocaleString()}`;
+      let rt = '';
+      if (narrative) rt += `${narrative}\n\n`;
+      rt += `━━━━━━━━━━━━━━━━━━\n`;
+      rt += `🔴 **${w.attacker_flag} ${w.attacker_name}**\n`;
+      rt += attLosses.length ? fmtLosses(attLosses, attLang) : '✅ بدون تلفات';
+      rt += `\n📊 قدرت: ${attPow.toLocaleString()} (${attLostPct > 0 ? '-' + (attLostPct * 100).toFixed(1) + '%' : ''})\n\n`;
+      rt += `🔵 **${w.defender_flag} ${w.defender_name}**\n`;
+      rt += defLosses.length ? fmtLosses(defLosses, attLang) : '✅ بدون تلفات';
+      rt += `\n📊 قدرت: ${defPow.toLocaleString()} (${defLostPct > 0 ? '-' + (defLostPct * 100).toFixed(1) + '%' : ''})\n`;
+      rt += `━━━━━━━━━━━━━━━━━━\n`;
+      rt += `${resultText}`;
 
       await sendToGroup(bot, rt, warTopicId);
 
@@ -977,9 +1002,9 @@ export function registerHandlers(bot) {
       const msg = `📢 **بیانیه رسمی ${u.country_flag} ${u.country_name}**\n\n━━━━━━━━━━━━━━━━━━\n\n${statement}\n\n━━━━━━━━━━━━━━━━━━\n🖊️ ${u.first_name}`;
       await ctx.reply(msg, { reply_markup: mainMenuKeyboard(), parse_mode: 'Markdown' });
       const gid = getGroupChatId();
-      if (gid) {
-        const stmtTopicId = await createForumTopic(gid, `📢 بیانیه ${u.country_name}`, 0x6FB3D2);
-        if (stmtTopicId) await safeSend(bot, gid, msg, { message_thread_id: stmtTopicId });
+      const bayaieTopicId = process.env.BAYAIE_TOPIC_ID;
+      if (gid && bayaieTopicId) {
+        await safeSend(bot, gid, msg, { message_thread_id: parseInt(bayaieTopicId) });
       }
       return;
     }

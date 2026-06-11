@@ -89,17 +89,26 @@ ${attackPlan}
 DEFENSE PLAN (${defName}):
 ${defensePlan}
 
-IMPORTANT RULES:
-1. The description MUST be in PERSIAN (Farsi) and written like a dramatic war movie narration
-2. Use vivid, sensory details: sounds of explosions, smell of gunpowder, visual descriptions of destruction
-3. Include specific unit types in the narrative (e.g., "تانک‌های M1A2 آبرامز", "جنگنده‌های F-35")
-4. Mention the weather, terrain, and time of day for atmosphere
-5. Describe the emotional state of soldiers and commanders
-6. Include turning points, heroic moments, and tragic losses
-7. The narrative should be 8-12 sentences, NOT generic - make it unique and specific to this battle
-8. NEVER use the same phrases as previous rounds - each battle must feel fresh
-9. Losses must be realistic and proportional to the forces involved
-10. The side with more military power should generally have an advantage, but tactics and plans matter
+CRITICAL RULES:
+1. Losses MUST be realistic and proportional to the forces involved
+2. The side with MORE military power should generally suffer FEWER losses
+3. The side with LESS military power should generally suffer MORE losses
+4. NEVER let a weaker force completely destroy a much stronger force in one round
+5. A weaker attacker against a strong defender should suffer HEAVY losses
+6. A strong attacker against a weak defender should still suffer SOME losses
+7. Maximum 20-30% of total forces lost per round for the winning side
+8. Maximum 30-40% of total forces lost per round for the losing side
+9. Infantry losses should be highest (they are the front line)
+10. Expensive units (bombers, capital ships, submarines) should have lower losses
+11. If attacker has less power than defender, attacker should generally LOSE the round
+12. The narrative MUST be in PERSIAN (Farsi) and written like a dramatic war movie narration
+13. Use vivid, sensory details: sounds of explosions, smell of gunpowder, visual descriptions of destruction
+14. Include specific unit types in the narrative
+15. Mention the weather, terrain, and time of day for atmosphere
+16. Describe the emotional state of soldiers and commanders
+17. Include turning points, heroic moments, and tragic losses
+18. The narrative should be 8-12 sentences, NOT generic - make it unique and specific to this battle
+19. NEVER use the same phrases as previous rounds - each battle must feel fresh
 
 Return ONLY valid JSON (no markdown, no code blocks):
 {
@@ -111,8 +120,8 @@ Return ONLY valid JSON (no markdown, no code blocks):
 
   const text = await callAI([
     { role: 'system', content: sysPrompt },
-    { role: 'user', content: `Write a CINEMATIC battle report for round ${round}. Return ONLY JSON with the battle result, losses, and a dramatic Persian narrative.` }
-  ], 1200, 0.7);
+    { role: 'user', content: `Write a CINEMATIC battle report for round ${round}. Return ONLY JSON with the battle result, losses, and a dramatic Persian narrative. Remember: losses MUST be realistic and proportional.` }
+  ], 1200, 0.6);
 
   if (text) {
     try {

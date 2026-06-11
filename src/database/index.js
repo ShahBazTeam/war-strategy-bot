@@ -243,34 +243,34 @@ export function getAllianceBetween(user1Id, user2Id) {
   return one('SELECT * FROM alliances WHERE ((user1_id=? AND user2_id=?) OR (user1_id=? AND user2_id=?)) AND status=?', [user1Id, user2Id, user2Id, user1Id, 'active']);
 }
 
-export function getPendingAlliances(userId) {
+export function getPendingAlliances(telegramId) {
   return all(`
     SELECT a.*, 
-      CASE WHEN a.user1_id=? THEN u2.telegram_id ELSE u1.telegram_id END as other_tid,
-      CASE WHEN a.user1_id=? THEN c2.name ELSE c1.name END as other_name,
-      CASE WHEN a.user1_id=? THEN c2.flag ELSE c1.flag END as other_flag
+      CASE WHEN u1.telegram_id=? THEN u2.telegram_id ELSE u1.telegram_id END as other_tid,
+      CASE WHEN u1.telegram_id=? THEN c2.name ELSE c1.name END as other_name,
+      CASE WHEN u1.telegram_id=? THEN c2.flag ELSE c1.flag END as other_flag
     FROM alliances a 
     JOIN users u1 ON a.user1_id = u1.id 
     JOIN users u2 ON a.user2_id = u2.id
     JOIN countries c1 ON u1.country_id = c1.id
     JOIN countries c2 ON u2.country_id = c2.id
-    WHERE (a.user1_id=? OR a.user2_id=?) AND a.status='pending'
-  `, [userId, userId, userId, userId, userId]);
+    WHERE (u1.telegram_id=? OR u2.telegram_id=?) AND a.status='pending'
+  `, [telegramId, telegramId, telegramId, telegramId, telegramId]);
 }
 
-export function getActiveAlliances(userId) {
+export function getActiveAlliances(telegramId) {
   return all(`
     SELECT a.*, 
-      CASE WHEN a.user1_id=? THEN u2.telegram_id ELSE u1.telegram_id END as other_tid,
-      CASE WHEN a.user1_id=? THEN c2.name ELSE c1.name END as other_name,
-      CASE WHEN a.user1_id=? THEN c2.flag ELSE c1.flag END as other_flag
+      CASE WHEN u1.telegram_id=? THEN u2.telegram_id ELSE u1.telegram_id END as other_tid,
+      CASE WHEN u1.telegram_id=? THEN c2.name ELSE c1.name END as other_name,
+      CASE WHEN u1.telegram_id=? THEN c2.flag ELSE c1.flag END as other_flag
     FROM alliances a 
     JOIN users u1 ON a.user1_id = u1.id 
     JOIN users u2 ON a.user2_id = u2.id
     JOIN countries c1 ON u1.country_id = c1.id
     JOIN countries c2 ON u2.country_id = c2.id
-    WHERE (a.user1_id=? OR a.user2_id=?) AND a.status='active'
-  `, [userId, userId, userId, userId, userId]);
+    WHERE (u1.telegram_id=? OR u2.telegram_id=?) AND a.status='active'
+  `, [telegramId, telegramId, telegramId, telegramId, telegramId]);
 }
 
 export function voteUN(resolutionId, uid, vote) {
