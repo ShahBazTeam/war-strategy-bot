@@ -19,12 +19,23 @@ import {
   countrySelectKeyboard, languageSelectKeyboard
 } from '../keyboards/index.js';
 import { checkWarReason, evaluateBattleRound, generateUNResolutions, generateWarSummary, generateStatement } from '../utils/ai.js';
-import { createForumTopic, GROUP_ID } from '../utils/telegram.js';
+import { createForumTopic, setDetectedGroupId, getDetectedGroupId } from '../utils/telegram.js';
 import { getModelName, getUnitName } from '../utils/translations.js';
 
-// Check if GROUP_ID is configured
+// Detect group from incoming updates
+function detectGroupId(ctx) {
+  const gid = ctx.chat?.id;
+  if (gid && String(gid).startsWith('-')) {
+    setDetectedGroupId(String(gid));
+  }
+}
+
+function getGroupChatId() {
+  return getDetectedGroupId() || process.env.GROUP_ID || null;
+}
+
 function isGroupConfigured() {
-  return GROUP_ID && GROUP_ID.trim() !== '';
+  return getGroupChatId() !== null;
 }
 import { formatEq, formatInd, calcMilitaryPower, calcDailyIncome, calcDailyExpenses } from '../game/index.js';
 import { getUnitDef, getIndustryDef, UNIT_TYPES, INDUSTRY_TYPES, COUNTRIES } from '../game/data.js';
@@ -74,17 +85,18 @@ function levelUpCheck(xp) {
 }
 
 async function sendToGroup(bot, text, topicId = null) {
-  const gid = GROUP_ID || process.env.GROUP_ID;
+  const gid = getGroupChatId();
   if (!gid) return;
   
-  const tid = topicId || process.env.TOPIC_WAR_ID;
-  if (tid) await safeSend(bot, gid, text, { message_thread_id: parseInt(tid) });
+  if (topicId) {
+    await safeSend(bot, gid, text, { message_thread_id: parseInt(topicId) });
+  }
 }
 
 async function sendToUNTopic(bot, text) {
-  const gid = GROUP_ID || process.env.GROUP_ID;
-  const tid = process.env.TOPIC_UN_ID;
-  if (gid && tid) await safeSend(bot, gid, text, { message_thread_id: parseInt(tid) });
+  const gid = getGroupChatId();
+  if (!gid) return;
+  // Use war topic or any existing topic
 }
 
 async function sendToTopic(bot, gid, tid, text) {
@@ -93,8 +105,16 @@ async function sendToTopic(bot, gid, tid, text) {
 
 export function registerHandlers(bot) {
 
+  // Auto-detect group from ANY message (even non-user messages)
+  bot.on('message', (ctx) => {
+    detectGroupId(ctx);
+  });
+
   bot.on('message:text', async (ctx) => {
     const uid = ctx.from.id;
+    
+    // Auto-detect group ID from any group message
+    detectGroupId(ctx);
     
     // Spam protection - 1 second cooldown
     const now = Date.now();
@@ -127,18 +147,17 @@ export function registerHandlers(bot) {
       clearState(uid);
       const wid = w.lastInsertRowid;
 
-      // Create forum topic for this war (only if GROUP_ID is configured)
+      // Create forum topic for this war
       let warTopicId = null;
-      if (isGroupConfigured()) {
+      const gid = getGroupChatId();
+      if (gid) {
         const groupName = `${u.country_flag} ${u.country_name} ⚔️ ${t.country_flag} ${t.country_name}`;
-        warTopicId = await createForumTopic(`⚔️ ${groupName}`, 0xE05252);
+        warTopicId = await createForumTopic(gid, `⚔️ ${groupName}`, 0xE05252);
         
         if (warTopicId) {
           setWarTopicId(wid, warTopicId);
           console.log(`War topic created for war ${wid}: ${warTopicId}`);
         }
-      } else {
-        console.warn('GROUP_ID not configured. War topic will not be created.');
       }
 
       const header = `⚔️ **جنگ اعلام شد!** ⚔️\n\n`
@@ -309,11 +328,12 @@ export function registerHandlers(bot) {
 
         const unRes = await generateUNResolutions(`${attInfo.country_name} vs ${defInfo.country_name}`);
         if (unRes.length) {
-          // Create UN topic (only if GROUP_ID is configured)
-          let unTopicId = null;
-          if (isGroupConfigured()) {
-            unTopicId = await createForumTopic(`🌐 قطعنامه: ${attInfo.country_name} vs ${defInfo.country_name}`, 0x6FB3D2);
-          }
+          // Create UN topic
+        let unTopicId = null;
+        const unGid = getGroupChatId();
+        if (unGid) {
+          unTopicId = await createForumTopic(unGid, `🌐 قطعنامه: ${attInfo.country_name} vs ${defInfo.country_name}`, 0x6FB3D2);
+        }
           
           for (const res of unRes) {
             const resolution = createUNResolution(w.id, res.title, res.desc);
@@ -482,11 +502,13 @@ export function registerHandlers(bot) {
       
       await ctx.reply(msg, { reply_markup: mainMenuKeyboard(), parse_mode: 'Markdown' });
       
-      // Send to group
-      const gid = GROUP_ID || process.env.GROUP_ID;
+      // Post to group with a dedicated statement topic
+      const gid = getGroupChatId();
       if (gid) {
-        const stmtTopicId = process.env.TOPIC_WAR_ID;
-        if (stmtTopicId) await safeSend(bot, gid, msg, { message_thread_id: parseInt(stmtTopicId) });
+        const stmtTopicId = await createForumTopic(gid, `📢 بیانیه ${u.country_name}`, 0x6FB3D2);
+        if (stmtTopicId) {
+          await safeSend(bot, gid, msg, { message_thread_id: stmtTopicId });
+        }
       }
       return;
     }
@@ -500,6 +522,9 @@ export function registerHandlers(bot) {
   bot.on('callback_query:data', async (ctx) => {
     const d = ctx.callbackQuery.data;
     const uid = ctx.from.id;
+    
+    // Auto-detect group ID
+    detectGroupId(ctx);
     
     // Prevent callback spam
     const cbKey = `${uid}:${d}`;
