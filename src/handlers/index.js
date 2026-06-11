@@ -63,13 +63,17 @@ function levelUpCheck(xp) {
 }
 
 function getGroupChatId() {
-  return getDetectedGroupId() || null;
+  return getDetectedGroupId() || (process.env.GROUP_ID ? parseInt(process.env.GROUP_ID) : null);
 }
 
 async function sendToGroup(bot, text, topicId = null) {
   const gid = getGroupChatId();
-  if (!gid || !topicId) return;
-  await safeSend(bot, gid, text, { message_thread_id: parseInt(topicId) });
+  if (!gid) return;
+  if (!topicId) {
+    await safeSend(bot, gid, text);
+  } else {
+    await safeSend(bot, gid, text, { message_thread_id: parseInt(topicId) });
+  }
 }
 
 export function registerHandlers(bot) {
@@ -1006,6 +1010,51 @@ export function registerHandlers(bot) {
       if (gid && bayaieTopicId) {
         await safeSend(bot, gid, msg, { message_thread_id: parseInt(bayaieTopicId) });
       }
+      return;
+    }
+  });
+
+  // ============ GROUP HANDLERS ============
+
+  bot.on('message', async (ctx) => {
+    const chat = ctx.message?.chat;
+    if (!chat) return;
+    const chatType = chat.type;
+    if (chatType !== 'group' && chatType !== 'supergroup') return;
+
+    const chatId = chat.id;
+    const currentGid = getGroupChatId();
+    if (!currentGid || currentGid !== chatId) {
+      setDetectedGroupId(chatId);
+      console.log(`Group detected: ${chatId} (${chat.title || 'unknown'})`);
+    }
+
+    const text = ctx.message.text;
+    if (!text) return;
+
+    if (text.startsWith('/start')) {
+      await ctx.reply(
+        `🎮 **جهان مدرن — Modern World**\n\n`
+        + `این یک بازی استراتژیک تلگرامیه!\n`
+        + `برای شروع، ربات رو در پیویت دایرکت کن:\n`
+        + `👉 @${ctx.me.username}`,
+        { parse_mode: 'Markdown' }
+      );
+      return;
+    }
+
+    if (text === 'وضعیت' || text === 'status') {
+      const bayaieTopicId = process.env.BAYAIE_TOPIC_ID;
+      const warTopicCount = 0;
+      let info = `📊 **وضعیت گروه**\n━━━━━━━━━━━━━━━━━━\n`;
+      info += `🆔 Chat ID: \`${chatId}\`\n`;
+      info += `📝 Topic ID پیام‌ها: ${ctx.message.message_thread_id || '通用'}\n`;
+      info += `📢 بیانیه Topic: ${bayaieTopicId || '❌ تنظیم نشده'}\n`;
+      info += `━━━━━━━━━━━━━━━━━━\n`;
+      info += `💡 متغیرهای Railway:\n`;
+      info += `• GROUP_ID = \`${chatId}\`\n`;
+      if (bayaieTopicId) info += `• BAYAIE_TOPIC_ID = ${bayaieTopicId}\n`;
+      await ctx.reply(info, { parse_mode: 'Markdown' });
       return;
     }
   });

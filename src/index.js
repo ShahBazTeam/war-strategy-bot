@@ -22,6 +22,15 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Health server listening on port ${PORT}`);
 });
 
+if (process.env.GROUP_ID) {
+  setDetectedGroupId(parseInt(process.env.GROUP_ID));
+  console.log(`✅ GROUP_ID loaded from env: ${process.env.GROUP_ID}`);
+}
+
+if (process.env.BAYAIE_TOPIC_ID) {
+  console.log(`✅ BAYAIE_TOPIC_ID loaded from env: ${process.env.BAYAIE_TOPIC_ID}`);
+}
+
 const bot = new Bot(TOKEN);
 
 bot.catch((err) => {
