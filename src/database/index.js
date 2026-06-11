@@ -118,9 +118,9 @@ export function getWarDetail(wid) {
   return w;
 }
 
-export function addWarRound(wid, round, aAct, dAct, aLoss, dLoss, res) {
-  return run('INSERT INTO war_rounds (war_id, round_number, attacker_action, defender_action, attacker_losses, defender_losses, result) VALUES (?,?,?,?,?,?,?)',
-    [wid, round, aAct, dAct, JSON.stringify(aLoss), JSON.stringify(dLoss), res]);
+export function addWarRound(wid, round, aAct, dAct, aTactic, dTactic, aLoss, dLoss, res) {
+  return run('INSERT INTO war_rounds (war_id, round_number, attacker_action, defender_action, attacker_tactic, defender_tactic, attacker_losses, defender_losses, result) VALUES (?,?,?,?,?,?,?,?,?)',
+    [wid, round, aAct, dAct, aTactic, dTactic, JSON.stringify(aLoss), JSON.stringify(dLoss), res]);
 }
 
 export function endWar(wid, winnerId) {

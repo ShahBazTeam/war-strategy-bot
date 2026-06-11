@@ -38,7 +38,9 @@ export function mainMenuKeyboard() {
     .text('💰 درآمد خودکار', 'daily_collect')
     .text('🏆 رتبه‌بندی', 'leaderboard')
     .row()
+    .text('📢 بیانیه', 'make_statement')
     .text('🔬 تکنولوژی', 'tech_menu')
+    .row()
     .text('❓ راهنما', 'help_menu');
 }
 

@@ -18,7 +18,7 @@ import {
   techKeyboard, allianceKeyboard, allianceTargetKeyboard, allianceActionKeyboard,
   countrySelectKeyboard, languageSelectKeyboard
 } from '../keyboards/index.js';
-import { checkWarReason, evaluateBattleRound, generateUNResolutions, generateWarSummary } from '../utils/ai.js';
+import { checkWarReason, evaluateBattleRound, generateUNResolutions, generateWarSummary, generateStatement } from '../utils/ai.js';
 import { createForumTopic, GROUP_ID } from '../utils/telegram.js';
 import { getModelName, getUnitName } from '../utils/translations.js';
 
@@ -31,6 +31,8 @@ import { getUnitDef, getIndustryDef, UNIT_TYPES, INDUSTRY_TYPES, COUNTRIES } fro
 import { dashMsg, profileMsg } from './messages.js';
 
 const UT = Object.fromEntries(UNIT_TYPES.map(u => [u.id, u]));
+const processing = new Map();
+const lastMessage = new Map();
 
 function getUnitPrice(typeId) {
   const p = { infantry: 3, tank: 40, artillery: 35, airdef: 45, missile: 60, fighter: 120, bomber: 150, helicopter: 60, destroyer: 200, submarine: 250, capital: 500 };
@@ -93,10 +95,22 @@ export function registerHandlers(bot) {
 
   bot.on('message:text', async (ctx) => {
     const uid = ctx.from.id;
+    
+    // Spam protection - 1 second cooldown
+    const now = Date.now();
+    const last = lastMessage.get(uid) || 0;
+    if (now - last < 1000) return;
+    lastMessage.set(uid, now);
+    
+    // Processing lock - prevent double-submit
+    if (processing.has(uid)) return;
+    processing.set(uid, true);
+    
+    try {
     const u = getUserByTelegramId(uid);
-    if (!u) return;
+    if (!u) { processing.delete(uid); return; }
     const st = getState(uid);
-    if (!st) return;
+    if (!st) { processing.delete(uid); return; }
     const d = JSON.parse(st.data || '{}');
     const txt = ctx.message.text;
 
@@ -166,6 +180,12 @@ export function registerHandlers(bot) {
     if (st.state === 'awaiting_attack_plan') {
       const w = getWarDetail(d.warId);
       if (!w) { await ctx.reply('❌', { reply_markup: mainMenuKeyboard() }); clearState(uid); return; }
+      const existingRound = getExistingRound(w.id, w.current_round);
+      if (existingRound && existingRound.attacker_action) {
+        await ctx.reply('⏳ قبلاً طرح حمله این راند ثبت شده!', { reply_markup: warDetailKeyboard(w.id) });
+        clearState(uid);
+        return;
+      }
       addWarRound(w.id, w.current_round, txt, null, d.tactic || 'heavy', null, [], [], 'pending');
       clearState(uid);
       
@@ -204,6 +224,11 @@ export function registerHandlers(bot) {
       const ex = getExistingRound(w.id, round);
       if (!ex || !ex.attacker_action) {
         await ctx.reply('⏳ مهاجم هنوز طرح حمله را ننوشته.', { reply_markup: warActionKeyboard(w.id, false) });
+        return;
+      }
+      if (ex.defender_action) {
+        await ctx.reply('⏳ قبلاً طرح دفاع این راند ثبت شده!', { reply_markup: warDetailKeyboard(w.id) });
+        clearState(uid);
         return;
       }
       updateWarRoundDefense(w.id, round, txt);
@@ -442,11 +467,45 @@ export function registerHandlers(bot) {
       );
       return;
     }
+
+    if (st.state === 'awaiting_statement') {
+      clearState(uid);
+      await ctx.reply('🧠 **هوش مصنوعی در حال نوشتن بیانیه...** ⏳', { parse_mode: 'Markdown' });
+      
+      const statement = await generateStatement(u.country_name, txt);
+      
+      const msg = `📢 **بیانیه رسمی ${u.country_flag} ${u.country_name}**\n\n`
+        + `━━━━━━━━━━━━━━━━━━\n\n`
+        + `${statement}\n\n`
+        + `━━━━━━━━━━━━━━━━━━\n`
+        + `🖊️ ${u.first_name} — رهبر ${u.country_name}`;
+      
+      await ctx.reply(msg, { reply_markup: mainMenuKeyboard(), parse_mode: 'Markdown' });
+      
+      // Send to group
+      const gid = GROUP_ID || process.env.GROUP_ID;
+      if (gid) {
+        const stmtTopicId = process.env.TOPIC_WAR_ID;
+        if (stmtTopicId) await safeSend(bot, gid, msg, { message_thread_id: parseInt(stmtTopicId) });
+      }
+      return;
+    }
+    } catch (err) {
+      console.error('Text handler error:', err.message);
+    } finally {
+      processing.delete(uid);
+    }
   });
 
   bot.on('callback_query:data', async (ctx) => {
     const d = ctx.callbackQuery.data;
     const uid = ctx.from.id;
+    
+    // Prevent callback spam
+    const cbKey = `${uid}:${d}`;
+    if (processing.has(cbKey)) return;
+    processing.set(cbKey, true);
+    
     await ctx.answerCallbackQuery().catch(() => {});
 
     try {
@@ -785,6 +844,20 @@ export function registerHandlers(bot) {
         setIndustries(uid, u.industries);
         const upd = getUserByTelegramId(uid);
         await safeEdit(ctx, `✅ **${upgNames[d]}** → سطح ${target.level}!\n💰 درآمد: ${calcDailyIncome(upd.industries, upd.country_id).toLocaleString()}💰`, { reply_markup: industriesKeyboard() });
+        return;
+      }
+
+      if (d === 'make_statement') {
+        const u = getUserByTelegramId(uid);
+        if (!u) return;
+        setState(uid, 'awaiting_statement', '{}');
+        await safeEdit(ctx,
+          `📢 **بیانیه رسمی**\n\n`
+          + `🌍 ${u.country_flag} **${u.country_name}**\n\n`
+          + `📝 متن بیانیه خود را بنویس:\n`
+          + `(مثلاً: اعلام حمایت از متحدان، محکومیت حمله، درخواست آتش‌بس)`,
+          { reply_markup: backBtn() }
+        );
         return;
       }
 
@@ -1178,6 +1251,8 @@ export function registerHandlers(bot) {
 
     } catch (err) {
       console.error('Callback error:', d, err.message);
+    } finally {
+      processing.delete(cbKey);
     }
   });
 }
