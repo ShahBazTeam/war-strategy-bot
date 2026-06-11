@@ -109,6 +109,9 @@ CRITICAL RULES:
 17. Include turning points, heroic moments, and tragic losses
 18. The narrative should be 8-12 sentences, NOT generic - make it unique and specific to this battle
 19. NEVER use the same phrases as previous rounds - each battle must feel fresh
+20. USE ONLY THE ACTUAL EQUIPMENT COUNTS PROVIDED ABOVE - IGNORE any different numbers the player mentions in their plan text. If a player claims to send 80 bombers but only has 40, use 40.
+21. If a player's plan says "do nothing", "هیچ کاری نمیکنم", "pass", "不动", or similar passive language: that side provides ZERO resistance or attack. They take maximum losses (30-40%) and deal almost no damage. A passive defender loses territory. A passive attacker wastes the round.
+22. Plans are STRATEGIC INTENT only - they describe WHAT the player wants to do. The ACTUAL units deployed are determined by the equipment counts above, NOT by what the player claims in their plan.
 
 Return ONLY valid JSON (no markdown, no code blocks):
 {

@@ -511,7 +511,7 @@ export function registerHandlers(bot) {
         const tactic = d.includes('_heavy_') ? 'heavy' : d.includes('_precise_') ? 'precise' : d.includes('_ambush_') ? 'ambush' : d.includes('_air_') ? 'air_raid' : 'naval';
         const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی' };
         setState(uid, 'awaiting_attack_plan', JSON.stringify({ warId: wid, tactic }));
-        await safeEdit(ctx, `⚔️ **${names[tactic]}** انتخاب شد.\n\n📝 حالا طرح حمله خود را بنویس:`, { reply_markup: backBtn() });
+        await safeEdit(ctx, `⚔️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح حمله:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً حمله هوایی، محاصره، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
         return;
       }
 
@@ -520,7 +520,7 @@ export function registerHandlers(bot) {
         const tactic = d.includes('_nuclear_') ? 'nuclear' : d.includes('_counter_') ? 'counter' : d.includes('_ambush_def_') ? 'ambush' : 'defend';
         const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ حمله اتمی' };
         setState(uid, 'awaiting_defense_plan', JSON.stringify({ warId: wid, tactic }));
-        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n\n📝 حالا طرح دفاع خود را بنویس:`, { reply_markup: backBtn() });
+        await safeEdit(ctx, `🛡️ **${names[tactic]}** انتخاب شد.\n\n📝 **طرح دفاع:** استراتژی و تاکتیکت رو بنویس.\n💡 فقط بنویس **چه کاری میخوای انجام بدهی** (مثلاً دفاع موضعی، ضدحمله، و...)\n⚠️ تعداد نیروها از موجودی واقعیت استفاده میشه.`, { reply_markup: backBtn() });
         return;
       }
 
@@ -533,6 +533,7 @@ export function registerHandlers(bot) {
           { reply_markup: warActionKeyboard(wid, true) });
         await safeSend(bot, w.defender_tid, `⏭️ راند ${w.current_round} شروع شد.`);
         await sendToGroup(bot, `➡️ **راند ${w.current_round} شروع شد**`, warTopicId);
+        return;
         return;
       }
 
@@ -843,8 +844,6 @@ export function registerHandlers(bot) {
         `⚔️ **${w.attacker_name}** طرح حمله نوشت!\n\n🛡️ **حالا تو دفاع کن!**\nطرح دفاع خود را بنویس:`,
         { reply_markup: warActionKeyboard(w.id, false) }
       );
-      const warTopicId = getWarTopicId(w.id);
-      await sendToGroup(bot, `⚔️ راند ${w.current_round} — حمله ثبت شد\n📝 "${txt}"`, warTopicId);
       return;
     }
 
