@@ -42,8 +42,6 @@ import { getUnitDef, getIndustryDef, UNIT_TYPES, INDUSTRY_TYPES, COUNTRIES } fro
 import { dashMsg, profileMsg } from './messages.js';
 
 const UT = Object.fromEntries(UNIT_TYPES.map(u => [u.id, u]));
-const processing = new Map();
-const lastMessage = new Map();
 
 function getUnitPrice(typeId) {
   const p = { infantry: 3, tank: 40, artillery: 35, airdef: 45, missile: 60, fighter: 120, bomber: 150, helicopter: 60, destroyer: 200, submarine: 250, capital: 500 };
@@ -105,34 +103,25 @@ async function sendToTopic(bot, gid, tid, text) {
 
 export function registerHandlers(bot) {
 
-  // Auto-detect group from ANY message (even non-user messages)
+  // Auto-detect group from group messages only
   bot.on('message', (ctx) => {
-    detectGroupId(ctx);
+    if (ctx.chat?.type === 'supergroup' || ctx.chat?.type === 'group') {
+      detectGroupId(ctx);
+    }
   });
 
   bot.on('message:text', async (ctx) => {
     const uid = ctx.from.id;
-    
-    // Auto-detect group ID from any group message
-    detectGroupId(ctx);
-    
-    // Spam protection - 1 second cooldown
-    const now = Date.now();
-    const last = lastMessage.get(uid) || 0;
-    if (now - last < 1000) return;
-    lastMessage.set(uid, now);
-    
-    // Processing lock - prevent double-submit
-    if (processing.has(uid)) return;
-    processing.set(uid, true);
-    
-    try {
-    const u = getUserByTelegramId(uid);
-    if (!u) { processing.delete(uid); return; }
-    const st = getState(uid);
-    if (!st) { processing.delete(uid); return; }
-    const d = JSON.parse(st.data || '{}');
     const txt = ctx.message.text;
+    
+    // Skip commands - let bot.command handle them
+    if (txt.startsWith('/')) return;
+    
+    const u = getUserByTelegramId(uid);
+    if (!u) return;
+    const st = getState(uid);
+    if (!st) return;
+    const d = JSON.parse(st.data || '{}');
 
     if (st.state === 'awaiting_war_reason') {
       const t = getUserByTelegramId(d.targetId);
@@ -512,25 +501,11 @@ export function registerHandlers(bot) {
       }
       return;
     }
-    } catch (err) {
-      console.error('Text handler error:', err.message);
-    } finally {
-      processing.delete(uid);
-    }
   });
 
   bot.on('callback_query:data', async (ctx) => {
     const d = ctx.callbackQuery.data;
     const uid = ctx.from.id;
-    
-    // Auto-detect group ID
-    detectGroupId(ctx);
-    
-    // Prevent callback spam
-    const cbKey = `${uid}:${d}`;
-    if (processing.has(cbKey)) return;
-    processing.set(cbKey, true);
-    
     await ctx.answerCallbackQuery().catch(() => {});
 
     try {
@@ -1276,8 +1251,6 @@ export function registerHandlers(bot) {
 
     } catch (err) {
       console.error('Callback error:', d, err.message);
-    } finally {
-      processing.delete(cbKey);
     }
   });
 }
