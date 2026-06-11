@@ -551,46 +551,6 @@ export function registerHandlers(bot) {
         return;
       }
 
-      if (d.startsWith('war_plan_')) {
-        const wid = parseInt(d.slice(9));
-        const w = getWarDetail(wid);
-        if (!w) return;
-        const isA = w.attacker_tid === uid;
-        const existing = getExistingRound(w.id, w.current_round);
-        if (isA && existing && existing.attacker_action) {
-          await safeEdit(ctx, '⏳ قبلاً طرح حمله ثبت شده! منتظر طرح دفاع باش.', { reply_markup: warDetailKeyboard(wid) });
-          return;
-        }
-        if (!isA && existing && existing.defender_action) {
-          await safeEdit(ctx, '⏳ قبلاً طرح دفاع ثبت شده!', { reply_markup: warDetailKeyboard(wid) });
-          return;
-        }
-
-        // Show current equipment first
-        const user = isA ? getUserRaw(w.attacker_tid) : getUserRaw(w.defender_tid);
-        const flag = isA ? w.attacker_flag : w.defender_flag;
-        const country = isA ? w.attacker_name : w.defender_name;
-        const lang = user.language || 'fa';
-        let eqText = `🎖️ **تجهیزات فعلی ${flag} ${country}:**\n\n`;
-        user.equipment.forEach(eq => {
-          const def = UT[eq.type];
-          if (def && eq.count > 0) {
-            eqText += `${def.icon} **${getModelName(eq.model, lang)}**: ${eq.count.toLocaleString()} (${getUnitName(eq.type, lang)})\n   ⚔️ ${def.atk} | 🛡️ ${def.def}\n`;
-          }
-        });
-        eqText += `\n━━━━━━━━━━━━━━━━━━\n`;
-
-        setState(uid, isA ? 'awaiting_attack_plan' : 'awaiting_defense_plan', JSON.stringify({ warId: wid }));
-        await safeEdit(ctx,
-          eqText +
-          (isA
-            ? `💥 **طرح حمله — راند ${w.current_round}**\n\n${w.attacker_flag} → ${w.defender_flag}\n\n📝 طرح حمله خود را بنویس.`
-            : `🛡️ **طرح دفاع — راند ${w.current_round}**\n\n${w.defender_flag} در برابر ${w.attacker_flag}\n\n📝 طرح دفاع خود را بنویس.`),
-          { reply_markup: backBtn() }
-        );
-        return;
-      }
-
       if (d.startsWith('war_tactic_defend_') || d.startsWith('war_tactic_counter_') || d.startsWith('war_tactic_ambush_def_') || d.startsWith('war_tactic_nuke_def_') || d.startsWith('war_tactic_bio_def_') || d.startsWith('war_tactic_cyber_def_') || d.startsWith('war_tactic_emp_def_') || d.startsWith('war_tactic_napalm_def_')) {
         const wid = parseInt(d.split('_').pop());
         let tactic = 'defend';
@@ -646,7 +606,7 @@ export function registerHandlers(bot) {
         const w = getWarDetail(wid);
         if (!w) return;
         const warTopicId = getWarTopicId(wid);
-        await safeEdit(ctx, `⏭️ **راند ${w.current_round}**\n\n✍️ طرح حمله بعدی را بنویس:`,
+        await safeEdit(ctx, `⏭️ **راند ${w.current_round}**\n\n👇 یک تاکتیک جدید انتخاب کن:`,
           { reply_markup: warActionKeyboard(wid, true) });
         await safeSend(bot, w.defender_tid, `⏭️ راند ${w.current_round} شروع شد.`);
         await sendToGroup(bot, `➡️ **راند ${w.current_round} شروع شد**`, warTopicId);
@@ -935,7 +895,7 @@ export function registerHandlers(bot) {
       }
 
       await ctx.reply(
-        `⚔️ **جنگ اعلام شد!**\n\n🔴 ${u.country_flag} **${u.country_name}** → 🔵 ${t.country_flag} **${t.country_name}**\n\n📝 "${txt}"\n\n━━━━━━━━━━━━━━━━━━\n🎯 **راند ۱** — طرح حمله را بنویس:`,
+        `⚔️ **جنگ اعلام شد!**\n\n🔴 ${u.country_flag} **${u.country_name}** → 🔵 ${t.country_flag} **${t.country_name}**\n\n📝 "${txt}"\n━━━━━━━━━━━━━━━━━━\n🎯 **راند ۱**\n\n👇 یک تاکتیک حمله انتخاب کن:\n\n💡 بعد از انتخاب تاکتیک، تجهیزاتت رو مشخص کن.`,
         { reply_markup: warActionKeyboard(wid, true), parse_mode: 'Markdown' }
       );
       await safeSend(bot, d.targetId,
