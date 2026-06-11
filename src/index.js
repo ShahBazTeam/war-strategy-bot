@@ -73,12 +73,47 @@ bot.command('cancel', async (ctx) => {
 });
 
 const PORT = process.env.PORT || 3000;
-http.createServer((_, res) => { res.writeHead(200); res.end('OK'); }).listen(PORT, () => console.log(`Health on ${PORT}`));
 
-initDatabase().then(() => {
-  registerHandlers(bot);
-  bot.start({ drop_pending_updates: true }).catch(e => console.log('⚠️ start:', e.message));
-  console.log('🤖 Bot running');
-}).catch(err => { console.error('DB init failed:', err); process.exit(1); });
+const server = http.createServer((_, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('OK');
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Health server listening on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err.message);
+});
+
+async function startBot() {
+  try {
+    await initDatabase();
+    console.log('Database initialized');
+    
+    registerHandlers(bot);
+    console.log('Handlers registered');
+    
+    await bot.api.deleteMyCommands();
+    await bot.api.setMyCommands([]);
+    
+    bot.start({ drop_pending_updates: true }).then(() => {
+      console.log('Bot polling started');
+    }).catch(e => {
+      console.error('Bot start error:', e.message);
+    });
+    
+    console.log('Bot running');
+  } catch (err) {
+    console.error('Startup failed:', err.message);
+    console.error(err.stack);
+  }
+}
+
+startBot();
 
 process.on('SIGTERM', () => { bot.stop(); process.exit(0); });
+process.on('SIGINT', () => { bot.stop(); process.exit(0); });
+process.on('uncaughtException', (err) => { console.error('Uncaught:', err.message); });
+process.on('unhandledRejection', (err) => { console.error('Unhandled:', err); });
