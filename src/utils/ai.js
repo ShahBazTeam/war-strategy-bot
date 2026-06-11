@@ -10,12 +10,6 @@ const AI_PROVIDERS = [
     model: 'nemotron-3-ultra-free'
   },
   {
-    name: 'opencode-bigpickle',
-    url: 'https://opencode.ai/zen/v1/chat/completions',
-    key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
-    model: 'big-pickle'
-  },
-  {
     name: 'groq',
     url: 'https://api.groq.com/openai/v1/chat/completions',
     key: process.env.GROQ_API_KEY,
