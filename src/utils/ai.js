@@ -4,38 +4,79 @@ dotenv.config();
 
 const AI_PROVIDERS = [
   {
+    name: 'google-gemini',
+    type: 'google',
+    key: process.env.GOOGLE_AI_KEY,
+    model: 'gemini-2.0-flash'
+  },
+  {
     name: 'opencode-nemotron',
+    type: 'openai',
     url: 'https://opencode.ai/zen/v1/chat/completions',
     key: process.env.OPENCODE_API_KEY || 'sk-4hvB3VNZsncxOjvGQ3kpVoRJmMpsQXAzsupLqSKqYCEangeu5Ih3H3UOqSVarIdx',
     model: 'nemotron-3-ultra-free'
   },
   {
     name: 'groq',
+    type: 'openai',
     url: 'https://api.groq.com/openai/v1/chat/completions',
     key: process.env.GROQ_API_KEY,
     model: 'llama-3.1-8b-instant'
   },
   {
     name: 'openrouter',
+    type: 'openai',
     url: 'https://openrouter.ai/api/v1/chat/completions',
     key: process.env.OPENROUTER_API_KEY,
     model: 'meta-llama/llama-3.1-8b-instruct:free'
   }
 ];
 
+async function callGoogleGemini(messages, maxTokens, temp, provider) {
+  const systemMsg = messages.find(m => m.role === 'system')?.content || '';
+  const userMsg = messages.filter(m => m.role !== 'system').map(m => m.content).join('\n\n');
+
+  const contents = [];
+  if (systemMsg) {
+    contents.push({ role: 'user', parts: [{ text: systemMsg }] });
+    contents.push({ role: 'model', parts: [{ text: 'OK, I understand.' }] });
+  }
+  contents.push({ role: 'user', parts: [{ text: userMsg || messages[0]?.content || '' }] });
+
+  const r = await axios.post(
+    `https://generativelanguage.googleapis.com/v1beta/models/${provider.model}:generateContent?key=${provider.key}`,
+    {
+      contents,
+      generationConfig: {
+        temperature: temp,
+        maxOutputTokens: maxTokens
+      }
+    },
+    { timeout: 30000 }
+  );
+
+  const text = r.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+  return text || null;
+}
+
 async function callAI(messages, maxTokens = 200, temp = 0.3) {
   for (const provider of AI_PROVIDERS) {
     if (!provider.key) continue;
     try {
-      const r = await axios.post(provider.url, {
-        model: provider.model, messages, temperature: temp, max_tokens: maxTokens
-      }, {
-        headers: { 'Authorization': `Bearer ${provider.key}`, 'Content-Type': 'application/json' },
-        timeout: 20000
-      });
-      const content = r.data.choices[0]?.message?.content?.trim();
+      let content;
+      if (provider.type === 'google') {
+        content = await callGoogleGemini(messages, maxTokens, temp, provider);
+      } else {
+        const r = await axios.post(provider.url, {
+          model: provider.model, messages, temperature: temp, max_tokens: maxTokens
+        }, {
+          headers: { 'Authorization': `Bearer ${provider.key}`, 'Content-Type': 'application/json' },
+          timeout: 20000
+        });
+        content = r.data.choices[0]?.message?.content?.trim();
+      }
       if (content) {
-        if (provider.name !== 'freemodel.dev') console.log(`AI fallback used: ${provider.name}`);
+        console.log(`AI used: ${provider.name}`);
         return content;
       }
     } catch (err) {
