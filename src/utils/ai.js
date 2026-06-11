@@ -2,23 +2,48 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const AI_API_URL = process.env.AI_API_URL || 'https://api.freemodel.dev/v1/chat/completions';
-const AI_API_KEY = process.env.AI_API_KEY;
+const AI_PROVIDERS = [
+  {
+    name: 'freemodel.dev',
+    url: process.env.AI_API_URL || 'https://api.freemodel.dev/v1/chat/completions',
+    key: process.env.AI_API_KEY,
+    model: 'gpt-4o-mini'
+  },
+  {
+    name: 'groq',
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    key: process.env.GROQ_API_KEY,
+    model: 'llama-3.1-8b-instant'
+  },
+  {
+    name: 'openrouter',
+    url: 'https://openrouter.ai/api/v1/chat/completions',
+    key: process.env.OPENROUTER_API_KEY,
+    model: 'meta-llama/llama-3.1-8b-instruct:free'
+  }
+];
 
 async function callAI(messages, maxTokens = 200, temp = 0.3) {
-  if (!AI_API_KEY) { console.warn('AI_API_KEY not set'); return null; }
-  try {
-    const r = await axios.post(AI_API_URL, {
-      model: 'gpt-4o-mini', messages, temperature: temp, max_tokens: maxTokens
-    }, {
-      headers: { 'Authorization': `Bearer ${AI_API_KEY}`, 'Content-Type': 'application/json' },
-      timeout: 20000
-    });
-    return r.data.choices[0].message.content.trim();
-  } catch (err) {
-    console.error('AI error:', err.response?.status || '', err.message);
-    return null;
+  for (const provider of AI_PROVIDERS) {
+    if (!provider.key) continue;
+    try {
+      const r = await axios.post(provider.url, {
+        model: provider.model, messages, temperature: temp, max_tokens: maxTokens
+      }, {
+        headers: { 'Authorization': `Bearer ${provider.key}`, 'Content-Type': 'application/json' },
+        timeout: 20000
+      });
+      const content = r.data.choices[0]?.message?.content?.trim();
+      if (content) {
+        if (provider.name !== 'freemodel.dev') console.log(`AI fallback used: ${provider.name}`);
+        return content;
+      }
+    } catch (err) {
+      console.error(`AI error (${provider.name}):`, err.response?.status || '', err.message);
+    }
   }
+  console.warn('All AI providers failed');
+  return null;
 }
 
 export async function checkWarReason(reason, attackerCountry, defenderCountry) {
