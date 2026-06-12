@@ -19,7 +19,7 @@ import { CATALOG, INITIAL_QUANTITIES } from "./src/catalogData";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 app.use(express.json({ limit: "15mb" }));
 
@@ -2044,118 +2044,6 @@ app.get("/api/countries/leaderboard", (req, res) => {
   });
 
   res.json({ leaderboard: ranked });
-});
-
-// Get all tweets
-app.get("/api/tweets", (req, res) => {
-  res.json({ tweets: db.tweets || [] });
-});
-
-// Post a new tweet
-app.post("/api/tweets", checkRateLimit, async (req, res) => {
-  const user = getCurrentUser(req);
-  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
-
-  const { text } = req.body;
-  if (!text || text.trim().length < 5) {
-    return res.status(400).json({ error: "متن پیام کوتاه است. حداقل ۵ کاراکتر نیاز است." });
-  }
-
-  const newTweet: Tweet = {
-    id: "tweet_" + Math.random().toString(36).substring(2, 9),
-    userId: user.id,
-    username: user.username,
-    countryName: user.country.name,
-    flagUrl: user.country.flagUrl,
-    text: text.trim(),
-    likes: [],
-    comments: [],
-    timestamp: new Date().toISOString(),
-    isVerified: user.isAdmin
-  };
-
-  if (!db.tweets) db.tweets = [];
-  db.tweets.unshift(newTweet);
-
-  // Gemini integration: AI Reaction of a rival/journalism body
-  const isAiActive = geminiApiKey && geminiApiKey !== "MOCK_KEY_FOR_BUILD";
-  if (isAiActive) {
-    // Generate AI response in background
-    setTimeout(async () => {
-      try {
-        const aiPrompt = `کشور مستقل "${user.country.name}" به رهبری "${user.username}" پیام توییتری یا بیانیه فوری زیر را صادر کرده است:
-"${text}"
-
-به عنوان یکی دیگر از رهبران ملت‌های رقیب در بازی یا خبرگزاری مطرح جهانی (مانند الجزیره فارسی یا رویترز دیپلماتیک)، یک پاسخ کوتاه، جنجالی، هوشمندانه یا حمایتی به زبان فارسی بنویسید که در شبکه اجتماعی ثبت شود.
-پاسخ شما باید در این فرمت JSON دقیق باشد:
-{
-  "authorName": "اسم ارگان خبرگزاری یا رهبر فرضی (مثلا: خبرگزاری ملل متحد، یا دبیرکل رویترز، یا لرد اسمیت بریتانیا، یا وزیر دفاع چین)",
-  "flag": "یک اموجی پرچم یا مرتبط",
-  "text": "متن پاسخ کوتاه دیپلماتیک و جذاب به فارسی (حداکثر ۱۰۰ کاراکتر)"
-}`;
-
-        const systemPrompt = "تو ربات تحلیلگر اخبار و حواشی ژئوپلیتیک توییتر دیپلماسی در بازی شبیه‌سازی نظامی-سیاسی ملل هستی.";
-        const aiSchema = {
-          type: Type.OBJECT,
-          properties: {
-            authorName: { type: Type.STRING },
-            flag: { type: Type.STRING },
-            text: { type: Type.STRING }
-          },
-          required: ["authorName", "flag", "text"]
-        };
-
-        const replyRaw = await callGemini(aiPrompt, systemPrompt, aiSchema);
-        const replyParsed = JSON.parse(replyRaw);
-
-        const aiCommentComment: TweetComment = {
-          id: "t_com_" + Math.random().toString(36).substring(2, 9),
-          userId: "thesurenax_ai_reporter",
-          username: replyParsed.authorName,
-          countryName: replyParsed.authorName,
-          flagUrl: replyParsed.flag || "🌐",
-          text: replyParsed.text,
-          timestamp: new Date().toISOString(),
-          isVerified: true
-        };
-
-        const activeTweetObj = db.tweets.find(t => t.id === newTweet.id);
-        if (activeTweetObj) {
-          activeTweetObj.comments.push(aiCommentComment);
-          saveDatabase();
-        }
-      } catch (err) {
-        console.error("AI automated tweet reaction failed:", err);
-      }
-    }, 1500);
-  } else {
-    // Simulated simple local reaction for fallback when Gemini is offline/disabled
-    setTimeout(() => {
-      const fallbacks = [
-        { authorName: "خبرگزاری سازمان ملل متحد", flag: "🇺🇳", text: "گزارش فوری: شورای امنیت روند تحولات را زیر نظر دارد و بیانیه‌های متناقض را بررسی می‌کند." },
-        { authorName: "سخنگوی پنتاگون فرضی", flag: "🚨", text: "موضع‌گیری تحریک‌آمیز در توییت دیپلماسی ردیابی گردید؛ آمادگی نظامی افزایش می‌یابد." },
-        { authorName: "رویترز دیپلماتیک دسک", flag: "🎙️", text: "کارشناسان می‌گویند این بیانیه جدید می‌تواند به نوسان اقتصادی در منطقه منجر شود." }
-      ];
-      const pick = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-      const activeTweetObj = db.tweets.find(t => t.id === newTweet.id);
-      if (activeTweetObj) {
-        activeTweetObj.comments.push({
-          id: "t_com_" + Math.random().toString(36).substring(2, 9),
-          userId: "fallback_reporter",
-          username: pick.authorName,
-          countryName: pick.authorName,
-          flagUrl: pick.flag,
-          text: pick.text,
-          timestamp: new Date().toISOString(),
-          isVerified: true
-        });
-        saveDatabase();
-      }
-    }, 1000);
-  }
-
-  saveDatabase();
-  res.status(201).json({ tweet: newTweet, message: "پیام دیپلماتیک شما در شبکه توییتر بازی ثبت شد!" });
 });
 
 // Like a tweet

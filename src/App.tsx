@@ -395,7 +395,7 @@ export default function App() {
     try {
       await apiCall("/api/diplomacy/submit-defense", {
         method: "POST",
-        body: JSON.stringify({ warId, scenario })
+        body: JSON.stringify({ warId, defenseScenario: scenario })
       });
       showTemporarySuccess("بیانیه دفاعی ثبت شد. جنگ آغاز گردید!");
       fetchGlobalData();
@@ -406,7 +406,7 @@ export default function App() {
     try {
       const res = await apiCall("/api/diplomacy/battle-round", {
         method: "POST",
-        body: JSON.stringify({ warId, tactic })
+        body: JSON.stringify({ warId, tacticalScenario: tactic })
       });
       showTemporarySuccess(`راند با موفقیت توسط جمینی شبیه‌سازی شد! امتیازات ارتش کشور شما تغییر کرد.`);
       fetchGlobalData();
@@ -416,7 +416,7 @@ export default function App() {
 
   const proposeBattleCeasefire = async (warId: string) => {
     try {
-      await apiCall("/api/diplomacy/propose-ceasefire", {
+      await apiCall("/api/diplomacy/ceasefire-propose", {
         method: "POST",
         body: JSON.stringify({ warId })
       });
@@ -427,7 +427,7 @@ export default function App() {
 
   const respondToCeasefireRequest = async (warId: string, accept: boolean) => {
     try {
-      await apiCall("/api/diplomacy/respond-ceasefire", {
+      await apiCall("/api/diplomacy/ceasefire-respond", {
         method: "POST",
         body: JSON.stringify({ warId, accept })
       });
@@ -475,7 +475,7 @@ export default function App() {
   // ALLIANCE ACTIONS
   const createModernAlliance = async (name: string, charter: string, logoUrl: string) => {
     try {
-      await apiCall("/api/alliances", {
+      await apiCall("/api/alliances/create", {
         method: "POST",
         body: JSON.stringify({ name, charter, logoUrl })
       });
@@ -487,7 +487,7 @@ export default function App() {
 
   const joinModernAlliance = async (allianceId: string) => {
     try {
-      await apiCall(`/api/alliances/${allianceId}/join`, { method: "POST" });
+      await apiCall("/api/alliances/join", { method: "POST", body: JSON.stringify({ allianceId }) });
       showTemporarySuccess("پیش‌نویس همپیمانی امضا گشت و به ائتلاف ملحق شدید.");
       fetchGlobalData();
       fetchCurrentUser();
