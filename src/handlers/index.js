@@ -14,7 +14,7 @@ import {
   industriesKeyboard, helpKeyboard, techKeyboard,
   allianceKeyboard, allianceTargetKeyboard, allianceActionKeyboard,
   countrySelectKeyboard, languageSelectKeyboard,
-  warTargetKeyboard, warActionKeyboard
+  warTargetKeyboard, warActionKeyboard, nextRoundKeyboard
 } from '../keyboards/index.js';
 import { checkWarValidity, evaluateBattleRound } from '../utils/ai.js';
 import { createForumTopic, setDetectedGroupId, getDetectedGroupId } from '../utils/telegram.js';
@@ -362,24 +362,15 @@ async function handleDefensePlan(ctx, text, bot) {
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await sendToGroup(bot, endMsg, warTopicId);
     } else {
-      updateWarRound(parseInt(war.id), war.current_round + 1);
+      const choiceMsg = `راند ${war.current_round} تمام شد.\n\nانتخاب کنید:`;
 
-      const nextRoundMsg = `راند ${war.current_round + 1} شروع شد.\n\nسناریوی حمله/دفاع جدید خود را بنویسید:`;
-
-      await safeSend(bot, war.attacker_tid, nextRoundMsg, { reply_markup: backBtn() });
-      await safeSend(bot, war.defender_tid, nextRoundMsg, { reply_markup: backBtn() });
-
-      pendingWars.set(war.attacker_tid, {
-        step: 'attack_plan',
-        warId: parseInt(war.id),
-        attackPlan: pending.attackPlan
+      await safeSend(bot, war.attacker_tid, choiceMsg, {
+        reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
-
-      pendingWars.set(war.defender_tid, {
-        step: 'defense_plan',
-        warId: parseInt(war.id),
-        attackPlan: pending.attackPlan
+      await safeSend(bot, war.defender_tid, choiceMsg, {
+        reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
+      await sendToGroup(bot, choiceMsg, warTopicId);
     }
   } catch (err) {
     console.error('[War] Battle error:', err.message);
@@ -530,24 +521,15 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await sendToGroup(bot, endMsg, warTopicId);
     } else {
-      updateWarRound(parseInt(war.id), war.current_round + 1);
+      const choiceMsg = `راند ${war.current_round} تمام شد.\n\nانتخاب کنید:`;
 
-      const nextRoundMsg = `راند ${war.current_round + 1} شروع شد.\n\nسناریوی جدید خود را بنویسید:`;
-
-      await safeSend(bot, war.attacker_tid, nextRoundMsg, { reply_markup: backBtn() });
-      await safeSend(bot, war.defender_tid, nextRoundMsg, { reply_markup: backBtn() });
-
-      pendingWars.set(war.attacker_tid, {
-        step: 'attack_plan',
-        warId: parseInt(war.id),
-        attackPlan: attackPlan
+      await safeSend(bot, war.attacker_tid, choiceMsg, {
+        reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
-
-      pendingWars.set(war.defender_tid, {
-        step: 'defense_plan',
-        warId: parseInt(war.id),
-        attackPlan: attackPlan
+      await safeSend(bot, war.defender_tid, choiceMsg, {
+        reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
+      await sendToGroup(bot, choiceMsg, warTopicId);
     }
   } catch (err) {
     console.error('[War] Next round error:', err.message);
@@ -767,11 +749,140 @@ export function registerHandlers(bot) {
     });
   });
 
+  // ─── War Post-Round Choices ──────────────────────────────
+
+  bot.callbackQuery(/^war_continue_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = parseInt(ctx.match[1]);
+    const uid = ctx.from.id;
+    const war = getWarDetail(warId);
+    if (!war) return;
+
+    if (war.attacker_tid !== uid && war.defender_tid !== uid) return;
+
+    updateWarRound(warId, war.current_round + 1);
+
+    const isAttacker = war.attacker_tid === uid;
+    const opponentTid = isAttacker ? war.defender_tid : war.attacker_tid;
+
+    const msg = `راند ${war.current_round + 1} شروع شد.\n\nسناریوی جدید خود را بنویسید:`;
+
+    await safeEdit(ctx, msg);
+    await safeSend(bot, opponentTid, msg, { reply_markup: backBtn() });
+
+    pendingWars.set(war.attacker_tid, {
+      step: 'attack_plan',
+      warId: warId,
+      attackPlan: war.reason
+    });
+
+    pendingWars.set(war.defender_tid, {
+      step: 'defense_plan',
+      warId: warId,
+      attackPlan: war.reason
+    });
+  });
+
+  bot.callbackQuery(/^war_peace_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = parseInt(ctx.match[1]);
+    const uid = ctx.from.id;
+    const war = getWarDetail(warId);
+    if (!war) return;
+
+    if (war.attacker_tid !== uid && war.defender_tid !== uid) return;
+
+    const isAttacker = war.attacker_tid === uid;
+    const opponentTid = isAttacker ? war.defender_tid : war.attacker_tid;
+    const requester = getUserByTelegramId(uid);
+
+    endWar(warId, null);
+
+    const peaceMsg = `صلح سفید!\n\n${requester.country_flag} ${requester.country_name} پیشنهاد صلح داد.\n\nجنگ بدون برنده پایان یافت.`;
+
+    await safeEdit(ctx, peaceMsg, { reply_markup: mainMenuKeyboard() });
+    await safeSend(bot, opponentTid, peaceMsg, { reply_markup: mainMenuKeyboard() });
+    await sendToGroup(bot, peaceMsg, warTopicId);
+  });
+
+  bot.callbackQuery(/^war_surrender_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = parseInt(ctx.match[1]);
+    const uid = ctx.from.id;
+    const war = getWarDetail(warId);
+    if (!war) return;
+
+    if (war.attacker_tid !== uid && war.defender_tid !== uid) return;
+
+    const isAttacker = war.attacker_tid === uid;
+    const winnerTid = isAttacker ? war.defender_tid : war.attacker_tid;
+    const loser = getUserByTelegramId(uid);
+    const winner = getUserByTelegramId(winnerTid);
+
+    endWar(warId, winnerTid);
+
+    const surrenderMsg = `تسلیم!\n\n${loser.country_flag} ${loser.country_name} تسلیم شد.\n\nبرنده: ${winner.country_flag} ${winner.country_name}`;
+
+    await safeEdit(ctx, surrenderMsg, { reply_markup: mainMenuKeyboard() });
+    await safeSend(bot, winnerTid, surrenderMsg, { reply_markup: mainMenuKeyboard() });
+    await sendToGroup(bot, surrenderMsg, warTopicId);
+  });
+
+  bot.callbackQuery(/^war_conquer_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = parseInt(ctx.match[1]);
+    const uid = ctx.from.id;
+    const war = getWarDetail(warId);
+    if (!war) return;
+
+    if (war.attacker_tid !== uid && war.defender_tid !== uid) return;
+
+    const isAttacker = war.attacker_tid === uid;
+    const conquerorTid = isAttacker ? war.attacker_tid : war.defender_tid;
+    const loserTid = isAttacker ? war.defender_tid : war.attacker_tid;
+    const conqueror = getUserByTelegramId(conquerorTid);
+    const loser = getUserByTelegramId(loserTid);
+
+    endWar(warId, conquerorTid);
+
+    const conquerMsg = `فتح کامل!\n\n${conqueror.country_flag} ${conqueror.country_name} ${loser.country_flag} ${loser.country_name} را فتح کرد!`;
+
+    await safeEdit(ctx, conquerMsg, { reply_markup: mainMenuKeyboard() });
+    await safeSend(bot, loserTid, conquerMsg, { reply_markup: mainMenuKeyboard() });
+    await sendToGroup(bot, conquerMsg, warTopicId);
+  });
+
+  bot.callbackQuery(/^war_colony_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = parseInt(ctx.match[1]);
+    const uid = ctx.from.id;
+    const war = getWarDetail(warId);
+    if (!war) return;
+
+    if (war.attacker_tid !== uid && war.defender_tid !== uid) return;
+
+    const isAttacker = war.attacker_tid === uid;
+    const masterTid = isAttacker ? war.attacker_tid : war.defender_tid;
+    const colonyTid = isAttacker ? war.defender_tid : war.attacker_tid;
+    const master = getUserByTelegramId(masterTid);
+    const colony = getUserByTelegramId(colonyTid);
+
+    endWar(warId, masterTid);
+
+    const colonyMsg = `مستعمره!\n\n${colony.country_flag} ${colony.country_name} مستعمره ${master.country_flag} ${master.country_name} شد!`;
+
+    await safeEdit(ctx, colonyMsg, { reply_markup: mainMenuKeyboard() });
+    await safeSend(bot, masterTid, colonyMsg, { reply_markup: mainMenuKeyboard() });
+    await sendToGroup(bot, colonyMsg, warTopicId);
+  });
+
   // ─── Message Handler ────────────────────────────────────────
 
   bot.on('message:text', async (ctx) => {
     const text = ctx.message.text;
     const uid = ctx.from.id;
+
+    if (ctx.chat.type !== 'private') return;
 
     try {
       if (pendingWars.has(uid)) {

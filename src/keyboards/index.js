@@ -197,8 +197,13 @@ export function warDetailKeyboard(wid) {
 
 export function nextRoundKeyboard(wid) {
   return new InlineKeyboard()
-    .text('⏭️ راند بعدی', `next_round_${wid}`)
-    .text('🏳️ تسلیم', `surrender_${wid}`)
+    .text('⚔️ ادامه نبرد', `war_continue_${wid}`)
+    .row()
+    .text('☮️ صلح سفید', `war_peace_${wid}`)
+    .text('🏳️ تسلیم', `war_surrender_${wid}`)
+    .row()
+    .text('👑 فتح کامل', `war_conquer_${wid}`)
+    .text('🏴 مستعمره', `war_colony_${wid}`)
     .row()
     .text('🔙 بازگشت', 'war_status');
 }
