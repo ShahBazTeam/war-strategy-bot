@@ -28,9 +28,9 @@ const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const AI_BASE_URL = "https://openrouter.ai/api/v1";
 const AI_MODELS = [
   "nvidia/nemotron-3-super-120b-a12b:free",
-  "meta-llama/llama-3.1-8b-instruct:free",
-  "google/gemma-2-9b-it:free",
-  "qwen/qwen-2.5-7b-instruct:free",
+  "openai/gpt-oss-120b:free",
+  "qwen/qwen3-next-80b-a3b-instruct:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
 ];
 let currentModelIndex = 0;
 
@@ -98,12 +98,12 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
       } catch (error: any) {
         lastError = error;
         console.error(`[AI] ${model} attempt ${attempt} failed:`, error.message);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
+        if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
       }
     }
     console.log(`[AI] Trying next model...`);
+    await new Promise(r => setTimeout(r, 3000));
   }
-
   const errMessage = lastError ? lastError.message : "خطای ناشناخته";
   console.error("All AI models failed. Error:", errMessage);
   
