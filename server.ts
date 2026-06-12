@@ -329,10 +329,23 @@ app.post("/api/auth/register", (req, res) => {
   }
 
   // Assign random country not already assigned if possible
-  const assignedCountries = db.users.map(u => u.country.originalName);
-  const remainingCountries = AVAILABLE_COUNTRIES.filter(c => !assignedCountries.includes(c.englishName));
+  const assignedCountries = db.users.map(u => u.country.originalName.toLowerCase());
+  const remainingCountries = AVAILABLE_COUNTRIES.filter(c => !assignedCountries.includes(c.englishName.toLowerCase()));
   const pool = remainingCountries.length > 0 ? remainingCountries : AVAILABLE_COUNTRIES;
   const picked = pool[Math.floor(Math.random() * pool.length)];
+
+  // If user chose a specific country, validate it's not taken
+  if (countryName) {
+    const requestedLower = countryName.toLowerCase();
+    const isTaken = db.users.some(u => {
+      const origLower = (u.country.originalName || "").toLowerCase();
+      const nameLower = (u.country.name || "").toLowerCase();
+      return origLower === requestedLower || nameLower === requestedLower;
+    });
+    if (isTaken) {
+      return res.status(400).json({ error: "این کشور قبلاً توسط کشور دیگری انتخاب شده است. لطفاً کشور دیگری برگزینید." });
+    }
+  }
 
   // Unequal, realistic starting assets based on chosen country
   let initialAssets: NationalAssets = {
