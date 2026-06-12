@@ -23,6 +23,7 @@ import { getUnitDef, getIndustryDef, UNIT_TYPES, COUNTRIES } from '../game/data.
 import { dashMsg, profileMsg } from './messages.js';
 
 const pendingWars = new Map();
+let warTopicId = null;
 
 function safeEdit(ctx, text, opts = {}) {
   return ctx.editMessageText(text, { parse_mode: 'Markdown', ...opts })
@@ -345,7 +346,7 @@ async function handleDefensePlan(ctx, text, bot) {
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, war.defender_tid, roundText, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, roundText);
+    await sendToGroup(bot, roundText, warTopicId);
 
     const ended = attPower <= 0 || defPower <= 0;
     if (ended) {
@@ -359,7 +360,7 @@ async function handleDefensePlan(ctx, text, bot) {
 
       await safeSend(bot, war.attacker_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
-      await sendToGroup(bot, endMsg);
+      await sendToGroup(bot, endMsg, warTopicId);
     } else {
       updateWarRound(parseInt(war.id), war.current_round + 1);
 
@@ -513,7 +514,7 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, war.defender_tid, roundText, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, roundText);
+    await sendToGroup(bot, roundText, warTopicId);
 
     const ended = attPower <= 0 || defPower <= 0;
     if (ended) {
@@ -527,7 +528,7 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
       await safeSend(bot, war.attacker_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
-      await sendToGroup(bot, endMsg);
+      await sendToGroup(bot, endMsg, warTopicId);
     } else {
       updateWarRound(parseInt(war.id), war.current_round + 1);
 
@@ -580,7 +581,26 @@ export function registerHandlers(bot) {
   bot.command('cancel', async (ctx) => {
     clearState(ctx.from.id);
     pendingWars.delete(ctx.from.id);
-    await ctx.reply('✅ لغو شد.', { reply_markup: mainMenuKeyboard() });
+    await ctx.reply('لغو شد.', { reply_markup: mainMenuKeyboard() });
+  });
+
+  bot.command('verbal', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const messageThreadId = ctx.message.message_thread_id;
+
+    if (ctx.chat.type !== 'supergroup') {
+      await ctx.reply('این دستور فقط در گروه کار می‌کند.');
+      return;
+    }
+
+    if (!messageThreadId) {
+      await ctx.reply('این دستور را در یک تاپیک ارسال کنید.');
+      return;
+    }
+
+    warTopicId = messageThreadId;
+    await ctx.reply(`تاپیک جنگ تنظیم شد!\n\nهمه نتایج نبرد در این تاپیک ارسال خواهد شد.`);
+    console.log(`[War] Topic set: ${messageThreadId} in chat ${chatId}`);
   });
 
   bot.callbackQuery(/^select_lang_(.+)$/, async (ctx) => {
