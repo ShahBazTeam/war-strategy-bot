@@ -26,6 +26,8 @@ export function languageSelectKeyboard() {
 export function mainMenuKeyboard() {
   return new InlineKeyboard()
     .text('👤 پروفایل', 'profile')
+    .text('🎁 پاداش روزانه', 'daily_claim')
+    .row()
     .text('🏪 فروشگاه', 'shop')
     .text('🏭 صنایع', 'industries')
     .row()

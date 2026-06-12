@@ -415,7 +415,7 @@ export function registerHandlers(bot) {
       if (d === 'sell_resources') {
         const u = getUserRaw(uid);
         if (!u) return;
-        await safeEdit(ctx, `💰 **فروش منابع**\n\n🛢 نفت: ${u.oil} | ⚙️ فولاد: ${u.steel} | 🌾 غذا: ${u.food}\n\n💎 هر ۱۰ = ۳۰💰`, { reply_markup: sellKeyboard() });
+        await safeEdit(ctx, `💰 **فروش منابع**\n\n🛢 نفت: ${u.oil} | ⚙️ فولاد: ${u.steel} | 🌾 غذا: ${u.food}\n\n💎 هر ۱۰ = ~۳۰💰 (قیمت پویا ±۲۰٪)`, { reply_markup: sellKeyboard() });
         return;
       }
 
@@ -426,8 +426,11 @@ export function registerHandlers(bot) {
         if (!u) return;
         if (u[resSell[d]] < 10) { await safeEdit(ctx, '❌ حداقل ۱۰ واحد.', { reply_markup: sellKeyboard() }); return; }
         const qty = Math.floor(u[resSell[d]] / 10) * 10;
-        updateResources(uid, { gold: (qty / 10) * 30, [resSell[d]]: -qty });
-        await safeEdit(ctx, `✅ ${qty} ${resSN[d]} فروخته شد\n💰 +${(qty / 10) * 30} طلا`, { reply_markup: sellKeyboard() });
+        const basePrice = 30;
+        const dynamicPrice = Math.floor(basePrice * (0.8 + Math.random() * 0.4));
+        const totalGold = Math.floor((qty / 10) * dynamicPrice);
+        updateResources(uid, { gold: totalGold, [resSell[d]]: -qty });
+        await safeEdit(ctx, `✅ ${qty} ${resSN[d]} فروخته شد\n💰 +${totalGold.toLocaleString()} طلا (قیمت: ${dynamicPrice}💰/۱۰ واحد)`, { reply_markup: sellKeyboard() });
         return;
       }
 
@@ -459,6 +462,24 @@ export function registerHandlers(bot) {
         setIndustries(uid, u.industries);
         const upd = getUserByTelegramId(uid);
         await safeEdit(ctx, `✅ **${upgNames[d]}** → سطح ${target.level}!\n💰 درآمد: ${calcDailyIncome(upd.industries, upd.country_id, upd.tech_economy || 1).toLocaleString()}💰`, { reply_markup: industriesKeyboard() });
+        return;
+      }
+
+      if (d === 'daily_claim') {
+        const u = getUserRaw(uid);
+        if (!u) return;
+        const now = Date.now();
+        const lastClaim = u.last_claim ? new Date(u.last_claim).getTime() : 0;
+        const cooldown = 24 * 60 * 60 * 1000;
+        if (now - lastClaim < cooldown) {
+          const remaining = Math.ceil((cooldown - (now - lastClaim)) / (60 * 60 * 1000));
+          await safeEdit(ctx, `⏰ **پاداش روزانه**\n\n⏳ هنوز ${remaining} ساعت مونده.\n🎁 بعد از ${remaining} ساعت دوباره بیا.`, { reply_markup: backBtn() });
+          return;
+        }
+        const reward = Math.floor(50 + Math.random() * 151);
+        updateResources(uid, { gold: reward });
+        setLastClaim(uid);
+        await safeEdit(ctx, `🎁 **پاداش روزانه!**\n\n💰 +${reward.toLocaleString()} طلا\n\n✅ فردا دوباره بیا!`, { reply_markup: backBtn() });
         return;
       }
 
