@@ -156,11 +156,13 @@ TASK:
 1. Is the reason valid and serious enough for a war? (not gibberish, not empty)
 2. Does the attacker have ANY military equipment to attack with?
 3. Is the scenario at least somewhat realistic given the equipment?
+4. IMPORTANT: Check if the user's scenario mentions equipment they DON'T actually have. For example, if they say "use 500 missiles" but only have 40 missiles, that's still OK (the battle simulation will handle realistic losses). But if they say "use nuclear bombs" and have no nuclear capability, that's a flag.
 
 RULES:
 - Be LENIENT. Almost any serious text should be approved.
 - Only reject if: completely empty, pure gibberish, or attacker has ZERO equipment.
 - Even a weak attack plan should be approved.
+- Even if user exaggerates numbers, approve it (battle simulation handles realism).
 
 Return ONLY JSON: {"valid": true/false, "reason": "brief explanation in Persian"}`;
 

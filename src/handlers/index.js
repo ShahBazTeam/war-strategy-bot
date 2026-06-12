@@ -64,11 +64,24 @@ function getGroupChatId() {
 
 async function sendToGroup(bot, text, topicId = null) {
   const gid = getGroupChatId();
-  if (!gid) return;
-  if (!topicId) {
-    await safeSend(bot, gid, text);
-  } else {
-    await safeSend(bot, gid, text, { message_thread_id: parseInt(topicId) });
+  if (!gid) { console.log('[sendToGroup] No group ID set. Use /verbal in group first.'); return; }
+  
+  const opts = { parse_mode: 'Markdown' };
+  if (topicId) opts.message_thread_id = parseInt(topicId);
+  
+  try {
+    await bot.api.sendMessage(gid, text, opts);
+    console.log('[sendToGroup] OK to group', gid, 'topic', topicId);
+  } catch (e) {
+    console.error('[sendToGroup] Markdown failed, trying plain:', e.message);
+    try {
+      const plainOpts = {};
+      if (topicId) plainOpts.message_thread_id = parseInt(topicId);
+      await bot.api.sendMessage(gid, text, plainOpts);
+      console.log('[sendToGroup] Plain OK to group', gid);
+    } catch (e2) {
+      console.error('[sendToGroup] FAILED:', e2.message);
+    }
   }
 }
 
@@ -413,10 +426,10 @@ async function handleNextRoundPlan(ctx, text, bot) {
     return false;
   }
 
-  if (pending.step === 'attack_plan') {
+  if (pending.step === 'next_attack') {
     pendingWars.delete(uid);
     pendingWars.set(uid, {
-      step: 'attack_plan_done',
+      step: 'next_attack_done',
       warId: pending.warId,
       attackPlan: text
     });
@@ -424,16 +437,16 @@ async function handleNextRoundPlan(ctx, text, bot) {
     await ctx.reply('طرح حمله ذخیره شد! منتظر طرح دفاع مدافع...');
 
     const defPending = pendingWars.get(war.defender_tid);
-    if (defPending && defPending.step === 'defense_plan_done') {
+    if (defPending && defPending.step === 'next_defense_done') {
       await startNextRound(bot, war, defPending.defensePlan, text);
     }
     return true;
   }
 
-  if (pending.step === 'defense_plan') {
+  if (pending.step === 'next_defense') {
     pendingWars.delete(uid);
     pendingWars.set(uid, {
-      step: 'defense_plan_done',
+      step: 'next_defense_done',
       warId: pending.warId,
       defensePlan: text
     });
@@ -441,7 +454,7 @@ async function handleNextRoundPlan(ctx, text, bot) {
     await ctx.reply('طرح دفاع ذخیره شد! منتظر طرح حمله مهاجم...');
 
     const attPending = pendingWars.get(war.attacker_tid);
-    if (attPending && attPending.step === 'attack_plan_done') {
+    if (attPending && attPending.step === 'next_attack_done') {
       await startNextRound(bot, war, text, attPending.attackPlan);
     }
     return true;
@@ -770,22 +783,20 @@ export function registerHandlers(bot) {
 
     updateWarRound(warId, war.current_round + 1);
 
-    const isAttacker = war.attacker_tid === uid;
-    const opponentTid = isAttacker ? war.defender_tid : war.attacker_tid;
-
     const msg = `راند ${war.current_round + 1} شروع شد.\n\nسناریوی جدید خود را بنویسید:`;
 
     await safeEdit(ctx, msg);
-    await safeSend(bot, opponentTid, msg, { reply_markup: backBtn() });
+    await safeSend(bot, war.attacker_tid, msg);
+    await safeSend(bot, war.defender_tid, msg);
 
     pendingWars.set(war.attacker_tid, {
-      step: 'attack_plan',
+      step: 'next_attack',
       warId: warId,
       attackPlan: war.reason
     });
 
     pendingWars.set(war.defender_tid, {
-      step: 'defense_plan',
+      step: 'next_defense',
       warId: warId,
       attackPlan: war.reason
     });
@@ -896,6 +907,11 @@ export function registerHandlers(bot) {
       if (pendingWars.has(uid)) {
         const pending = pendingWars.get(uid);
 
+        if (pending.step === 'next_attack' || pending.step === 'next_defense') {
+          const handled = await handleNextRoundPlan(ctx, text, bot);
+          if (handled) return;
+        }
+
         if (pending.step === 'war_plan') {
           const handled = await handleAttackerPlan(ctx, text, bot);
           if (handled) return;
@@ -903,11 +919,6 @@ export function registerHandlers(bot) {
 
         if (pending.step === 'defense_plan') {
           const handled = await handleDefensePlan(ctx, text, bot);
-          if (handled) return;
-        }
-
-        if (pending.step === 'attack_plan' || pending.step === 'defense_plan') {
-          const handled = await handleNextRoundPlan(ctx, text, bot);
           if (handled) return;
         }
       }
