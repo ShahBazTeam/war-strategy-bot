@@ -44,6 +44,11 @@ function verifyInitData(initData, botToken) {
 }
 
 function parseUser(initData) {
+  if (!initData) return null;
+  try {
+    const parsed = JSON.parse(initData);
+    if (parsed && parsed.id) return parsed;
+  } catch (e) {}
   try {
     const url = new URLSearchParams(initData);
     const userStr = url.get('user');
