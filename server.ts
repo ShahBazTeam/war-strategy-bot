@@ -27,10 +27,10 @@ app.use(express.json({ limit: "15mb" }));
 const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const AI_BASE_URL = "https://openrouter.ai/api/v1";
 const AI_MODELS = [
-  "nvidia/nemotron-3-super-120b-a12b:free",
   "openai/gpt-oss-120b:free",
-  "qwen/qwen3-next-80b-a3b-instruct:free",
-  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-nano-9b-v2:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
 ];
 let currentModelIndex = 0;
 
@@ -82,7 +82,10 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         }
 
         const data = await response.json() as any;
-        const responseText = data.choices?.[0]?.message?.content?.trim() || "";
+        let responseText = data.choices?.[0]?.message?.content?.trim() || "";
+        
+        // Strip markdown code blocks if present
+        responseText = responseText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
         
         currentModelIndex = (currentModelIndex + modelIdx) % AI_MODELS.length;
         console.log(`[AI] Success with model: ${model}`);
