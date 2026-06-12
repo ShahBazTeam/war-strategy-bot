@@ -80,8 +80,11 @@ export function getTotalPower(eq) { return calcMilitaryPower(eq); }
 export function getDailyIncome(ind) { return calcDailyIncome(ind); }
 export function getDailyExpenses(eq, ind) { return calcDailyExpenses(eq, ind); }
 
-export function getAllUsers(exTid) {
-  return all('SELECT DISTINCT u.telegram_id, c.name, c.flag FROM users u JOIN countries c ON u.country_id = c.id WHERE u.telegram_id != ?', [exTid]);
+export function getAllUsers(exTid = null) {
+  if (exTid) {
+    return all('SELECT DISTINCT u.telegram_id, c.name, c.flag FROM users u JOIN countries c ON u.country_id = c.id WHERE u.telegram_id != ?', [exTid]);
+  }
+  return all('SELECT DISTINCT u.telegram_id, c.name, c.flag FROM users u JOIN countries c ON u.country_id = c.id');
 }
 
 export function createWar(aId, dId, reason, aiV) {
