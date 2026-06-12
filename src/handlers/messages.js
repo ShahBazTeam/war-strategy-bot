@@ -1,13 +1,15 @@
 import { calcMilitaryPower, calcDailyIncome, calcDailyExpenses, formatEq, formatInd } from '../game/index.js';
 
+function esc(s) { return String(s || '').replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&'); }
+
 export function dashMsg(u) {
-  if (!u) return '💎 **جهان مدرن - Modern World**\n🧊 برای شروع کلیک کن:';
+  if (!u) return '💎 جهان مدرن - Modern World\n🧊 برای شروع کلیک کن:';
   const power = calcMilitaryPower(u.equipment);
   const income = calcDailyIncome(u.industries, u.country_id);
   const expenses = calcDailyExpenses(u.equipment, u.industries);
   const net = income - expenses;
   const lang = u.language || 'fa';
-  return `🧊 **داشبورد ${u.first_name}** 🧊
+  return `🧊 **داشبورد ${esc(u.first_name)}** 🧊
 
 ━━━━━━━━━━━━━━━━━━━
 🌍 ${u.country_flag} **${u.country_name}**
@@ -39,7 +41,7 @@ export function profileMsg(u) {
 
 ━━━━━━━━━━━━━━━━━━━
 🌍 **کشور:** ${u.country_flag} ${u.country_name}
-👤 **رهبر:** ${u.first_name}
+👤 **رهبر:** ${esc(u.first_name)}
 ━━━━━━━━━━━━━━━━━━━
 
 💰 **طلـا:** ${u.gold.toLocaleString()}

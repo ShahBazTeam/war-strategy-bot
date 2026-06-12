@@ -9,7 +9,7 @@ import {
   getUNResolutionVotes, getActiveUNResolutions, setWarTopicId, getWarTopicId,
   setUNResolutionTopicId,
   createAlliance, acceptAlliance, rejectAlliance, deleteAlliance,
-  getPendingAlliances, getActiveAlliances, isCountryAvailable
+  getPendingAlliances, getActiveAlliances, isCountryAvailable, setLastClaim
 } from '../database/index.js';
 import {
   mainMenuKeyboard, backBtn, shopKeyboard, resourcesKeyboard, sellKeyboard,
@@ -42,7 +42,13 @@ function fmtLosses(losses, lang = 'fa') {
 }
 
 function safeEdit(ctx, text, opts = {}) {
-  return ctx.editMessageText(text, { parse_mode: 'Markdown', ...opts }).catch(e => console.error('safeEdit:', e.message));
+  return ctx.editMessageText(text, { parse_mode: 'Markdown', ...opts })
+    .catch(() => ctx.editMessageText(text, { parse_mode: 'HTML', ...opts }))
+    .catch(() => ctx.editMessageText(text, opts))
+    .catch(e => {
+      console.error('safeEdit all failed:', e.message);
+      return ctx.reply(text, opts).catch(() => {});
+    });
 }
 
 function safeSend(bot, tid, text, opts = {}) {
@@ -856,8 +862,11 @@ export function registerHandlers(bot) {
       };
       if (HL[d]) { await safeEdit(ctx, HL[d], { reply_markup: helpKeyboard() }); return; }
 
+      await safeEdit(ctx, '❌ دکمه نامعتبر. منوی اصلی:', { reply_markup: mainMenuKeyboard() });
+
     } catch (err) {
       console.error('Callback error:', d, err.message);
+      await safeEdit(ctx, '❌ خطا! منوی اصلی:', { reply_markup: mainMenuKeyboard() }).catch(() => {});
     }
   });
 
