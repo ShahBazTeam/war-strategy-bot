@@ -1,0 +1,6 @@
+{
+  "name": "دنیای مدرن",
+  "description": "یک بازی استراتژیک مدرن شبیه‌سازی جنگ، اقتصاد و دیپلماسی ملل با نظارت و رهبری هوش مصنوعی @TheSurenax",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
