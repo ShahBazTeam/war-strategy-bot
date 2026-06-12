@@ -930,19 +930,6 @@ export function registerHandlers(bot) {
     await sendToGroup(bot, colonyMsg, getWarTopicIdLocal());
   });
 
-  // ─── Group Auto-Detect ──────────────────────────────────────
-
-  bot.on('message', async (ctx) => {
-    if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
-      const gid = ctx.chat.id;
-      const existing = getSetting('war_group_id');
-      if (!existing) {
-        setSetting('war_group_id', gid);
-        console.log(`[Group] Auto-detected group_id: ${gid}`);
-      }
-    }
-  });
-
   // ─── Message Handler ────────────────────────────────────────
 
   bot.on('message:text', async (ctx) => {
