@@ -7,7 +7,8 @@ import {
   createWar, getWarDetail, getWarsByUser, endWar, updateWarRound, updateWarStatus,
   setWarTopicId, getWarTopicId,
   createAlliance, acceptAlliance, rejectAlliance, deleteAlliance,
-  getPendingAlliances, getActiveAlliances
+  getPendingAlliances, getActiveAlliances,
+  getSetting, setSetting
 } from '../database/index.js';
 import {
   mainMenuKeyboard, backBtn, shopKeyboard, resourcesKeyboard, sellKeyboard,
@@ -23,7 +24,11 @@ import { getUnitDef, getIndustryDef, UNIT_TYPES, COUNTRIES } from '../game/data.
 import { dashMsg, profileMsg } from './messages.js';
 
 const pendingWars = new Map();
-let warTopicId = null;
+
+function getWarTopicIdLocal() {
+  const val = getSetting('war_topic_id');
+  return val ? parseInt(val) : null;
+}
 
 function safeEdit(ctx, text, opts = {}) {
   return ctx.editMessageText(text, { parse_mode: 'Markdown', ...opts })
@@ -52,6 +57,8 @@ function levelUpCheck(xp) {
 }
 
 function getGroupChatId() {
+  const dbGroupId = getSetting('war_group_id');
+  if (dbGroupId) return parseInt(dbGroupId);
   return getDetectedGroupId() || (process.env.GROUP_ID ? parseInt(process.env.GROUP_ID) : null);
 }
 
@@ -346,7 +353,7 @@ async function handleDefensePlan(ctx, text, bot) {
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, war.defender_tid, roundText, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, roundText, warTopicId);
+    await sendToGroup(bot, roundText, getWarTopicIdLocal());
 
     const ended = attPower <= 0 || defPower <= 0;
     if (ended) {
@@ -360,7 +367,7 @@ async function handleDefensePlan(ctx, text, bot) {
 
       await safeSend(bot, war.attacker_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
-      await sendToGroup(bot, endMsg, warTopicId);
+      await sendToGroup(bot, endMsg, getWarTopicIdLocal());
     } else {
       const choiceMsg = `راند ${war.current_round} تمام شد.\n\nانتخاب کنید:`;
 
@@ -370,7 +377,7 @@ async function handleDefensePlan(ctx, text, bot) {
       await safeSend(bot, war.defender_tid, choiceMsg, {
         reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
-      await sendToGroup(bot, choiceMsg, warTopicId);
+      await sendToGroup(bot, choiceMsg, getWarTopicIdLocal());
     }
   } catch (err) {
     console.error('[War] Battle error:', err.message);
@@ -505,7 +512,7 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, war.defender_tid, roundText, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, roundText, warTopicId);
+    await sendToGroup(bot, roundText, getWarTopicIdLocal());
 
     const ended = attPower <= 0 || defPower <= 0;
     if (ended) {
@@ -519,7 +526,7 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
       await safeSend(bot, war.attacker_tid, endMsg, { reply_markup: mainMenuKeyboard() });
       await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
-      await sendToGroup(bot, endMsg, warTopicId);
+      await sendToGroup(bot, endMsg, getWarTopicIdLocal());
     } else {
       const choiceMsg = `راند ${war.current_round} تمام شد.\n\nانتخاب کنید:`;
 
@@ -529,7 +536,7 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
       await safeSend(bot, war.defender_tid, choiceMsg, {
         reply_markup: nextRoundKeyboard(parseInt(war.id))
       });
-      await sendToGroup(bot, choiceMsg, warTopicId);
+      await sendToGroup(bot, choiceMsg, getWarTopicIdLocal());
     }
   } catch (err) {
     console.error('[War] Next round error:', err.message);
@@ -580,7 +587,8 @@ export function registerHandlers(bot) {
       return;
     }
 
-    warTopicId = messageThreadId;
+    setSetting('war_topic_id', messageThreadId);
+    setSetting('war_group_id', chatId);
     await ctx.reply(`تاپیک جنگ تنظیم شد!\n\nهمه نتایج نبرد در این تاپیک ارسال خواهد شد.`);
     console.log(`[War] Topic set: ${messageThreadId} in chat ${chatId}`);
   });
@@ -802,7 +810,7 @@ export function registerHandlers(bot) {
 
     await safeEdit(ctx, peaceMsg, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, opponentTid, peaceMsg, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, peaceMsg, warTopicId);
+    await sendToGroup(bot, peaceMsg, getWarTopicIdLocal());
   });
 
   bot.callbackQuery(/^war_surrender_(\d+)$/, async (ctx) => {
@@ -825,7 +833,7 @@ export function registerHandlers(bot) {
 
     await safeEdit(ctx, surrenderMsg, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, winnerTid, surrenderMsg, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, surrenderMsg, warTopicId);
+    await sendToGroup(bot, surrenderMsg, getWarTopicIdLocal());
   });
 
   bot.callbackQuery(/^war_conquer_(\d+)$/, async (ctx) => {
@@ -849,7 +857,7 @@ export function registerHandlers(bot) {
 
     await safeEdit(ctx, conquerMsg, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, loserTid, conquerMsg, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, conquerMsg, warTopicId);
+    await sendToGroup(bot, conquerMsg, getWarTopicIdLocal());
   });
 
   bot.callbackQuery(/^war_colony_(\d+)$/, async (ctx) => {
@@ -873,7 +881,7 @@ export function registerHandlers(bot) {
 
     await safeEdit(ctx, colonyMsg, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, masterTid, colonyMsg, { reply_markup: mainMenuKeyboard() });
-    await sendToGroup(bot, colonyMsg, warTopicId);
+    await sendToGroup(bot, colonyMsg, getWarTopicIdLocal());
   });
 
   // ─── Message Handler ────────────────────────────────────────

@@ -77,6 +77,10 @@ export async function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       accepted_at DATETIME
     );
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
   `);
 
   // مهاجرت دیتابیس قدیمی

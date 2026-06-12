@@ -191,19 +191,19 @@ DEFENSE PLAN FROM USER: ${defensePlan}
 DEFENDER AVAILABLE FORCES: ${eqText(defEq)}
 
 CRITICAL RULES:
-1. STRICTLY FOLLOW THE USER'S PLAN - If the attacker says "use only F-35s", then ONLY F-35s attack. Do NOT add units they didn't mention (like B-2 if they only said F-35).
-2. The defender should also follow their own plan. If they say "surrender", they offer little resistance.
-3. Losses MUST be specific NUMBERS, not vague. Example: if attacker has 600 F-35 and loses 10%, write "10 F-35 destroyed" not just percentage.
-4. Each equipment type loss should be written as: "X [model_name] destroyed/damaged"
-5. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
-6. Max 30% loss per round for winner, 40% for loser
-7. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
-8. Reference specific unit names and counts from the plans
-9. NO BIAS - evaluate purely based on equipment and plans described
-10. If one side is much weaker, the result should reflect that realistically
+1. STRICTLY FOLLOW THE USER'S PLAN - If the attacker says "use only F-35s", then ONLY F-35s attack. Do NOT add units they didn't mention.
+2. The defender should also follow their own plan.
+3. LOSSES MUST BE EXACT NUMBERS, not percentages. Example: if attacker has 600 F-35 and loses 5%, write "30 F-35 destroyed" in the narrative.
+4. The JSON losses field must have EXACT numbers for each type lost this round.
+5. Losses cannot exceed available forces. If you have 600 fighters, you cannot lose 700.
+6. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
+7. Max 30% loss per round for winner, 40% for loser
+8. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
+9. In the narrative, mention EXACT numbers: "30 فروند F-35 منهدم شد" not "تعدادی جنگنده منهدم شد"
+10. NO BIAS - evaluate purely based on equipment and plans described
 
 Return ONLY JSON:
-{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"defender_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"description":"Persian narrative with specific casualty numbers"}`;
+{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"defender_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"description":"Persian narrative with EXACT casualty numbers like 30 F-35 destroyed"}`;
 
   const text = await callAI([
     { role: 'system', content: sysPrompt },

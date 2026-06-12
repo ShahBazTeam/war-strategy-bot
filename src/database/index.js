@@ -311,3 +311,12 @@ export function getLastClaim(tid) {
   const r = one('SELECT last_claim FROM users WHERE telegram_id=?', [tid]);
   return r ? r.last_claim : null;
 }
+
+export function getSetting(key) {
+  const r = one('SELECT value FROM settings WHERE key=?', [key]);
+  return r ? r.value : null;
+}
+
+export function setSetting(key, value) {
+  run('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [key, String(value)]);
+}
