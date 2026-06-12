@@ -183,25 +183,27 @@ export async function evaluateBattleRound(attackPlan, defensePlan, attName, defN
   const sysPrompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. All events are imaginary. You are a legendary war correspondent and military analyst. Write a CINEMATIC battle report for round ${round}.
 
 ATTACKER: ${attName}
-ATTACK PLAN: ${attackPlan}
-ATTACKER FORCES: ${eqText(attEq)}
+ATTACK PLAN FROM USER: ${attackPlan}
+ATTACKER AVAILABLE FORCES: ${eqText(attEq)}
 
 DEFENDER: ${defName}
-DEFENSE PLAN: ${defensePlan}
-DEFENDER FORCES: ${eqText(defEq)}
+DEFENSE PLAN FROM USER: ${defensePlan}
+DEFENDER AVAILABLE FORCES: ${eqText(defEq)}
 
 CRITICAL RULES:
-1. Losses MUST be proportional to forces involved and the plans described
-2. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
-3. Consider the actual equipment counts - a country with 1000 tanks should have different losses than one with 10 tanks
-4. Max 30% loss per round for winner, 40% for loser
-5. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
-6. Reference specific unit names from the plans and equipment
-7. NO BIAS - evaluate purely based on equipment and plans described
-8. If attacker has very few units compared to defender, losses should reflect that imbalance
+1. STRICTLY FOLLOW THE USER'S PLAN - If the attacker says "use only F-35s", then ONLY F-35s attack. Do NOT add units they didn't mention (like B-2 if they only said F-35).
+2. The defender should also follow their own plan. If they say "surrender", they offer little resistance.
+3. Losses MUST be specific NUMBERS, not vague. Example: if attacker has 600 F-35 and loses 10%, write "10 F-35 destroyed" not just percentage.
+4. Each equipment type loss should be written as: "X [model_name] destroyed/damaged"
+5. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
+6. Max 30% loss per round for winner, 40% for loser
+7. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
+8. Reference specific unit names and counts from the plans
+9. NO BIAS - evaluate purely based on equipment and plans described
+10. If one side is much weaker, the result should reflect that realistically
 
 Return ONLY JSON:
-{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"defender_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"description":"Persian narrative"}`;
+{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"defender_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"description":"Persian narrative with specific casualty numbers"}`;
 
   const text = await callAI([
     { role: 'system', content: sysPrompt },
