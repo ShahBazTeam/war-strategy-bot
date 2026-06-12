@@ -11,7 +11,7 @@ import {
   getUserByTelegramId, getAllUsers, getAllUsersFull,
   createWar, getWarDetail, getWarsByUser, endWar, updateWarRound,
   setEquipment, updateResources, getSetting, setSetting,
-  updateField, addLog
+  updateField, addLog, createUser
 } from './database/index.js';
 import { checkWarValidity, evaluateBattleRound } from './utils/ai.js';
 import { calcMilitaryPower, calcDailyIncome, calcDailyExpenses } from './game/index.js';
@@ -71,6 +71,7 @@ function readBody(req) {
 }
 
 async function handleAPI(req, res, botToken) {
+  try {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname;
 
@@ -141,15 +142,12 @@ async function handleAPI(req, res, botToken) {
     const defaultEquipment = (country.units || []).map(e => ({ ...e }));
     const defaultIndustries = (country.industries || []).map(i => ({ ...i }));
 
-    const dbModule = await import('./database/index.js');
-    dbModule.createUser(tgUser.id, tgUser.username || tgUser.first_name, tgUser.first_name, countryId, language);
+    createUser(tgUser.id, tgUser.username || tgUser.first_name, tgUser.first_name, countryId, language);
 
     const user = getUserByTelegramId(tgUser.id);
     if (user) {
       setEquipment(tgUser.id, defaultEquipment);
-      if (defaultIndustries.length > 0) {
-        dbModule.run('UPDATE users SET industries=? WHERE telegram_id=?', [JSON.stringify(defaultIndustries), tgUser.id]);
-      }
+      updateField(tgUser.id, 'industries', JSON.stringify(defaultIndustries));
       if (country.gold) updateResources(tgUser.id, { gold: country.gold });
     }
 
@@ -483,6 +481,12 @@ async function handleAPI(req, res, botToken) {
   }
 
   return false;
+
+  } catch (err) {
+    console.error('[API] Error:', err.message, err.stack);
+    sendJSON(res, { error: 'Server error: ' + err.message }, 500);
+    return true;
+  }
 }
 
 let BOT_TOKEN = '';
