@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Bot } from 'grammy';
 import http from 'http';
-import { initDatabase, saveDatabase } from './database/index.js';
+import { initDatabase, saveDatabase } from './database/init.js';
 import { getAllUsersFull, updateResources } from './database/index.js';
 import { calcDailyIncome, calcDailyExpenses } from './game/index.js';
 import { logError, logInfo } from './utils/logger.js';
