@@ -35,7 +35,9 @@ function safeEdit(ctx, text, opts = {}) {
 }
 
 function safeSend(bot, tid, text, opts = {}) {
-  return bot.api.sendMessage(tid, text, { parse_mode: 'Markdown', ...opts }).catch(e => console.error('safeSend:', e.message));
+  if (!bot || !tid) { console.error('safeSend: missing bot or tid'); return Promise.resolve(); }
+  return bot.api.sendMessage(tid, text, { parse_mode: 'Markdown', ...opts })
+    .catch(e => { console.error('safeSend error to', tid, ':', e.message); return null; });
 }
 
 function levelUpCheck(xp) {
@@ -145,7 +147,14 @@ async function handleWarReason(ctx, reason, bot) {
     }
 
     const target = getUserByTelegramId(pending.targetId);
+    console.log(`[War] targetId=${pending.targetId}, target=${JSON.stringify(target ? { id: target.id, name: target.country_name } : null)}`);
+    if (!target) {
+      await ctx.reply('❌ مدافع یافت نشد! (ممکنه ربات رو شروع نکرده باشد)');
+      return true;
+    }
+
     const war = createWar(uid, pending.targetId, reason, result.message);
+    console.log(`[War] war created: id=${war.lastInsertRowid}`);
 
     await ctx.reply(
       `✅ **اعلان جنگ ثبت شد!**\n\n` +
@@ -162,13 +171,19 @@ async function handleWarReason(ctx, reason, bot) {
       `📝 دلیل: ${reason}\n\n` +
       `🛡️ برای شروع دفاع، دکمه زیر را بزنید:`;
 
-    await safeSend(bot, pending.targetId, defendMsg, {
+    console.log(`[War] Sending defend message to ${pending.targetId} (war ID: ${war.lastInsertRowid})`);
+    const sendResult = await safeSend(bot, pending.targetId, defendMsg, {
       reply_markup: new InlineKeyboard()
         .text('🛡️ پذیرش دفاع', `defend_accept_${war.lastInsertRowid}`)
         .text('❌ رد کردن', `defend_reject_${war.lastInsertRowid}`)
     });
 
-    await sendToGroup(bot, defendMsg);
+    if (sendResult === null) {
+      console.error(`[War] FAILED to send defend message to ${pending.targetId}`);
+      await ctx.reply(`⚠️ پیام به مدافع فرستاده نشد! (ID: ${pending.targetId})\n\nجنگ ثبت شد ولی مدافع پیام نگرفت.`);
+    }
+
+    sendToGroup(bot, defendMsg).catch(e => console.error('[War] sendToGroup error:', e.message));
     return true;
   } catch (err) {
     console.error('[War] AI error:', err.message);
