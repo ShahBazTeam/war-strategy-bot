@@ -26,7 +26,7 @@ app.use(express.json({ limit: "15mb" }));
 // --------------------------------------------------------
 const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const AI_BASE_URL = "https://openrouter.ai/api/v1";
-const AI_MODEL = "meta-llama/llama-3.1-8b-instruct:free";
+const AI_MODEL = "google/gemma-2-9b-it:free";
 
 async function callGemini(prompt: string, systemInstruction: string, jsonSchema?: any): Promise<string> {
   const logId = Math.random().toString(36).substring(2, 11);
