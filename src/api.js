@@ -135,8 +135,10 @@ async function handleAPI(req, res, botToken) {
   if (pathname === '/api/register') {
     const body = JSON.parse(await readBody(req));
     const { initData, language, countryId } = body;
+    console.log('[Register] initData:', String(initData).substring(0, 100), 'countryId:', countryId);
     const tgUser = parseUser(initData);
-    if (!tgUser) return sendJSON(res, { error: 'Invalid' }, 401);
+    console.log('[Register] parsed user:', tgUser);
+    if (!tgUser) return sendJSON(res, { error: 'Invalid user data', initData: String(initData).substring(0, 50) }, 401);
 
     const existing = getUserByTelegramId(tgUser.id);
     if (existing) return sendJSON(res, { error: 'Already registered' }, 400);
