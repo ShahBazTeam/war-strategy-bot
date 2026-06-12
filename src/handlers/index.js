@@ -35,9 +35,10 @@ function safeEdit(ctx, text, opts = {}) {
 }
 
 function safeSend(bot, tid, text, opts = {}) {
-  if (!bot || !tid) { console.error('safeSend: missing bot or tid'); return Promise.resolve(); }
-  return bot.api.sendMessage(tid, text, { parse_mode: 'Markdown', ...opts })
-    .catch(e => { console.error('safeSend error to', tid, ':', e.message); return null; });
+  if (!bot || !tid) { console.error('safeSend: missing bot or tid'); return Promise.resolve(null); }
+  return bot.api.sendMessage(tid, text, opts)
+    .then(msg => { console.log('[safeSend] OK to', tid); return msg; })
+    .catch(e => { console.error('[safeSend] FAIL to', tid, ':', e.message); return null; });
 }
 
 function levelUpCheck(xp) {
@@ -149,12 +150,12 @@ async function handleWarReason(ctx, reason, bot) {
     const target = getUserByTelegramId(pending.targetId);
     console.log(`[War] targetId=${pending.targetId}, target=${JSON.stringify(target ? { id: target.id, name: target.country_name } : null)}`);
     if (!target) {
-      await ctx.reply('❌ مدافع یافت نشد! (ممکنه ربات رو شروع نکرده باشد)');
+      await ctx.reply('مدافع یافت نشد! (ممکنه ربات رو شروع نکرده باشد)');
       return true;
     }
 
-    const war = createWar(uid, pending.targetId, reason, result.message);
-    console.log(`[War] war created: id=${war.lastInsertRowid}`);
+    const war = createWar(user.id, target.id, reason, result.message);
+    console.log(`[War] war created: id=${war.lastInsertRowid}, attacker_internal=${user.id}, defender_internal=${target.id}`);
 
     await ctx.reply(
       `✅ **اعلان جنگ ثبت شد!**\n\n` +
@@ -166,21 +167,23 @@ async function handleWarReason(ctx, reason, bot) {
     );
 
     const defendMsg =
-      `🔔 **اعلان جنگ!**\n\n` +
-      `⚔️ ${user.country_flag} ${user.country_name} به ${target.country_flag} ${target.country_name} اعلان جنگ داد!\n` +
-      `📝 دلیل: ${reason}\n\n` +
-      `🛡️ برای شروع دفاع، دکمه زیر را بزنید:`;
+      `اعلان جنگ!\n\n` +
+      `${user.country_flag} ${user.country_name} به ${target.country_flag} ${target.country_name} اعلان جنگ داد!\n` +
+      `دلیل: ${reason}\n\n` +
+      `برای شروع دفاع، دکمه زیر را بزنید:`;
 
     console.log(`[War] Sending defend message to ${pending.targetId} (war ID: ${war.lastInsertRowid})`);
     const sendResult = await safeSend(bot, pending.targetId, defendMsg, {
       reply_markup: new InlineKeyboard()
-        .text('🛡️ پذیرش دفاع', `defend_accept_${war.lastInsertRowid}`)
-        .text('❌ رد کردن', `defend_reject_${war.lastInsertRowid}`)
+        .text('پذیرش دفاع', `defend_accept_${war.lastInsertRowid}`)
+        .text('رد کردن', `defend_reject_${war.lastInsertRowid}`)
     });
 
     if (sendResult === null) {
       console.error(`[War] FAILED to send defend message to ${pending.targetId}`);
-      await ctx.reply(`⚠️ پیام به مدافع فرستاده نشد! (ID: ${pending.targetId})\n\nجنگ ثبت شد ولی مدافع پیام نگرفت.`);
+      await ctx.reply(`پیام به مدافع فرستاده نشد! (ID: ${pending.targetId})`);
+    } else {
+      await ctx.reply(`پیام به مدافع فرستاده شد.`);
     }
 
     sendToGroup(bot, defendMsg).catch(e => console.error('[War] sendToGroup error:', e.message));
