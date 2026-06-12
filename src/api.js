@@ -479,28 +479,32 @@ async function handleAPI(req, res, botToken) {
   return false;
 }
 
-export function setupAPI(server, botToken) {
-  server.on('request', async (req, res) => {
-    const url = new URL(req.url, `http://${req.headers.host}`);
+let BOT_TOKEN = '';
 
-    if (url.pathname.startsWith('/api/')) {
-      const handled = await handleAPI(req, res, botToken);
-      if (handled !== false) return;
-    }
+export function setupAPI(botToken) {
+  BOT_TOKEN = botToken;
+}
 
-    let filePath = path.join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname);
-    if (!fs.existsSync(filePath)) filePath = path.join(PUBLIC_DIR, 'index.html');
+export async function handleRequest(req, res) {
+  const url = new URL(req.url, `http://${req.headers.host}`);
 
-    const ext = path.extname(filePath);
-    const contentType = MIME[ext] || 'application/octet-stream';
+  if (url.pathname.startsWith('/api/')) {
+    const handled = await handleAPI(req, res, BOT_TOKEN);
+    if (handled !== false) return;
+  }
 
-    try {
-      const content = fs.readFileSync(filePath);
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content);
-    } catch (e) {
-      res.writeHead(404);
-      res.end('Not found');
-    }
-  });
+  let filePath = path.join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname);
+  if (!fs.existsSync(filePath)) filePath = path.join(PUBLIC_DIR, 'index.html');
+
+  const ext = path.extname(filePath);
+  const contentType = MIME[ext] || 'application/octet-stream';
+
+  try {
+    const content = fs.readFileSync(filePath);
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+  } catch (e) {
+    res.writeHead(404);
+    res.end('Not found');
+  }
 }
