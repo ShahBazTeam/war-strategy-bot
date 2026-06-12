@@ -27,8 +27,8 @@ app.use(express.json({ limit: "15mb" }));
 const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const AI_BASE_URL = "https://openrouter.ai/api/v1";
 const AI_MODELS = [
-  "openai/gpt-oss-120b:free",
   "google/gemma-4-31b-it:free",
+  "openai/gpt-oss-120b:free",
   "nvidia/nemotron-nano-9b-v2:free",
   "nvidia/nemotron-3-super-120b-a12b:free",
 ];
@@ -86,6 +86,11 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         
         // Strip markdown code blocks if present
         responseText = responseText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+        
+        // Skip if content is null/empty (reasoning models may return everything in reasoning)
+        if (!responseText || responseText.length < 5) {
+          throw new Error("Empty response content");
+        }
         
         currentModelIndex = (currentModelIndex + modelIdx) % AI_MODELS.length;
         console.log(`[AI] Success with model: ${model}`);
