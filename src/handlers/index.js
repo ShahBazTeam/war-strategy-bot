@@ -588,21 +588,24 @@ export function registerHandlers(bot) {
 
   bot.command('verbal', async (ctx) => {
     const chatId = ctx.chat.id;
-    const messageThreadId = ctx.message.message_thread_id;
+    const chatType = ctx.chat.type;
+    const messageThreadId = ctx.message?.message_thread_id;
 
-    if (ctx.chat.type !== 'supergroup') {
+    console.log(`[verbal] chatId=${chatId} type=${chatType} threadId=${messageThreadId}`);
+
+    if (chatType !== 'supergroup' && chatType !== 'group') {
       await ctx.reply('این دستور فقط در گروه کار می‌کند.');
       return;
     }
 
     if (!messageThreadId) {
-      await ctx.reply('این دستور را در یک تاپیک ارسال کنید.');
+      await ctx.reply('⚠️ این دستور را باید **داخل یک تاپیک** ارسال کنید.\n\nاول یک تاپیک جدید بسازید، بعد `/verbal` رو داخلش بفرستید.');
       return;
     }
 
     setSetting('war_topic_id', messageThreadId);
     setSetting('war_group_id', chatId);
-    await ctx.reply(`تاپیک جنگ تنظیم شد!\n\nهمه نتایج نبرد در این تاپیک ارسال خواهد شد.`);
+    await ctx.reply(`✅ تاپیک جنگ تنظیم شد!\n\n.topic_id: ${messageThreadId}\n.chat_id: ${chatId}`);
     console.log(`[War] Topic set: ${messageThreadId} in chat ${chatId}`);
   });
 
@@ -893,6 +896,19 @@ export function registerHandlers(bot) {
     await safeEdit(ctx, colonyMsg, { reply_markup: mainMenuKeyboard() });
     await safeSend(bot, masterTid, colonyMsg, { reply_markup: mainMenuKeyboard() });
     await sendToGroup(bot, colonyMsg, getWarTopicIdLocal());
+  });
+
+  // ─── Group Auto-Detect ──────────────────────────────────────
+
+  bot.on('message', async (ctx) => {
+    if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
+      const gid = ctx.chat.id;
+      const existing = getSetting('war_group_id');
+      if (!existing) {
+        setSetting('war_group_id', gid);
+        console.log(`[Group] Auto-detected group_id: ${gid}`);
+      }
+    }
   });
 
   // ─── Message Handler ────────────────────────────────────────
