@@ -38,7 +38,8 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
     try {
       attempts++;
       if (!AI_API_KEY) {
-        throw new Error("کلید API معتبر تعریف نشده است. لطفاً FREEMODEL_API_KEY را تنظیم کنید.");
+        console.error("[AI] OPENROUTER_API_KEY is not set! Available env keys:", Object.keys(process.env).filter(k => k.includes("KEY") || k.includes("API") || k.includes("OPENROUTER")));
+        throw new Error("کلید API معتبر تعریف نشده است. لطفاً OPENROUTER_API_KEY را تنظیم کنید.");
       }
 
       let systemMsg = systemInstruction;

@@ -121,10 +121,12 @@ export default function App() {
 
     try {
       const resp = await fetch(url, { ...options, headers });
-      const data = await resp.json();
+      const text = await resp.text();
+      let data: any;
+      try { data = JSON.parse(text); } catch { data = { error: text.substring(0, 300) }; }
 
       if (!resp.ok) {
-        throw new Error(data.error || "خطای نامشخص در سمت سرور رخ داد");
+        throw new Error(data.error || `خطای ${resp.status}: ${text.substring(0, 200)}`);
       }
       return data;
     } catch (err: any) {
