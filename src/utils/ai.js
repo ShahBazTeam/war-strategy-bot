@@ -5,6 +5,13 @@ dotenv.config();
 
 const AI_PROVIDERS = [
   {
+    name: 'freemodel',
+    type: 'openai',
+    url: 'https://api.freemodel.dev/v1/chat/completions',
+    key: process.env.FREEMODEL_API_KEY,
+    model: 'gpt-4o-mini'
+  },
+  {
     name: 'google-gemini',
     type: 'google',
     key: process.env.GOOGLE_AI_KEY,
