@@ -85,8 +85,11 @@ async function handleAPI(req, res, botToken) {
 
   if (pathname === '/api/me') {
     const initData = url.searchParams.get('initData');
-    if (!initData) return sendJSON(res, { error: 'No initData' }, 401);
-
+    
+    if (!initData) {
+      return sendJSON(res, { registered: false, tgUser: null, browserMode: true });
+    }
+    
     const tgUser = parseUser(initData);
     if (!tgUser) return sendJSON(res, { error: 'Invalid user' }, 401);
 
@@ -97,7 +100,6 @@ async function handleAPI(req, res, botToken) {
     const industries = user.industries || [];
     const income = calcDailyIncome(industries, user.country_id, user.tech_economy || 1);
     const expenses = calcDailyExpenses(user.equipment, industries);
-    const expensesPerUnit = calcDailyExpenses(user.equipment, industries);
 
     return sendJSON(res, {
       registered: true,
@@ -114,7 +116,7 @@ async function handleAPI(req, res, botToken) {
         level: user.level,
         power,
         income,
-        expenses: expensesPerUnit,
+        expenses,
         equipment: user.equipment,
         industries: user.industries,
         tech_attack: user.tech_attack || 1,
@@ -136,20 +138,22 @@ async function handleAPI(req, res, botToken) {
     const country = COUNTRIES[countryId];
     if (!country) return sendJSON(res, { error: 'Invalid country' }, 400);
 
-    const defaultEquipment = country.startingEquipment.map(e => ({ ...e }));
-    const defaultIndustries = [
-      { type: 'oil', level: 1 },
-      { type: 'mining', level: 1 },
-      { type: 'agriculture', level: 1 },
-      { type: 'manufacturing', level: 1 },
-    ];
+    const defaultEquipment = (country.units || []).map(e => ({ ...e }));
+    const defaultIndustries = (country.industries || []).map(i => ({ ...i }));
 
-    const { run, one } = await import('./database/index.js');
     const dbModule = await import('./database/index.js');
-    dbModule.createUser(tgUser.id, tgUser.first_name, countryId, language, defaultEquipment, defaultIndustries);
+    dbModule.createUser(tgUser.id, tgUser.username || tgUser.first_name, tgUser.first_name, countryId, language);
 
     const user = getUserByTelegramId(tgUser.id);
-    return sendJSON(res, { success: true, user });
+    if (user) {
+      setEquipment(tgUser.id, defaultEquipment);
+      if (defaultIndustries.length > 0) {
+        dbModule.run('UPDATE users SET industries=? WHERE telegram_id=?', [JSON.stringify(defaultIndustries), tgUser.id]);
+      }
+      if (country.gold) updateResources(tgUser.id, { gold: country.gold });
+    }
+
+    return sendJSON(res, { success: true, user: getUserByTelegramId(tgUser.id) });
   }
 
   if (pathname === '/api/countries') {

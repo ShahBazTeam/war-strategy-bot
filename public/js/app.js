@@ -4,11 +4,13 @@ let currentScreen = 'loading';
 let selectedTarget = null;
 let currentWarId = null;
 let isAttacker = false;
+let testMode = false;
+let testUserId = null;
 
 const API = '';
 
 async function api(path, data = null) {
-  const initData = tg?.initData || '';
+  const initData = testMode ? JSON.stringify({ id: testUserId, first_name: 'Test User', username: 'test' }) : (tg?.initData || '');
   const opts = data
     ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, initData }) }
     : { method: 'GET' };
@@ -40,8 +42,14 @@ function goBack() { showScreen('dashboard'); }
 // ─── Init ──────────────────────────────────────────
 
 async function init() {
-  tg?.ready();
-  tg?.expand();
+  if (tg) {
+    tg.ready();
+    tg.expand();
+  } else {
+    testMode = true;
+    testUserId = Math.floor(Math.random() * 1000000);
+    console.log('Browser mode - test userId:', testUserId);
+  }
 
   const me = await api('/api/me');
   if (!me.registered) {
