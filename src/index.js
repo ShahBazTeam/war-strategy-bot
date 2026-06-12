@@ -1,13 +1,14 @@
 import 'dotenv/config';
 import { Bot } from 'grammy';
 import http from 'http';
-import { initDatabase } from './database/init.js';
+import { initDatabase, saveDatabase } from './database/init.js';
 import { registerHandlers } from './handlers/index.js';
 import { mainMenuKeyboard, languageSelectKeyboard } from './keyboards/index.js';
 import { clearState, getUserByTelegramId, getAllUsersFull, updateResources } from './database/index.js';
 import { dashMsg } from './handlers/messages.js';
 import { setDetectedGroupId } from './utils/telegram.js';
 import { calcDailyIncome, calcDailyExpenses } from './game/index.js';
+import { logError, logInfo } from './utils/logger.js';
 
 const TOKEN = process.env.BOT_TOKEN;
 if (!TOKEN) { console.error('BOT_TOKEN not set!'); process.exit(1); }
@@ -20,41 +21,41 @@ const server = http.createServer((_, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Health server listening on port ${PORT}`);
+  logInfo(`Health server listening on port ${PORT}`);
 });
 
 if (process.env.GROUP_ID) {
   setDetectedGroupId(parseInt(process.env.GROUP_ID));
-  console.log(`✅ GROUP_ID loaded from env: ${process.env.GROUP_ID}`);
+  logInfo(`GROUP_ID loaded from env: ${process.env.GROUP_ID}`);
 }
 
 const bot = new Bot(TOKEN);
 
 bot.catch((err) => {
-  console.error('Bot error:', err.message);
+  logError(err, 'bot.catch');
 });
 
 async function startBot() {
   try {
-    console.log('Starting database...');
+    logInfo('Starting database...');
     await initDatabase();
-    console.log('✅ Database initialized');
+    logInfo('Database initialized');
 
     registerHandlers(bot);
-    console.log('✅ Handlers registered');
+    logInfo('Handlers registered');
 
     bot.start({ drop_pending_updates: true }).then(() => {
-      console.log('✅ Bot polling started');
+      logInfo('Bot polling started');
     }).catch(e => {
-      console.error('Bot start error:', e.message);
+      logError(e, 'bot.start');
     });
 
-    console.log('🤖 Bot running');
+    logInfo('Bot running');
 
     // Income scheduler - every 12 hours
     async function distributeIncome() {
       try {
-        console.log('💰 Distributing income...');
+        logInfo('Distributing income...');
         const users = getAllUsersFull();
         for (const u of users) {
           const industries = JSON.parse(u.industries || '[]');
@@ -64,25 +65,23 @@ async function startBot() {
           const net = income - expenses;
           if (net > 0) {
             updateResources(u.telegram_id, { gold: net });
-            console.log(`  💰 ${u.name}: +${net} gold`);
           }
         }
-        console.log('✅ Income distributed');
+        logInfo(`Income distributed to ${users.length} users`);
       } catch (err) {
-        console.error('Income distribution error:', err.message);
+        logError(err, 'distributeIncome');
       }
     }
-    setInterval(distributeIncome, 12 * 60 * 60 * 1000); // Every 12 hours
-    console.log('⏰ Income scheduler started (every 12 hours)');
+    setInterval(distributeIncome, 12 * 60 * 60 * 1000);
+    logInfo('Income scheduler started (every 12 hours)');
   } catch (err) {
-    console.error('Startup failed:', err.message);
-    console.error(err.stack);
+    logError(err, 'startBot');
   }
 }
 
 startBot();
 
-process.on('SIGTERM', () => { bot.stop(); process.exit(0); });
-process.on('SIGINT', () => { bot.stop(); process.exit(0); });
-process.on('uncaughtException', (err) => { console.error('Uncaught:', err.message); });
-process.on('unhandledRejection', (err) => { console.error('Unhandled:', err); });
+process.on('SIGTERM', () => { bot.stop(); saveDatabase(); process.exit(0); });
+process.on('SIGINT', () => { bot.stop(); saveDatabase(); process.exit(0); });
+process.on('uncaughtException', (err) => { logError(err, 'uncaughtException'); });
+process.on('unhandledRejection', (err) => { logError(err, 'unhandledRejection'); });

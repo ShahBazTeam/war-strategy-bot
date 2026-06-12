@@ -1,5 +1,6 @@
 import { getDatabase, saveDatabase, COUNTRIES } from './init.js';
 import { getUnitDef, calcDailyIncome, calcDailyExpenses, calcMilitaryPower } from '../game/data.js';
+import { logError } from '../utils/logger.js';
 
 function db() { const d = getDatabase(); if (!d) throw new Error('DB not ready'); return d; }
 function one(sql, p = []) { const s = db().prepare(sql); s.bind(p); let r = null; if (s.step()) r = s.getAsObject(); s.free(); return r; }
@@ -11,6 +12,9 @@ function run(sql, p = []) {
   saveDatabase();
   return { lastInsertRowid: id };
 }
+
+const ALLOWED_RESOURCE_FIELDS = ['gold', 'oil', 'steel', 'food', 'economic_power'];
+const ALLOWED_USER_FIELDS = ['gold', 'oil', 'steel', 'food', 'economic_power', 'level', 'xp', 'wars_won', 'wars_lost', 'tech_attack', 'tech_defense', 'tech_economy', 'last_claim'];
 
 function parseUser(u) {
   if (!u) return null;
@@ -29,11 +33,8 @@ export function getUserByTelegramId(tid) {
 
 export function createUser(tid, username, firstName, countryId, language = 'fa') {
   if (!getDatabase()) return null;
-  
-  // Check if user already exists
   const existing = one('SELECT id FROM users WHERE telegram_id = ?', [tid]);
-  if (existing) return null; // User already exists
-  
+  if (existing) return null;
   const c = COUNTRIES[countryId];
   if (!c) return null;
   const eq = JSON.stringify(c.units.map(u => ({ type: u.type, model: u.model, count: u.count })));
@@ -61,8 +62,10 @@ export function isCountryAvailable(countryId) {
 }
 
 export function updateResources(tid, upd) {
-  const set = Object.entries(upd).map(([k]) => `${k} = ${k} + ?`).join(', ');
-  run(`UPDATE users SET ${set}, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`, [...Object.values(upd), tid]);
+  const keys = Object.keys(upd).filter(k => ALLOWED_RESOURCE_FIELDS.includes(k));
+  if (keys.length === 0) return;
+  const set = keys.map(k => `${k} = MAX(0, ${k} + ?)`).join(', ');
+  run(`UPDATE users SET ${set}, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`, [...keys.map(k => upd[k]), tid]);
 }
 
 export function setEquipment(tid, eq) {
@@ -156,6 +159,7 @@ export function getState(uid) { return one('SELECT * FROM user_states WHERE user
 export function clearState(uid) { run('DELETE FROM user_states WHERE user_id=?', [uid]); }
 
 export function updateField(tid, field, value) {
+  if (!ALLOWED_USER_FIELDS.includes(field)) return;
   run(`UPDATE users SET ${field}=?, updated_at=CURRENT_TIMESTAMP WHERE telegram_id=?`, [value, tid]);
 }
 
@@ -198,6 +202,7 @@ export function addXp(uid, amount) {
 }
 
 export function updateTech(uid, field, value) {
+  if (!['tech_attack', 'tech_defense', 'tech_economy'].includes(field)) return;
   run(`UPDATE users SET ${field}=?, updated_at=CURRENT_TIMESTAMP WHERE telegram_id=?`, [value, uid]);
 }
 
@@ -219,9 +224,7 @@ export function getUNResolutionTopicId(resolutionId) {
   return r ? { topicId: r.topic_id, groupId: r.group_id } : null;
 }
 
-// Alliance functions
 export function createAlliance(user1Id, user2Id) {
-  // Check if alliance already exists
   const existing = one('SELECT id FROM alliances WHERE (user1_id=? AND user2_id=?) OR (user1_id=? AND user2_id=?)', [user1Id, user2Id, user2Id, user1Id]);
   if (existing) return null;
   return run('INSERT INTO alliances (user1_id, user2_id) VALUES (?,?)', [user1Id, user2Id]);
@@ -294,4 +297,13 @@ export function setWarTopicId(wid, topicId) {
 export function getWarTopicId(wid) {
   const r = one('SELECT topic_id FROM wars WHERE id=?', [wid]);
   return r ? r.topic_id : null;
+}
+
+export function setLastClaim(tid) {
+  run('UPDATE users SET last_claim = CURRENT_TIMESTAMP WHERE telegram_id=?', [tid]);
+}
+
+export function getLastClaim(tid) {
+  const r = one('SELECT last_claim FROM users WHERE telegram_id=?', [tid]);
+  return r ? r.last_claim : null;
 }

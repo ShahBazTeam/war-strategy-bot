@@ -84,58 +84,61 @@ function parseEquipmentInput(text, equipment) {
 }
 
 function autoBattleResult(attUser, defUser, attName, defName, attTactic, defTactic, attIsPassive, defIsPassive) {
-  const weights = { infantry: 1, tank: 8, artillery: 7, airdef: 6, missile: 10, fighter: 12, bomber: 14, helicopter: 5, destroyer: 15, submarine: 18, capital: 25 };
-  const attPower = attUser.equipment.reduce((s, u) => s + (weights[u.type] || 1) * u.count, 0);
-  const defPower = defUser.equipment.reduce((s, u) => s + (weights[u.type] || 1) * u.count, 0);
+  const attPower = calcMilitaryPower(attUser.equipment);
+  const defPower = calcMilitaryPower(defUser.equipment);
 
-  let attLossPct, defLossPct, result;
+  let attTotalLoss, defTotalLoss, result;
 
   if (attIsPassive && defIsPassive) {
-    attLossPct = 0.02; defLossPct = 0.02; result = 'draw';
+    attTotalLoss = 0; defTotalLoss = 0; result = 'draw';
   } else if (attIsPassive) {
-    attLossPct = 0.35; defLossPct = 0.02; result = 'defender_victory';
+    attTotalLoss = Math.floor(attPower * 0.35);
+    defTotalLoss = Math.floor(defPower * 0.02);
+    result = 'defender_victory';
   } else if (defIsPassive) {
-    attLossPct = 0.05; defLossPct = 0.38; result = 'attacker_victory';
+    attTotalLoss = Math.floor(attPower * 0.05);
+    defTotalLoss = Math.floor(defPower * 0.38);
+    result = 'attacker_victory';
   } else {
-    const ratio = attPower / (attPower + defPower || 1);
-    attLossPct = Math.min(0.25, (1 - ratio) * 0.3);
-    defLossPct = Math.min(0.3, ratio * 0.3);
-    result = ratio > 0.55 ? 'attacker_victory' : ratio < 0.45 ? 'defender_victory' : 'draw';
+    attTotalLoss = Math.floor(defPower / 10 * (0.8 + Math.random() * 0.4));
+    defTotalLoss = Math.floor(attPower / 10 * (0.8 + Math.random() * 0.4));
+    result = attTotalLoss < defTotalLoss ? 'attacker_victory' : attTotalLoss > defTotalLoss ? 'defender_victory' : 'draw';
   }
 
-  const calcLosses = (eq, pct) => {
+  const distributeLoss = (equipment, totalLoss) => {
+    const totalUnits = equipment.reduce((s, u) => s + u.count, 0);
+    if (totalUnits <= 0 || totalLoss <= 0) return {};
     const losses = {};
-    eq.forEach(u => {
-      if (u.count > 0) {
-        const loss = Math.max(1, Math.floor(u.count * pct * (0.7 + Math.random() * 0.6)));
-        losses[u.type] = Math.min(loss, u.count);
+    let remaining = totalLoss;
+    equipment.forEach((u) => {
+      if (u.count <= 0 || remaining <= 0) return;
+      const proportion = u.count / totalUnits;
+      const loss = Math.min(Math.floor(totalLoss * proportion), u.count, remaining);
+      if (loss > 0) {
+        losses[u.type] = (losses[u.type] || 0) + loss;
+        remaining -= loss;
       }
     });
     return losses;
   };
 
-  const attLossMap = calcLosses(attUser.equipment, attLossPct);
-  const defLossMap = calcLosses(defUser.equipment, defLossPct);
+  const attLossMap = distributeLoss(attUser.equipment, attTotalLoss);
+  const defLossMap = distributeLoss(defUser.equipment, defTotalLoss);
 
   const narratives = {
-    passive_def: `☠️ در راند ${Math.ceil(Math.random() * 10)}، ${defName} هیچ اقدام دفاعی انجام نداد. ${attName} بدون مقاومت، خطوط دفاعی ${defName} را در هم شکست. سربازان ${defName} در سنگرهای خالی غافلگیر شدند و تلفات سنگینی متحمل شدند. فرماندهان ${defName} در شوک بودند و نیروها فرار کردند. ${attName} با قدرت کامل پیشروی کرد.`,
-    passive_att: `☠️ ${attName} هیچ حمله‌ای انجام نداد و منتظر ماند. ${defName} از این فرصت استفاده کرد و مواضع ${attName} را شناسایی کرد. نیروهای ${attName} بدون آمادگی غافلگیر شدند. ${defName} ضدحمله‌ای غافلگیرکننده آغاز کرد و خسارات سنگینی به ${attName} وارد کرد.`,
-    passive_both: `☠️ هر دو طرف هیچ اقدامی انجام ندادند. نبرد بدون درگیری به پایان رسید.`,
-    normal: null
+    passive_def: `☠️ ${defName} هیچ اقدام دفاعی انجام نداد. ${attName} بدون مقاومت پیشروی کرد.`,
+    passive_att: `☠️ ${attName} هیچ حمله‌ای انجام نداد. ${defName} از فرصت استفاده کرد.`,
+    passive_both: `☠️ هر دو طرف هیچ اقدامی انجام ندادند.`,
+    normal: `⚔️ نبرد شدیدی بین ${attName} و ${defName} درگرفت. ${attName} با تاکتیک ${attTactic} حمله کرد و ${defName} با ${defTactic} دفاع نمود.`
   };
 
   let narrative;
   if (attIsPassive && defIsPassive) narrative = narratives.passive_both;
   else if (attIsPassive) narrative = narratives.passive_att;
   else if (defIsPassive) narrative = narratives.passive_def;
-  else narrative = `⚔️ راند نبرد با تاکتیک ${attTactic} در برابر ${defTactic} آغاز شد. ${attName} حمله‌ای ${attTactic === 'heavy' ? 'سنگین و گسترده' : attTactic === 'precise' ? 'دقیق و حساب‌شده' : attTactic === 'ambush' ? 'غافلگیرکننده' : attTactic === 'air_raid' ? 'هوایی' : 'دریایی'} را آغاز کرد. ${defName} با تاکتیک ${defTactic} مقاومت کرد. نبرد شدیدی درگرفت و تلفات قابل توجهی از هر دو طرف گزارش شد.`;
+  else narrative = narratives.normal;
 
-  return {
-    result,
-    attacker_losses: attLossMap,
-    defender_losses: defLossMap,
-    description: narrative
-  };
+  return { result, attacker_losses: attLossMap, defender_losses: defLossMap, description: narrative };
 }
 
 function levelUpCheck(xp) {
