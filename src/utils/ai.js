@@ -138,55 +138,67 @@ function safeParseJSON(text) {
   return null;
 }
 
-export async function checkWarReason(reason, attackerCountry, defenderCountry) {
+export async function checkWarValidity(scenario, attackerCountry, attackerEq, defenderCountry, defenderEq) {
+  const eqText = (eq) => eq.filter(u => u.count > 0).map(u => `${u.model}: ${u.count.toLocaleString()}`).join(', ');
+
+  const prompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. You are a military strategist evaluating a war declaration.
+
+ATTACKER: ${attackerCountry}
+ATTACKER EQUIPMENT: ${eqText(attackerEq)}
+
+DEFENDER: ${defenderCountry}
+DEFENDER EQUIPMENT: ${eqText(defenderEq)}
+
+ATTACK SCENARIO FROM USER:
+${scenario}
+
+TASK:
+1. Is the reason valid and serious enough for a war? (not gibberish, not empty)
+2. Does the attacker have ANY military equipment to attack with?
+3. Is the scenario at least somewhat realistic given the equipment?
+
+RULES:
+- Be LENIENT. Almost any serious text should be approved.
+- Only reject if: completely empty, pure gibberish, or attacker has ZERO equipment.
+- Even a weak attack plan should be approved.
+
+Return ONLY JSON: {"valid": true/false, "reason": "brief explanation in Persian"}`;
+
   const text = await callAI([
-    { role: 'system', content: `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. You are a war judge for a strategy game. The attacker ${attackerCountry} wants to declare war on ${defenderCountry}.\n\nReason provided: "${reason}"\n\nRULES: Be VERY lenient. Almost any reason should be APPROVED. Only reject if the reason is completely empty, gibberish, or offensive slurs.\n\nReply ONLY with one word: APPROVED or REJECTED` },
-    { role: 'user', content: `Reason: ${reason}` }
-  ], 20);
-  if (!text) return { approved: true, message: '✅ دلیل جنگ قابل قبول است.' };
-  const upper = text.toUpperCase().trim();
-  if (upper.includes('REJECTED')) return { approved: false, message: '❌ دلیل جنگ رد شد. دلیل دیگه‌ای بنویس.' };
-  return { approved: true, message: '✅ دلیل جنگ تأیید شد.' };
+    { role: 'system', content: prompt },
+    { role: 'user', content: `Evaluate this war scenario. Return ONLY JSON.` }
+  ], 200, 0.3);
+
+  const parsed = safeParseJSON(text);
+  if (parsed && typeof parsed.valid === 'boolean') {
+    return { valid: parsed.valid, reason: parsed.reason || (parsed.valid ? 'سناریو تایید شد.' : 'سناریو رد شد.') };
+  }
+
+  return { valid: true, reason: 'بررسی هوش مصنوعی انجام شد، سناریو قابل قبول است.' };
 }
 
 export async function evaluateBattleRound(attackPlan, defensePlan, attName, defName, attEq, defEq, attTactic, defTactic, round) {
-  const eqText = (eq) => eq.filter(u => u.count > 0).map(u => `${u.model}: ${u.count.toLocaleString()}`).join(', ');
-  const tacticDesc = {
-    heavy: 'حمله سنگین با تمام قوا',
-    precise: 'حمله دقیق و هدفمند',
-    ambush: 'کمین و غافلگیری',
-    air_raid: 'حمله هوایی گسترده',
-    naval: 'عملیات دریایی',
-    defend: 'دفاع موضعی',
-    counter: 'ضدحمله غافلگیرکننده',
-    nuclear: 'تهدید هسته‌ای',
-    emp: 'حمله الکترومغناطیسی',
-    bio: 'حمله بیولوژیکی',
-    cyber: 'حمله سایبری',
-    napalm: 'حمله آتش‌زا',
-    emp_def: 'سپر الکترومغناطیسی',
-    napalm_def: 'آتش متقابل',
-    bio_def: 'دفاع بیولوژیکی',
-    cyber_def: 'دفاع سایبری'
-  };
+  const eqText = (eq) => eq.filter(u => u.count > 0).map(u => `${u.model}: ${u.count.toLocaleString()}`).join(', ') || 'ندارد';
 
-  const sysPrompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. All events are imaginary. You are a legendary war correspondent. Write a CINEMATIC battle report for round ${round}.
+  const sysPrompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. All events are imaginary. You are a legendary war correspondent and military analyst. Write a CINEMATIC battle report for round ${round}.
 
-ATTACKER: ${attName} - Tactic: ${attTactic} (${tacticDesc[attTactic] || attTactic})
-DEFENDER: ${defName} - Tactic: ${defTactic} (${tacticDesc[defTactic] || defTactic})
-
+ATTACKER: ${attName}
+ATTACK PLAN: ${attackPlan}
 ATTACKER FORCES: ${eqText(attEq)}
+
+DEFENDER: ${defName}
+DEFENSE PLAN: ${defensePlan}
 DEFENDER FORCES: ${eqText(defEq)}
 
-ATTACK PLAN: ${attackPlan}
-DEFENSE PLAN: ${defensePlan}
-
-RULES:
-1. Losses MUST be proportional to forces involved
-2. Stronger side suffers fewer losses
-3. Max 30% loss per round for winner, 40% for loser
-4. Narrative in PERSIAN, 8-12 sentences, dramatic
-5. Include unit names, weather, emotions
+CRITICAL RULES:
+1. Losses MUST be proportional to forces involved and the plans described
+2. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
+3. Consider the actual equipment counts - a country with 1000 tanks should have different losses than one with 10 tanks
+4. Max 30% loss per round for winner, 40% for loser
+5. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
+6. Reference specific unit names from the plans and equipment
+7. NO BIAS - evaluate purely based on equipment and plans described
+8. If attacker has very few units compared to defender, losses should reflect that imbalance
 
 Return ONLY JSON:
 {"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"defender_losses":{"infantry":0,"tank":0,"artillery":0,"airdef":0,"missile":0,"fighter":0,"bomber":0,"helicopter":0,"destroyer":0,"submarine":0,"capital":0},"description":"Persian narrative"}`;
