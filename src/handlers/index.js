@@ -16,14 +16,13 @@ import {
   countrySelectKeyboard, languageSelectKeyboard,
   warTargetKeyboard, warActionKeyboard
 } from '../keyboards/index.js';
-import { checkWarReason } from '../utils/ai.js';
+import { checkWarReason, evaluateBattleRound } from '../utils/ai.js';
 import { createForumTopic, setDetectedGroupId, getDetectedGroupId } from '../utils/telegram.js';
 import { formatEq, formatInd, calcMilitaryPower, calcDailyIncome, calcDailyExpenses } from '../game/index.js';
 import { getUnitDef, getIndustryDef, UNIT_TYPES, COUNTRIES } from '../game/data.js';
 import { dashMsg, profileMsg } from './messages.js';
 
-const pendingWarDeclarations = new Map();
-const pendingDefenses = new Map();
+const pendingWars = new Map();
 
 function safeEdit(ctx, text, opts = {}) {
   return ctx.editMessageText(text, { parse_mode: 'Markdown', ...opts })
@@ -62,7 +61,7 @@ async function sendToGroup(bot, text, topicId = null) {
   }
 }
 
-// ─── New War System ───────────────────────────────────────────
+// ─── War System ───────────────────────────────────────────────
 
 async function handleWarDeclare(ctx, bot) {
   const uid = ctx.from.id;
@@ -100,10 +99,11 @@ async function handleWarTarget(ctx, targetId, bot) {
     return;
   }
 
-  pendingWarDeclarations.set(uid, {
+  pendingWars.set(uid, {
     targetId: parseInt(targetId),
     targetCountry: target.country_name,
-    targetFlag: target.country_flag
+    targetFlag: target.country_flag,
+    targetName: target.first_name
   });
 
   await safeEdit(ctx,
@@ -116,7 +116,7 @@ async function handleWarTarget(ctx, targetId, bot) {
 
 async function handleWarReason(ctx, reason, bot) {
   const uid = ctx.from.id;
-  const pending = pendingWarDeclarations.get(uid);
+  const pending = pendingWars.get(uid);
   if (!pending) return false;
 
   const wordCount = reason.trim().split(/\s+/).length;
@@ -128,7 +128,7 @@ async function handleWarReason(ctx, reason, bot) {
   }
 
   const user = getUserByTelegramId(uid);
-  pendingWarDeclarations.delete(uid);
+  pendingWars.delete(uid);
 
   await ctx.reply('🔍 در حال بررسی دلیل شما توسط هوش مصنوعی...');
 
@@ -143,15 +143,15 @@ async function handleWarReason(ctx, reason, bot) {
       return true;
     }
 
-    const war = createWar(uid, pending.targetId, reason, result.message);
     const target = getUserByTelegramId(pending.targetId);
+    const war = createWar(uid, pending.targetId, reason, result.message);
 
     await ctx.reply(
       `✅ **اعلان جنگ ثبت شد!**\n\n` +
       `⚔️ ${user.country_flag} ${user.country_name} → ${target.country_flag} ${target.country_name}\n` +
       `📝 دلیل: ${reason}\n\n` +
       `💬 ${result.message}\n\n` +
-      `⏳ در انتظار پاسخ مدافع...`,
+      `⏳ منتظر پاسخ مدافع...`,
       { parse_mode: 'Markdown', reply_markup: backBtn() }
     );
 
@@ -159,10 +159,12 @@ async function handleWarReason(ctx, reason, bot) {
       `🔔 **اعلان جنگ!**\n\n` +
       `⚔️ ${user.country_flag} ${user.country_name} به ${target.country_flag} ${target.country_name} اعلان جنگ داد!\n` +
       `📝 دلیل: ${reason}\n\n` +
-      `🛡️ دفاع کنید!`;
+      `🛡️ برای شروع دفاع، دکمه زیر را بزنید:`;
 
     await safeSend(bot, pending.targetId, defendMsg, {
-      reply_markup: warActionKeyboard(war.lastInsertRowid, false)
+      reply_markup: new InlineKeyboard()
+        .text('🛡️ پذیرش دفاع', `defend_accept_${war.lastInsertRowid}`)
+        .text('❌ رد کردن', `defend_reject_${war.lastInsertRowid}`)
     });
 
     await sendToGroup(bot, defendMsg);
@@ -175,6 +177,224 @@ async function handleWarReason(ctx, reason, bot) {
     );
     return true;
   }
+}
+
+async function handleDefendAccept(ctx, warId, bot) {
+  const uid = ctx.from.id;
+  const war = getWarDetail(parseInt(warId));
+
+  if (!war) {
+    await ctx.answerCallbackQuery('جنگ یافت نشد!');
+    return;
+  }
+
+  if (war.defender_tid !== uid) {
+    await ctx.answerCallbackQuery('شما مدافع این جنگ نیستید!');
+    return;
+  }
+
+  if (war.status !== 'active') {
+    await ctx.answerCallbackQuery('این جنگ قبلاً شروع شده!');
+    return;
+  }
+
+  await ctx.answerCallbackQuery('✅ دفاع فعال شد!');
+
+  const attacker = getUserByTelegramId(war.attacker_tid);
+  const defender = getUserByTelegramId(war.defender_tid);
+
+  await safeEdit(ctx,
+    `🛡️ **دفاع فعال شد!**\n\n` +
+    `📝 **طرح حمله خود را بنویسید** (حداقل 20 کلمه):\n\n` +
+    `_نیروهای خود، زمان حمله، و استراتژی خود را توضیح دهید._`,
+    { parse_mode: 'Markdown' }
+  );
+
+  await safeSend(bot, war.attacker_tid,
+    `⚔️ **نوبت شماست!**\n\n` +
+    `📝 **طرح حمله خود را بنویسید** (حداقل 20 کلمه):\n\n` +
+    `_نیروهای خود، زمان حمله، و استراتژی خود را توضیح دهید._`,
+    { parse_mode: 'Markdown' }
+  );
+
+  pendingWars.set(war.attacker_tid, {
+    warId: parseInt(warId),
+    type: 'attack_plan'
+  });
+
+  pendingWars.set(war.defender_tid, {
+    warId: parseInt(warId),
+    type: 'defense_plan'
+  });
+}
+
+async function handleDefendReject(ctx, warId, bot) {
+  const uid = ctx.from.id;
+  const war = getWarDetail(parseInt(warId));
+
+  if (!war || war.defender_tid !== uid) {
+    await ctx.answerCallbackQuery('شما مدافع این جنگ نیستید!');
+    return;
+  }
+
+  endWar(parseInt(warId), null);
+
+  await safeEdit(ctx, '❌ دفاع رد شد. جنگ لغو شد.', {
+    reply_markup: backBtn()
+  });
+
+  await safeSend(bot, war.attacker_tid,
+    `❌ مدافع (${war.defender_flag} ${war.defender_name}) دفاع را رد کرد.\n\nجنگ لغو شد.`,
+    { reply_markup: backBtn() }
+  );
+}
+
+async function handleWarPlan(ctx, plan, bot) {
+  const uid = ctx.from.id;
+  const pending = pendingWars.get(uid);
+  if (!pending) return false;
+
+  const wordCount = plan.trim().split(/\s+/).length;
+  if (wordCount < 10) {
+    await ctx.reply(`⚠️ طرح باید حداقل 10 کلمه باشد. (الان ${wordCount} کلمه نوشتید)`, {
+      reply_markup: backBtn()
+    });
+    return true;
+  }
+
+  const war = getWarDetail(pending.warId);
+  if (!war) {
+    pendingWars.delete(uid);
+    return false;
+  }
+
+  if (pending.type === 'attack_plan') {
+    pendingWars.delete(uid);
+    pendingWars.set(war.defender_tid, {
+      warId: pending.warId,
+      type: 'defense_plan',
+      attackPlan: plan
+    });
+
+    await ctx.reply(
+      `✅ **طرح حمله ذخیره شد!**\n\n` +
+      `📝 **منتظر طرح دفاع مدافع هستیم...**`,
+      { parse_mode: 'Markdown', reply_markup: backBtn() }
+    );
+    return true;
+  }
+
+  if (pending.type === 'defense_plan') {
+    const attackPlan = pending.attackPlan;
+    pendingWars.delete(uid);
+
+    await ctx.reply('⚔️ در حال شبیه‌سازی نبرد توسط هوش مصنوعی...');
+
+    const attacker = getUserByTelegramId(war.attacker_tid);
+    const defender = getUserByTelegramId(war.defender_tid);
+
+    try {
+      const result = await evaluateBattleRound(
+        attackPlan, plan,
+        `${attacker.country_flag} ${attacker.country_name}`,
+        `${defender.country_flag} ${defender.country_name}`,
+        attacker.equipment, defender.equipment,
+        'heavy', 'defend',
+        war.current_round
+      );
+
+      const attLosses = result.attacker_losses || {};
+      const defLosses = result.defender_losses || {};
+
+      const applyLosses = (equipment, losses) => {
+        return equipment.map(u => ({
+          ...u,
+          count: Math.max(0, u.count - (losses[u.type] || 0))
+        }));
+      };
+
+      const newAttEq = applyLosses(attacker.equipment, attLosses);
+      const newDefEq = applyLosses(defender.equipment, defLosses);
+
+      setEquipment(attacker.telegram_id, newAttEq);
+      setEquipment(defender.telegram_id, newDefEq);
+
+      const attPower = calcMilitaryPower(newAttEq);
+      const defPower = calcMilitaryPower(newDefEq);
+      const origAttPower = calcMilitaryPower(attacker.equipment);
+      const origDefPower = calcMilitaryPower(defender.equipment);
+
+      const attLostPct = origAttPower > 0 ? ((1 - attPower / origAttPower) * 100).toFixed(1) : 0;
+      const defLostPct = origDefPower > 0 ? ((1 - defPower / origDefPower) * 100).toFixed(1) : 0;
+
+      const narrative = result.description || 'نبرد به پایان رسید.';
+
+      const resultText = result.result === 'attacker_victory' ? '🏆 **پیروزی مهاجم!**' :
+        result.result === 'defender_victory' ? '🏆 **پیروزی مدافع!**' : '⚖️ **تساوی!**';
+
+      const roundText =
+        `━━━━━━━━━━━━━━━━━━\n` +
+        `⚔️ **راند ${war.current_round} نبرد**\n` +
+        `━━━━━━━━━━━━━━━━━━\n\n` +
+        `${narrative}\n\n` +
+        `━━━━━━━━━━━━━━━━━━\n` +
+        `🔴 **${attacker.country_flag} ${attacker.country_name}**\n` +
+        `📊 قدرت: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
+        `🔵 **${defender.country_flag} ${defender.country_name}**\n` +
+        `📊 قدرت: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
+        `━━━━━━━━━━━━━━━━━━\n` +
+        `${resultText}`;
+
+      await ctx.reply(roundText, { reply_markup: backBtn(), parse_mode: 'Markdown' });
+      await safeSend(bot, war.attacker_tid, roundText, { reply_markup: backBtn() });
+      await safeSend(bot, war.defender_tid, roundText, { reply_markup: backBtn() });
+      await sendToGroup(bot, roundText);
+
+      const ended = attPower <= 0 || defPower <= 0;
+      if (ended) {
+        const winnerId = attPower <= 0 ? war.defender_tid : war.attacker_tid;
+        endWar(parseInt(warId), winnerId);
+        const winner = getUserByTelegramId(winnerId);
+
+        const endMsg =
+          `🏁 **جنگ پایان یافت!**\n\n` +
+          `🏆 **برنده:** ${winner.country_flag} ${winner.country_name}`;
+
+        await ctx.reply(endMsg, { reply_markup: mainMenuKeyboard(), parse_mode: 'Markdown' });
+        await safeSend(bot, war.attacker_tid, endMsg, { reply_markup: mainMenuKeyboard() });
+        await safeSend(bot, war.defender_tid, endMsg, { reply_markup: mainMenuKeyboard() });
+        await sendToGroup(bot, endMsg);
+      } else {
+        updateWarRound(parseInt(warId), war.current_round + 1);
+
+        const nextRoundMsg = `➡️ راند ${war.current_round + 1} شروع شد. مهاجم طرح حمله بعدی را بنویسد:`;
+
+        await safeSend(bot, war.attacker_tid, nextRoundMsg, { reply_markup: backBtn() });
+        await safeSend(bot, war.defender_tid, nextRoundMsg, { reply_markup: backBtn() });
+
+        pendingWars.set(war.attacker_tid, {
+          warId: parseInt(warId),
+          type: 'attack_plan'
+        });
+
+        pendingWars.set(war.defender_tid, {
+          warId: parseInt(warId),
+          type: 'defense_plan'
+        });
+      }
+
+      return true;
+    } catch (err) {
+      console.error('[War] Battle error:', err.message);
+      await ctx.reply(
+        '⚠️ خطا در شبیه‌سازی نبرد. لطفاً دوباره تلاش کنید.',
+        { reply_markup: backBtn() }
+      );
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function registerHandlers(bot) {
@@ -201,8 +421,7 @@ export function registerHandlers(bot) {
 
   bot.command('cancel', async (ctx) => {
     clearState(ctx.from.id);
-    pendingWarDeclarations.delete(ctx.from.id);
-    pendingDefenses.delete(ctx.from.id);
+    pendingWars.delete(ctx.from.id);
     await ctx.reply('✅ لغو شد.', { reply_markup: mainMenuKeyboard() });
   });
 
@@ -301,33 +520,16 @@ export function registerHandlers(bot) {
     await handleWarTarget(ctx, targetId, bot);
   });
 
-  bot.callbackQuery(/^war_tactic_(.+)_(\d+)$/, async (ctx) => {
-    const tactic = ctx.match[1];
-    const warId = parseInt(ctx.match[2]);
-    const uid = ctx.from.id;
+  bot.callbackQuery(/^defend_accept_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = ctx.match[1];
+    await handleDefendAccept(ctx, warId, bot);
+  });
 
-    const war = getWarDetail(warId);
-    if (!war) {
-      await ctx.answerCallbackQuery('جنگ یافت نشد!');
-      return;
-    }
-
-    const isAttacker = war.attacker_tid === uid;
-    const isDefender = war.defender_tid === uid;
-
-    if (!isAttacker && !isDefender) {
-      await ctx.answerCallbackQuery('شما عضو این جنگ نیستید!');
-      return;
-    }
-
-    await ctx.answerCallbackQuery(`تاکتیک ${tactic} انتخاب شد`);
-    await ctx.reply(
-      `📝 **سناریوی خود را بنویسید** (اختیاری):\n\n` +
-      `_برای دفاع/حمله عادی بنویسید ادامه یا هیچ چیز ننویسید._`,
-      { parse_mode: 'Markdown' }
-    );
-
-    setState(uid, 'awaiting_war_plan', JSON.stringify({ warId, tactic, isAttacker }));
+  bot.callbackQuery(/^defend_reject_(\d+)$/, async (ctx) => {
+    await ctx.answerCallbackQuery();
+    const warId = ctx.match[1];
+    await handleDefendReject(ctx, warId, bot);
   });
 
   bot.callbackQuery(/^war_forces_(\d+)$/, async (ctx) => {
@@ -394,61 +596,17 @@ export function registerHandlers(bot) {
     const uid = ctx.from.id;
 
     try {
-      if (pendingWarDeclarations.has(uid)) {
+      if (pendingWars.has(uid)) {
+        const pending = pendingWars.get(uid);
+        if (pending.type === 'attack_plan' || pending.type === 'defense_plan') {
+          const handled = await handleWarPlan(ctx, text, bot);
+          if (handled) return;
+        }
+      }
+
+      if (pendingWars.has(uid)) {
         const handled = await handleWarReason(ctx, text, bot);
         if (handled) return;
-      }
-
-      const st = getState(uid);
-
-      if (st?.state === 'awaiting_war_plan') {
-        const data = JSON.parse(st.data);
-        const war = getWarDetail(data.warId);
-        if (!war) { clearState(uid); return; }
-
-        const user = getUserByTelegramId(uid);
-        const isAttacker = data.isAttacker;
-
-        clearState(uid);
-
-        await ctx.reply('⚔️ در حال شبیه‌سازی راند نبرد...');
-
-        // For now, use a simple battle simulation
-        // The full AI battle system can be added later
-        const attUser = getUserByTelegramId(war.attacker_tid);
-        const defUser = getUserByTelegramId(war.defender_tid);
-
-        const attPower = calcMilitaryPower(attUser.equipment);
-        const defPower = calcMilitaryPower(defUser.equipment);
-
-        const ratio = attPower / (attPower + defPower || 1);
-        const attLossPct = Math.min(0.2, (1 - ratio) * 0.3);
-        const defLossPct = Math.min(0.25, ratio * 0.3);
-
-        const attLoss = Math.floor(attPower * attLossPct);
-        const defLoss = Math.floor(defPower * defLossPct);
-
-        const result = ratio > 0.55 ? 'attacker_victory' : ratio < 0.45 ? 'defender_victory' : 'draw';
-
-        const narratives = {
-          attacker_victory: `⚔️ ${attUser.country_flag} ${attUser.country_name} با تاکتیک ${data.tactic} حمله‌ای گسترده آغاز کرد. ${defUser.country_flag} ${defUser.country_name} مقاومت کرد اما متحمل تلفات سنگینی شد.`,
-          defender_victory: `🛡️ ${defUser.country_flag} ${defUser.country_name} با دفاع موفق مانع پیشروی شد. ${attUser.country_flag} ${attUser.country_name} متحمل تلفات شد.`,
-          draw: `⚖️ نبرد بین ${attUser.country_name} و ${defUser.country_name} به بن‌بست رسید.`
-        };
-
-        const attText = `⚔️ **راند نبرد**\n\n${narratives[result]}\n\n📊 تلفات مهاجم: ${attLoss.toLocaleString()}\n📊 تلفات مدافع: ${defLoss.toLocaleString()}`;
-
-        await ctx.reply(attText, { reply_markup: backBtn(), parse_mode: 'Markdown' });
-        await safeSend(bot, war.attacker_tid, attText, { reply_markup: backBtn() });
-        await safeSend(bot, war.defender_tid, attText, { reply_markup: backBtn() });
-        await sendToGroup(bot, attText);
-        return;
-      }
-
-      if (st?.state === 'awaiting_country') {
-        const data = JSON.parse(st.data);
-        const lang = data.language;
-        // Handle country selection if needed
       }
 
     } catch (err) {
