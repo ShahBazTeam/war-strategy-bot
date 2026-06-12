@@ -255,13 +255,17 @@ function fallbackBattle(attName, defName, attEq, defEq, attTactic, defTactic, ro
 
 export async function generateUNResolutions(warContext) {
   const text = await callAI([
-    { role: 'system', content: `You are the UN Secretary General. Given this war: ${warContext}\n\nGenerate exactly 3 short resolutions as a JSON array of strings. Only return the JSON array.` },
-    { role: 'user', content: 'Generate 3 UN resolutions as JSON array' }
-  ], 200);
+    { role: 'system', content: `You are the UN Secretary General. Given this war: ${warContext}\n\nGenerate exactly 3 resolutions. Each must be a JSON object with "title" (short Persian title) and "description" (1-2 sentence Persian description). Return a JSON array of 3 objects.` },
+    { role: 'user', content: 'Generate 3 UN resolutions' }
+  ], 300);
 
   const parsed = safeParseJSON(text);
-  if (Array.isArray(parsed) && parsed.length >= 2) return parsed.slice(0, 3);
-  return ["آتش‌بس ۲۴ ساعته", "تحریم اقتصادی مهاجم", "وساطت سازمان ملل"];
+  if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0].title) return parsed.slice(0, 3);
+  return [
+    { title: "آتش‌بس ۲۴ ساعته", description: "سازمان ملل خواستار توقف فوری درگیری‌ها و آتش‌بس ۲۴ ساعته می‌شود." },
+    { title: "تحریم اقتصادی مهاجم", description: "تحریم‌های اقتصادی علیه کشور مهاجم اعمال می‌شود." },
+    { title: "وساطت سازمان ملل", description: "هیئت ویژه سازمان ملل برای مذاکره صلح اعزام می‌شود." }
+  ];
 }
 
 export async function generateWarSummary(attacker, defender, rounds, winner) {

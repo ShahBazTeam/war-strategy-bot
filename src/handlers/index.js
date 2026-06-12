@@ -690,7 +690,7 @@ export function registerHandlers(bot) {
         const resolutions = getActiveUNResolutions();
         const res = resolutions.find(r => r.id === resId);
         if (!res) { await safeEdit(ctx, '❌', { reply_markup: backBtn() }); return; }
-        await safeEdit(ctx, `📜 **${res.title}**\n\n${res.desc}\n\n🗳️ رأی خود را بده:`, { reply_markup: unVoteKeyboard(resId) });
+        await safeEdit(ctx, `📜 **${res.title}**\n\n${res.description}\n\n🗳️ رأی خود را بده:`, { reply_markup: unVoteKeyboard(resId) });
         return;
       }
 
@@ -1148,7 +1148,7 @@ export function registerHandlers(bot) {
         if (unRes.length && gid) {
           let unTopicId = await createForumTopic(gid, `🌐 قطعنامه: ${attInfo.country_name} vs ${defInfo.country_name}`, 0x6FB3D2);
           for (const res of unRes) {
-            const resolution = createUNResolution(w.id, res.title, res.desc);
+            const resolution = createUNResolution(w.id, res.title, res.description);
             if (resolution && resolution.lastInsertRowid && unTopicId) {
               setUNResolutionTopicId(resolution.lastInsertRowid, unTopicId, gid);
             }

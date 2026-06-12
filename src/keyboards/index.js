@@ -85,10 +85,10 @@ export function resourcesKeyboard() {
 
 export function sellKeyboard() {
   return new InlineKeyboard()
-    .text('🛢 فروش نفت (۱۰=۳۰💰)', 'sell_oil')
-    .text('⚙️ فروش فولاد (۱۰=۳۰💰)', 'sell_steel')
+    .text('🛢 فروش نفت (پویا ±۲۰٪)', 'sell_oil')
+    .text('⚙️ فروش فولاد (پویا ±۲۰٪)', 'sell_steel')
     .row()
-    .text('🌾 فروش غذا (۱۰=۳۰💰)', 'sell_food')
+    .text('🌾 فروش غذا (پویا ±۲۰٪)', 'sell_food')
     .row()
     .text('🔙 بازگشت', 'shop');
 }
@@ -154,6 +154,8 @@ export function warActionKeyboard(wid, isAtt) {
   kb.row()
     .text('📊 وضعیت نبرد', `war_detail_${wid}`)
     .text('🏳️ تسلیم', `surrender_${wid}`);
+  kb.row()
+    .text('🔙 بازگشت', 'war_status');
   return kb;
 }
 
@@ -196,7 +198,9 @@ export function warDetailKeyboard(wid) {
 export function nextRoundKeyboard(wid) {
   return new InlineKeyboard()
     .text('⏭️ راند بعدی', `next_round_${wid}`)
-    .text('🏳️ تسلیم', `surrender_${wid}`);
+    .text('🏳️ تسلیم', `surrender_${wid}`)
+    .row()
+    .text('🔙 بازگشت', 'war_status');
 }
 
 export function unMenuKeyboard() {
@@ -211,7 +215,9 @@ export function unVoteKeyboard(resId) {
     .text('✅ موافق', `un_vote_${resId}_agree`)
     .text('❌ مخالف', `un_vote_${resId}_disagree`)
     .row()
-    .text('⏸️ ممتنع', `un_vote_${resId}_abstain`);
+    .text('⏸️ ممتنع', `un_vote_${resId}_abstain`)
+    .row()
+    .text('🔙 بازگشت', 'un_menu');
 }
 
 export function techKeyboard() {
@@ -256,7 +262,9 @@ export function allianceKeyboard() {
 export function allianceTransferKeyboard(allianceId, otherName) {
   return new InlineKeyboard()
     .text(`💰 ارسال طلا به ${otherName}`, `alliance_send_gold_${allianceId}`)
-    .text(`📦 ارسال تجهیزات`, `alliance_send_units_${allianceId}`);
+    .text(`📦 ارسال تجهیزات`, `alliance_send_units_${allianceId}`)
+    .row()
+    .text('🔙 بازگشت', 'alliance_menu');
 }
 
 export function allianceTargetKeyboard(users, cur) {
@@ -273,5 +281,7 @@ export function allianceTargetKeyboard(users, cur) {
 export function allianceActionKeyboard(allianceId) {
   return new InlineKeyboard()
     .text('✅ قبول', `alliance_accept_${allianceId}`)
-    .text('❌ رد', `alliance_reject_${allianceId}`);
+    .text('❌ رد', `alliance_reject_${allianceId}`)
+    .row()
+    .text('🔙 بازگشت', 'alliance_pending');
 }
