@@ -258,7 +258,8 @@ export function registerHandlers(bot) {
           return;
         }
         const state = getState(uid);
-        const stateData = state ? JSON.parse(state.data || '{}') : {};
+        let stateData = {};
+        try { stateData = state ? JSON.parse(state.data || '{}') : {}; } catch { stateData = {}; }
         const language = stateData.language || 'fa';
         createUser(uid, ctx.from.username || '', ctx.from.first_name || '', countryId, language);
         const u = getUserByTelegramId(uid);
@@ -315,7 +316,7 @@ export function registerHandlers(bot) {
       if (d === 'tech_menu') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const xpNeeded = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500];
         const nextXp = xpNeeded[u.level] || 9999;
         await safeEdit(ctx,
@@ -333,7 +334,7 @@ export function registerHandlers(bot) {
       const techUpg = { tech_attack: 'tech_attack', tech_defense: 'tech_defense', tech_economy: 'tech_economy' };
       if (techUpg[d]) {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const field = techUpg[d];
         const current = u[field] || 1;
         if (current >= 10) { await safeEdit(ctx, '❌ حداکثر سطح ۱۰!', { reply_markup: techKeyboard() }); return; }
@@ -368,7 +369,7 @@ export function registerHandlers(bot) {
       if (d === 'shop') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         await safeEdit(ctx,
           `🏪 **فروشگاه تسلیحاتی**\n\n💰 ${u.gold.toLocaleString()} طلا\n━━━━━━━━━━━━━━━━━━`,
           { reply_markup: shopKeyboard() }
@@ -383,7 +384,7 @@ export function registerHandlers(bot) {
           const qty = parseInt(parts[2]);
           if (isNaN(qty) || qty <= 0) { await safeEdit(ctx, '❌ تعداد نامعتبر.', { reply_markup: shopKeyboard() }); return; }
           const u = getUserRaw(uid);
-          if (!u) return;
+          if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
           const unitDef = UT[typeId];
           if (!unitDef) { await safeEdit(ctx, '❌ یگان نامعتبر.', { reply_markup: shopKeyboard() }); return; }
           const target = (u.equipment || []).find(e => e.type === typeId);
@@ -410,7 +411,7 @@ export function registerHandlers(bot) {
       const resNames = { buy_oil: 'نفت', buy_steel: 'فولاد', buy_food: 'غذا' };
       if (resBuy[d]) {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         if (u.gold < 50) { await safeEdit(ctx, '❌ ۵۰💰 نیاز است.', { reply_markup: resourcesKeyboard() }); return; }
         updateResources(uid, { gold: -50, [resBuy[d]]: 20 });
         const upd = getUserByTelegramId(uid);
@@ -420,7 +421,7 @@ export function registerHandlers(bot) {
 
       if (d === 'sell_resources') {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         await safeEdit(ctx, `💰 **فروش منابع**\n\n🛢 نفت: ${u.oil} | ⚙️ فولاد: ${u.steel} | 🌾 غذا: ${u.food}\n\n💎 هر ۱۰ = ~۳۰💰 (قیمت پویا ±۲۰٪)`, { reply_markup: sellKeyboard() });
         return;
       }
@@ -429,7 +430,7 @@ export function registerHandlers(bot) {
       const resSN = { sell_oil: 'نفت', sell_steel: 'فولاد', sell_food: 'غذا' };
       if (resSell[d]) {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         if (u[resSell[d]] < 10) { await safeEdit(ctx, '❌ حداقل ۱۰ واحد.', { reply_markup: sellKeyboard() }); return; }
         const qty = Math.floor(u[resSell[d]] / 10) * 10;
         const basePrice = 30;
@@ -443,7 +444,7 @@ export function registerHandlers(bot) {
       if (d === 'industries') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const income = calcDailyIncome(u.industries, u.country_id, u.tech_economy || 1), exp = calcDailyExpenses(u.equipment, u.industries), net = income - exp;
         await safeEdit(ctx,
           `🏭 **صنایع ${u.country_name}**\n\n${formatInd(u.industries)}\n\n📊 **اقتصاد:**\n💰 درآمد: ${income.toLocaleString()} | 💸 هزینه: ${exp.toLocaleString()}\n📈 خالص: ${net >= 0 ? '+' : ''}${net.toLocaleString()}\n\n💎 ارتقاء:\n• نفت: ۲۰۰💰 | معدن: ۱۵۰💰 | کشاورزی: ۸۰💰\n• کارخانجات: ۱۸۰💰 | بانک: ۲۵۰💰`,
@@ -457,9 +458,9 @@ export function registerHandlers(bot) {
       if (upgMap[d]) {
         const typeId = upgMap[d];
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const target = (u.industries || []).find(i => i.type === typeId);
-        if (!target) return;
+        if (!target) { await safeEdit(ctx, '❌ صنعت یافت نشد.', { reply_markup: industriesKeyboard() }); return; }
         const def = getIndustryDef(typeId), cost = def ? def.baseCost : 100;
         if (u.gold < cost) { await safeEdit(ctx, `❌ ${cost.toLocaleString()}💰 نیاز است.`, { reply_markup: industriesKeyboard() }); return; }
         if (target.level >= 20) { await safeEdit(ctx, '❌ حداکثر سطح ۲۰!', { reply_markup: industriesKeyboard() }); return; }
@@ -473,7 +474,7 @@ export function registerHandlers(bot) {
 
       if (d === 'daily_claim') {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const now = Date.now();
         const lastClaim = u.last_claim ? new Date(u.last_claim).getTime() : 0;
         const cooldown = 24 * 60 * 60 * 1000;
@@ -491,7 +492,7 @@ export function registerHandlers(bot) {
 
       if (d === 'daily_collect') {
         const u = getUserRaw(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const income = calcDailyIncome(u.industries, u.country_id, u.tech_economy || 1);
         const expenses = calcDailyExpenses(u.equipment, u.industries);
         const net = income - expenses;
@@ -507,7 +508,7 @@ export function registerHandlers(bot) {
       if (d === 'declare_war') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const all = getAllUsers(uid);
         if (!all.length) { await safeEdit(ctx, '❌ هیچ کشوری نیست.', { reply_markup: mainMenuKeyboard() }); return; }
         await safeEdit(ctx, `⚔️ **اعلان جنگ**\n\n${u.country_flag} ${u.country_name}\n🌍 کشور هدف را انتخاب کن:`, { reply_markup: warTargetKeyboard(all, uid) });
@@ -518,7 +519,7 @@ export function registerHandlers(bot) {
         const tid = parseInt(d.slice(11));
         setState(uid, 'awaiting_war_reason', JSON.stringify({ targetId: tid }));
         const t = getUserByTelegramId(tid);
-        if (!t) return;
+        if (!t) { await safeEdit(ctx, '❌ کاربر یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         await safeEdit(ctx, `⚔️ **دلیل جنگ را تایپ کن**\n\n🎯 ${t.country_flag} ${t.country_name}\n\n📝 دلیل منطقی بنویس.`, { reply_markup: backBtn() });
         return;
       }
@@ -526,7 +527,7 @@ export function registerHandlers(bot) {
       if (d === 'war_status') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const wars = getWarsByUser(uid);
         if (!wars.length) { await safeEdit(ctx, '🔥 **جنگ‌ها**\n\nهیچ جنگ فعالی نداری.', { reply_markup: mainMenuKeyboard() }); return; }
         let txt = '🔥 **جنگ‌های فعال**\n━━━━━━━━━━━━━━━━━━\n\n';
@@ -545,9 +546,10 @@ export function registerHandlers(bot) {
       if (d.startsWith('war_forces_')) {
         const wid = parseInt(d.slice(11));
         const w = getWarDetail(wid);
-        if (!w) return;
+        if (!w) { await safeEdit(ctx, '❌ جنگ یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         const isA = w.attacker_tid === uid;
         const user = isA ? getUserRaw(w.attacker_tid) : getUserRaw(w.defender_tid);
+        if (!user) { await safeEdit(ctx, '❌ خطا.', { reply_markup: warDetailKeyboard(wid) }); return; }
         const flag = isA ? w.attacker_flag : w.defender_flag;
         const country = isA ? w.attacker_name : w.defender_name;
         let txt = `📋 **نیروهای ${flag} ${country}**\n━━━━━━━━━━━━━━━━━━\n\n`;
@@ -567,7 +569,7 @@ export function registerHandlers(bot) {
       if (d.startsWith('war_detail_')) {
         const wid = parseInt(d.slice(11));
         const w = getWarDetail(wid);
-        if (!w) return;
+        if (!w) { await safeEdit(ctx, '❌ جنگ یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         const isA = w.attacker_tid === uid;
         const attP = calcMilitaryPower(w.attacker_eq), defP = calcMilitaryPower(w.defender_eq);
         await safeEdit(ctx,
@@ -593,6 +595,7 @@ export function registerHandlers(bot) {
         else if (d.includes('_napalm_def_')) tactic = 'napalm_def';
         const names = { defend: '🛡️ دفاع موضعی', counter: '⚔️ ضدحمله', ambush: '🗡️ کمین', nuclear: '☢️ ضد هسته‌ای', bio_def: '🧬 ضد بیولوژیک', cyber_def: '💻 ضد سایبری', emp_def: '⚡ پوشش الکترومغناطیس', napalm_def: '🔥 ضد ناپالم' };
         const u = getUserRaw(uid);
+        if (!u) { await safeEdit(ctx, '❌ خطا.', { reply_markup: mainMenuKeyboard() }); return; }
         const lang = u.language || 'fa';
         const eq = u.equipment.filter(eq => eq.count > 0);
         let equipText = `\n📦 **موجودی تجهیزات:**\n`;
@@ -619,6 +622,7 @@ export function registerHandlers(bot) {
         else if (d.includes('_napalm_')) tactic = 'napalm';
         const names = { heavy: '💥 حمله سنگین', precise: '🎯 حمله دقیق', ambush: '🗡️ کمین', air_raid: '✈️ حمله هوایی', naval: '🚢 عملیات دریایی', nuclear: '☢️ حمله هسته‌ای', emp: '⚡ حمله الکترومغناطیسی', bio: '🧬 حمله بیولوژیکی', cyber: '💻 حمله سایبری', napalm: '🔥 حمله ناپالم' };
         const u = getUserRaw(uid);
+        if (!u) { await safeEdit(ctx, '❌ خطا.', { reply_markup: mainMenuKeyboard() }); return; }
         const lang = u.language || 'fa';
         const eq = u.equipment.filter(eq => eq.count > 0);
         let equipText = `\n📦 **موجودی تجهیزات:**\n`;
@@ -634,7 +638,7 @@ export function registerHandlers(bot) {
       if (d.startsWith('next_round_')) {
         const wid = parseInt(d.slice(11));
         const w = getWarDetail(wid);
-        if (!w) return;
+        if (!w) { await safeEdit(ctx, '❌ جنگ یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         const warTopicId = getWarTopicId(wid);
         await safeEdit(ctx, `⏭️ **راند ${w.current_round}**\n\n👇 یک تاکتیک جدید انتخاب کن:`,
           { reply_markup: warActionKeyboard(wid, true) });
@@ -646,7 +650,7 @@ export function registerHandlers(bot) {
       if (d.startsWith('surrender_')) {
         const wid = parseInt(d.slice(10));
         const w = getWarDetail(wid);
-        if (!w) return;
+        if (!w) { await safeEdit(ctx, '❌ جنگ یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         const warTopicId = getWarTopicId(wid);
         const isA = w.attacker_tid === uid;
         endWar(wid, isA ? w.defender_id : w.attacker_id);
@@ -715,7 +719,7 @@ export function registerHandlers(bot) {
       if (d === 'alliance_menu') {
         clearState(uid);
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const pending = getPendingAlliances(uid);
         const active = getActiveAlliances(uid);
         let txt = `🤝 **سیستم اتحاد**\n━━━━━━━━━━━━━━━━━━\n\n`;
@@ -730,7 +734,7 @@ export function registerHandlers(bot) {
 
       if (d === 'alliance_propose') {
         const u = getUserByTelegramId(uid);
-        if (!u) return;
+        if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
         const all = getAllUsers(uid);
         if (!all.length) { await safeEdit(ctx, '❌ هیچ کشوری نیست.', { reply_markup: allianceKeyboard() }); return; }
         await safeEdit(ctx, `🤝 **پیشنهاد اتحاد**\n\n🌍 کشور مورد نظر را انتخاب کن:`, { reply_markup: allianceTargetKeyboard(all, uid) });
@@ -741,7 +745,7 @@ export function registerHandlers(bot) {
         const targetId = parseInt(d.slice(16));
         setState(uid, 'awaiting_alliance_reason', JSON.stringify({ targetId }));
         const t = getUserByTelegramId(targetId);
-        if (!t) return;
+        if (!t) { await safeEdit(ctx, '❌ کاربر یافت نشد.', { reply_markup: mainMenuKeyboard() }); return; }
         await safeEdit(ctx, `🤝 **پیام اتحاد را بنویس**\n\n🎯 ${t.country_flag} ${t.country_name}\n\n📝 یک پیام بنویس:`, { reply_markup: backBtn() });
         return;
       }
@@ -822,6 +826,7 @@ export function registerHandlers(bot) {
         const alliance = getActiveAlliances(uid).find(a => a.id === allianceId);
         if (!alliance) { await safeEdit(ctx, '❌ اتحاد یافت نشد.', { reply_markup: allianceKeyboard() }); return; }
         const u = getUserRaw(uid);
+        if (!u) { await safeEdit(ctx, '❌ خطا.', { reply_markup: allianceKeyboard() }); return; }
         const units = u.equipment.filter(eq => eq.count > 0);
         if (!units.length) { await safeEdit(ctx, '❌ نیرویی نداری.', { reply_markup: allianceKeyboard() }); return; }
         let txt = `📦 **ارسال تجهیزات**\n\n🎯 به: ${alliance.other_flag} ${alliance.other_name}\n\n🎖️ **نیروها:**\n`;
@@ -902,10 +907,11 @@ export function registerHandlers(bot) {
     }
 
     const u = getUserByTelegramId(uid);
-    if (!u) return;
+    if (!u) { await safeEdit(ctx, '❌ خطا. لطفاً دوباره /start بزن.', { reply_markup: mainMenuKeyboard() }); return; }
     const st = getState(uid);
     if (!st) return;
-    const d = JSON.parse(st.data || '{}');
+    let d;
+    try { d = JSON.parse(st.data || '{}'); } catch { clearState(uid); return; }
 
     if (st.state === 'awaiting_war_reason') {
       const t = getUserByTelegramId(d.targetId);
@@ -1154,6 +1160,7 @@ export function registerHandlers(bot) {
         await sendToGroup(bot, `🏁 **پایان جنگ!**\n🏆 ${winnerName}`, warTopicId);
 
         const unRes = await generateUNResolutions(`${attInfo.country_name} vs ${defInfo.country_name}`);
+        const gid = getGroupChatId();
         if (unRes.length && gid) {
           let unTopicId = await createForumTopic(gid, `🌐 قطعنامه: ${attInfo.country_name} vs ${defInfo.country_name}`, 0x6FB3D2);
           for (const res of unRes) {
