@@ -28,6 +28,8 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
 };
 
 function verifyInitData(initData, botToken) {
