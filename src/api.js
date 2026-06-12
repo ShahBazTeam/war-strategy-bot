@@ -483,8 +483,8 @@ async function handleAPI(req, res, botToken) {
   return false;
 
   } catch (err) {
-    console.error('[API] Error:', err.message, err.stack);
-    sendJSON(res, { error: 'Server error: ' + err.message }, 500);
+    console.error('[API] Error:', String(err), err?.stack || '');
+    sendJSON(res, { error: 'Server error: ' + String(err) }, 500);
     return true;
   }
 }
