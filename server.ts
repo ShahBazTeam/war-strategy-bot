@@ -59,8 +59,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         config.responseSchema = jsonSchema;
       }
 
-      // Rotate models if experiencing high demand or errors (try 1.5-flash)
-      const selectedModel = "gemini-1.5-flash";
+      const selectedModel = "gemini-2.0-flash";
 
       console.log(`[Gemini Request] Attempt ${attempts}/${maxAttempts} using model: ${selectedModel}`);
 
