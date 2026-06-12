@@ -24,7 +24,10 @@ export function languageSelectKeyboard() {
 }
 
 export function mainMenuKeyboard() {
+  const appUrl = process.env.MINI_APP_URL || 'https://modern-world-bot-production.up.railway.app';
   return new InlineKeyboard()
+    .text('🎮 بازی (Mini App)', { web_app: { url: appUrl } })
+    .row()
     .text('👤 پروفایل', 'profile')
     .text('🎁 پاداش روزانه', 'daily_claim')
     .row()

@@ -9,6 +9,7 @@ import { dashMsg } from './handlers/messages.js';
 import { setDetectedGroupId } from './utils/telegram.js';
 import { calcDailyIncome, calcDailyExpenses } from './game/index.js';
 import { logError, logInfo } from './utils/logger.js';
+import { setupAPI } from './api.js';
 
 const TOKEN = process.env.BOT_TOKEN;
 if (!TOKEN) { console.error('BOT_TOKEN not set!'); process.exit(1); }
@@ -20,8 +21,10 @@ const server = http.createServer((_, res) => {
   res.end('OK');
 });
 
+setupAPI(server, TOKEN);
+
 server.listen(PORT, '0.0.0.0', () => {
-  logInfo(`Health server listening on port ${PORT}`);
+  logInfo(`Server listening on port ${PORT}`);
 });
 
 if (process.env.GROUP_ID) {
