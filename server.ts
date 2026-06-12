@@ -71,7 +71,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         config: config
       });
 
-      const responseText = response.text || "";
+      const responseText = response.text ?? response.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
       
       // Save logs safely
       saveGeminiLog({
@@ -790,15 +790,15 @@ app.get("/api/tweets", (req, res) => {
 app.post("/api/tweets", checkRateLimit, async (req, res) => {
     const user = getCurrentUser(req);
     if (!user) return res.status(401).json({ error: "ورود لغو شد" });
-    const { content } = req.body;
-    if (!content) return res.status(400).json({ error: "متن خالی است" });
+    const tweetText = req.body.text || req.body.content;
+    if (!tweetText || tweetText.trim().length < 5) return res.status(400).json({ error: "متن پیام باید حداقل ۵ کاراکتر باشد" });
     const tweet: Tweet = { 
       id: Math.random().toString(36).substring(2, 9), 
       userId: user.id,
       username: user.username, 
       countryName: user.country.name, 
       flagUrl: user.country.flagUrl,
-      text: content, 
+      text: tweetText.trim(), 
       timestamp: new Date().toISOString(),
       likes: [],
       comments: []
