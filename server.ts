@@ -6,7 +6,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { 
   User, TradeOffer, WarReasonSubmission, UNProposal, Alliance, GeminiLog, Resources, NationalAssets,
@@ -23,80 +22,82 @@ const PORT = parseInt(process.env.PORT || "8080", 10);
 app.use(express.json({ limit: "15mb" }));
 
 // --------------------------------------------------------
-// GOOGLE GEMINI API INITIALIZATION
+// FREEMODEL API INITIALIZATION (OpenAI-compatible)
 // --------------------------------------------------------
-const geminiApiKey = process.env.GEMINI_API_KEY || "";
-const ai = new GoogleGenAI({
-  apiKey: geminiApiKey || "MOCK_KEY_FOR_BUILD",
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
-  }
-});
+const AI_API_KEY = process.env.FREEMODEL_API_KEY || process.env.GEMINI_API_KEY || "";
+const AI_BASE_URL = "https://api.freemodel.ai/v1";
 
-// Helper function to safely invoke Gemini with retry logic and detailed logs
 async function callGemini(prompt: string, systemInstruction: string, jsonSchema?: any): Promise<string> {
   const logId = Math.random().toString(36).substring(2, 11);
   let attempts = 0;
-  const maxAttempts = 5;
+  const maxAttempts = 3;
   let lastError: any = null;
 
   while (attempts < maxAttempts) {
     try {
       attempts++;
-      if (!geminiApiKey || geminiApiKey === "MY_GEMINI_API_KEY") {
-        throw new Error("کلید Gemini API معتبر تعریف نشده است. لطفاً آن را در بخش Secrets تنظیم کنید.");
+      if (!AI_API_KEY) {
+        throw new Error("کلید API معتبر تعریف نشده است. لطفاً FREEMODEL_API_KEY را تنظیم کنید.");
       }
 
-      const config: any = {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-      };
+      let systemMsg = systemInstruction;
+      let userMsg = prompt;
 
       if (jsonSchema) {
-        config.responseMimeType = "application/json";
-        config.responseSchema = jsonSchema;
+        const schemaStr = JSON.stringify(jsonSchema, null, 2);
+        systemMsg += `\n\nپاسخ خود را حتماً در قالب JSON دقیق زیر برگردانید:\n${schemaStr}\nفقط محتوای JSON را برگردانید، بدون هیچ متن اضافی.`;
       }
 
-      const selectedModel = "gemini-2.0-flash";
+      console.log(`[AI Request] Attempt ${attempts}/${maxAttempts}`);
 
-      console.log(`[Gemini Request] Attempt ${attempts}/${maxAttempts} using model: ${selectedModel}`);
-
-      const response = await ai.models.generateContent({
-        model: selectedModel,
-        contents: prompt,
-        config: config
+      const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${AI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemMsg },
+            { role: "user", content: userMsg }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048,
+        }),
       });
 
-      const responseText = response.text ?? response.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      if (!response.ok) {
+        const errBody = await response.text();
+        throw new Error(`API ${response.status}: ${errBody}`);
+      }
+
+      const data = await response.json() as any;
+      const responseText = data.choices?.[0]?.message?.content?.trim() || "";
       
       // Save logs safely
       saveGeminiLog({
         id: logId,
-        prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: ${selectedModel}`,
+        prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: gpt-4o-mini`,
         response: responseText,
         timestamp: new Date().toISOString()
       });
 
-      return responseText.trim();
+      return responseText;
     } catch (error: any) {
       lastError = error;
-      const isUnavailable = error.message?.includes("503") || error.message?.includes("UNAVAILABLE") || error.message?.includes("capacity");
-      console.error(`Gemini call attempt ${attempts} failed (${isUnavailable ? "Model busy/503" : "Error"}):`, error.message);
+      console.error(`AI call attempt ${attempts} failed:`, error.message);
       
       if (attempts < maxAttempts) {
-        // Exponential backoff: 1s, 2s, 4s, etc., plus a small random jitter
-        const backoffDelay = Math.pow(2, attempts) * 500 + Math.floor(Math.random() * 300);
+        const backoffDelay = Math.pow(2, attempts) * 1000;
         console.log(`Waiting ${backoffDelay}ms before retry...`);
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
     }
   }
 
-  // Fallback if all attempts fail
-  const errMessage = lastError ? lastError.message : "خطای ناشناخته در جمینی";
-  console.error("All Gemini attempts failed. Using local fallback. Error:", errMessage);
+  const errMessage = lastError ? lastError.message : "خطای ناشناخته";
+  console.error("All AI attempts failed. Error:", errMessage);
   
   saveGeminiLog({
     id: logId,
@@ -106,7 +107,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
     timestamp: new Date().toISOString()
   });
 
-  throw new Error(`خطا در ارتباط با هوش مصنوعی جمینی: ${errMessage}`);
+  throw new Error(`خطا در ارتباط با هوش مصنوعی: ${errMessage}`);
 }
 
 // --------------------------------------------------------
