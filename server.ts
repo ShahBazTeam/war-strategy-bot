@@ -38,13 +38,16 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
   const logId = Math.random().toString(36).substring(2, 11);
   let lastError: any = null;
 
-  for (let modelIdx = 0; modelIdx < AI_MODELS.length; modelIdx++) {
-    const model = AI_MODELS[(currentModelIndex + modelIdx) % AI_MODELS.length];
+  // Shuffle models so we don't always hammer the same one
+  const models = [...AI_MODELS];
+
+  for (let modelIdx = 0; modelIdx < models.length; modelIdx++) {
+    const model = models[modelIdx];
     
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         if (!AI_API_KEY) {
-          throw new Error("کلید API معتبر تعریف نشده است. لطفاً OPENROUTER_API_KEY را تنظیم کنید.");
+          throw new Error("OPENROUTER_API_KEY تنظیم نشده");
         }
 
         let systemMsg = systemInstruction;
@@ -57,8 +60,12 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
 
         console.log(`[AI] Model: ${model} | Attempt ${attempt}/2`);
 
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 20000);
+
         const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
           method: "POST",
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${AI_API_KEY}`,
@@ -76,6 +83,8 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
           }),
         });
 
+        clearTimeout(timeout);
+
         if (!response.ok) {
           const errBody = await response.text();
           throw new Error(`API ${response.status}: ${errBody}`);
@@ -91,7 +100,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         if (!responseText || responseText.length < 5) {
           throw new Error("Empty response content");
         }
-        
+
         currentModelIndex = (currentModelIndex + modelIdx) % AI_MODELS.length;
         console.log(`[AI] Success with model: ${model}`);
 
@@ -106,12 +115,12 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
       } catch (error: any) {
         lastError = error;
         console.error(`[AI] ${model} attempt ${attempt} failed:`, error.message);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
       }
     }
     console.log(`[AI] Trying next model...`);
-    await new Promise(r => setTimeout(r, 3000));
   }
+
   const errMessage = lastError ? lastError.message : "خطای ناشناخته";
   console.error("All AI models failed. Error:", errMessage);
   
