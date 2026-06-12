@@ -42,7 +42,7 @@ function goBack() { showScreen('dashboard'); }
 // ─── Init ──────────────────────────────────────────
 
 async function init() {
-  if (tg) {
+  if (tg && tg.initData) {
     tg.ready();
     tg.expand();
   } else {
