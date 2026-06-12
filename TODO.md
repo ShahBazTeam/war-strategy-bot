@@ -1,0 +1,4 @@
+- [ ] حذف تولید و ارسال قطعنامه‌های UN بعد از پایان جنگ (در src/handlers/index.js)
+- [ ] اصلاح تشخیص passive/pass: اجرای isDoNothing فقط روی متن «استراتژی» (نه کل action شامل تجهیزات) در حالت awaiting_defense_plan
+- [ ] حذف importهای غیرضروری مربوط به UN از src/handlers/index.js (اگر بعد از حذف بلاک بلااستفاده ماند)
+- [ ] تست سریع با اجرای node برای چک Syntax یا اجرای اسکریپت موجود در package.json

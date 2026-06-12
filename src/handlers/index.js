@@ -5,9 +5,9 @@ import {
   createWar, getWarDetail, getWarsByUser, addWarRound, endWar, updateWarRound,
   setState, getState, clearState, getUserByInternalId, getExistingRound,
   addLog, updateField, getAllUsersFull, updateWarRoundDefense, updateWarRoundResult,
-  updateLevel, addXp, updateTech, updateWinLoss, createUNResolution, voteUN,
-  getUNResolutionVotes, getActiveUNResolutions, setWarTopicId, getWarTopicId,
-  setUNResolutionTopicId,
+  // UN بخش به پایان جنگ مربوط نیست (در این ورژن حذف شد)
+  // voteUN, createUNResolution و... در صورت نیاز در منوها می‌توانند باقی بمانند
+  setWarTopicId, getWarTopicId,
   createAlliance, acceptAlliance, rejectAlliance, deleteAlliance,
   getPendingAlliances, getActiveAlliances, isCountryAvailable, setLastClaim
 } from '../database/index.js';
@@ -18,7 +18,7 @@ import {
   techKeyboard, allianceKeyboard, allianceTargetKeyboard, allianceActionKeyboard,
   countrySelectKeyboard, languageSelectKeyboard
 } from '../keyboards/index.js';
-import { checkWarReason, evaluateBattleRound, generateUNResolutions } from '../utils/ai.js';
+import { checkWarReason, evaluateBattleRound } from '../utils/ai.js';
 import { createForumTopic, setDetectedGroupId, getDetectedGroupId } from '../utils/telegram.js';
 import { getModelName, getUnitName } from '../utils/translations.js';
 import { formatEq, formatInd, calcMilitaryPower, calcDailyIncome, calcDailyExpenses } from '../game/index.js';
@@ -1043,8 +1043,19 @@ export function registerHandlers(bot) {
       const defInfo = getUserByInternalId(w.defender_id);
       const warTopicId = getWarTopicId(w.id);
 
-      const attIsPassive = isDoNothing(ex.attacker_action);
-      const defIsPassive = isDoNothing(fullAction);
+      // Bugfix: متن کل action شامل تجهیزات هم هست، پس فقط «استراتژی/طرح» باید بررسی شود
+      const extractStrategyOnly = (actionText) => {
+        const m = actionText.match(/\[استراتژی:\s*([\s\S]*)\]\s*$/);
+        if (m?.[1]) return m[1].trim();
+        // fallback
+        return actionText.replace(/\[تجهیزات (?:اعزامی|مستقر): [^\]]*\]\s*/g, '').trim();
+      };
+
+      const attStrategyText = extractStrategyOnly(ex.attacker_action || '');
+      const defStrategyText = extractStrategyOnly(fullAction || '');
+
+      const attIsPassive = isDoNothing(attStrategyText);
+      const defIsPassive = isDoNothing(defStrategyText);
 
       function extractDeploy(actionText) {
         const match = actionText.match(/\[تجهیزات (?:اعزامی|مستقر): ([^\]]+)\]/);
@@ -1159,21 +1170,7 @@ export function registerHandlers(bot) {
         await safeSend(bot, w.defender_tid, rt, { reply_markup: mainMenuKeyboard() });
         await sendToGroup(bot, `🏁 **پایان جنگ!**\n🏆 ${winnerName}`, warTopicId);
 
-        const unRes = await generateUNResolutions(`${attInfo.country_name} vs ${defInfo.country_name}`);
-        const gid = getGroupChatId();
-        if (unRes.length && gid) {
-          let unTopicId = await createForumTopic(gid, `🌐 قطعنامه: ${attInfo.country_name} vs ${defInfo.country_name}`, 0x6FB3D2);
-          for (const res of unRes) {
-            const resolution = createUNResolution(w.id, res.title, res.description);
-            if (resolution && resolution.lastInsertRowid && unTopicId) {
-              setUNResolutionTopicId(resolution.lastInsertRowid, unTopicId, gid);
-            }
-          }
-          let unMsg = `🌐 **سازمان ملل**\n\n`;
-          unRes.forEach((r, i) => { unMsg += `${i + 1}. **${r.title}**\n${r.description}\n\n`; });
-          unMsg += `🗳️ رأی‌گیری فعال است.`;
-          await sendToGroup(bot, unMsg, unTopicId);
-        }
+        // حذف: تولید/ارسال قطعنامه‌های UN بعد از پایان جنگ (طبق درخواست)
       } else {
         updateWarRound(w.id, round + 1);
         rt += `\n\n➡️ راند ${round + 1} — ${w.attacker_flag} طرح حمله بعدی را بنویس:`;
