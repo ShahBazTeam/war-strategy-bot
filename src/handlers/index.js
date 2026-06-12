@@ -4,7 +4,7 @@ import {
   setEquipment, setIndustries, getUserRaw, getUserIdFromTid, getAllUsers,
   setState, getState, clearState, getUserByInternalId,
   addLog, updateField, getAllUsersFull, isCountryAvailable, setLastClaim,
-  createWar, getWarDetail, getWarsByUser, endWar, updateWarRound,
+  createWar, getWarDetail, getWarsByUser, endWar, updateWarRound, updateWarStatus,
   setWarTopicId, getWarTopicId,
   createAlliance, acceptAlliance, rejectAlliance, deleteAlliance,
   getPendingAlliances, getActiveAlliances
@@ -194,10 +194,13 @@ async function handleDefendAccept(ctx, warId, bot) {
     return;
   }
 
-  if (war.status !== 'active') {
-    await ctx.answerCallbackQuery('این جنگ قبلاً شروع شده!');
+  if (war.status !== 'waiting_defender') {
+    await ctx.answerCallbackQuery('این جنگ قبلاً پاسخ داده شده!');
     return;
   }
+
+  // Update war status to active
+  updateWarStatus(parseInt(warId), 'active');
 
   await ctx.answerCallbackQuery('✅ دفاع فعال شد!');
 

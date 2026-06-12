@@ -140,7 +140,7 @@ function safeParseJSON(text) {
 
 export async function checkWarReason(reason, attackerCountry, defenderCountry) {
   const text = await callAI([
-    { role: 'system', content: `You are a war judge for a strategy game. The attacker ${attackerCountry} wants to declare war on ${defenderCountry}.\n\nReason provided: "${reason}"\n\nRULES: Be VERY lenient. Almost any reason should be APPROVED. Only reject if the reason is completely empty, gibberish, or offensive slurs.\n\nReply ONLY with one word: APPROVED or REJECTED` },
+    { role: 'system', content: `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. You are a war judge for a strategy game. The attacker ${attackerCountry} wants to declare war on ${defenderCountry}.\n\nReason provided: "${reason}"\n\nRULES: Be VERY lenient. Almost any reason should be APPROVED. Only reject if the reason is completely empty, gibberish, or offensive slurs.\n\nReply ONLY with one word: APPROVED or REJECTED` },
     { role: 'user', content: `Reason: ${reason}` }
   ], 20);
   if (!text) return { approved: true, message: '✅ دلیل جنگ قابل قبول است.' };
@@ -170,7 +170,7 @@ export async function evaluateBattleRound(attackPlan, defensePlan, attName, defN
     cyber_def: 'دفاع سایبری'
   };
 
-  const sysPrompt = `You are a legendary war correspondent. Write a CINEMATIC battle report for round ${round}.
+  const sysPrompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. All events are imaginary. You are a legendary war correspondent. Write a CINEMATIC battle report for round ${round}.
 
 ATTACKER: ${attName} - Tactic: ${attTactic} (${tacticDesc[attTactic] || attTactic})
 DEFENDER: ${defName} - Tactic: ${defTactic} (${tacticDesc[defTactic] || defTactic})

@@ -85,7 +85,7 @@ export function getAllUsers(exTid) {
 }
 
 export function createWar(aId, dId, reason, aiV) {
-  return run("INSERT INTO wars (attacker_id, defender_id, reason, ai_verdict, status) VALUES (?,?,?,?,'active')", [aId, dId, reason, aiV]);
+  return run("INSERT INTO wars (attacker_id, defender_id, reason, ai_verdict, status) VALUES (?,?,?,?,'waiting_defender')", [aId, dId, reason, aiV]);
 }
 
 export function getWarById(wid) { return one('SELECT * FROM wars WHERE id = ?', [wid]); }
@@ -128,6 +128,10 @@ export function addWarRound(wid, round, aAct, dAct, aTactic, dTactic, aLoss, dLo
 
 export function endWar(wid, winnerId) {
   run("UPDATE wars SET status='ended', winner_id=?, ended_at=CURRENT_TIMESTAMP WHERE id=?", [winnerId, wid]);
+}
+
+export function updateWarStatus(wid, status) {
+  run('UPDATE wars SET status=? WHERE id=?', [status, wid]);
 }
 
 export function updateWarRound(wid, round) {
