@@ -19,7 +19,7 @@ import { CATALOG, INITIAL_QUANTITIES } from "./src/catalogData";
 dotenv.config();
 
 const app = express();
-const PORT = parseInt(process.env.PORT || "3000", 10);
+const PORT = parseInt(process.env.PORT || "8080", 10);
 
 app.use(express.json({ limit: "15mb" }));
 
