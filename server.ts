@@ -22,10 +22,11 @@ const PORT = parseInt(process.env.PORT || "8080", 10);
 app.use(express.json({ limit: "15mb" }));
 
 // --------------------------------------------------------
-// FREEMODEL API INITIALIZATION (OpenAI-compatible)
+// OPENROUTER API INITIALIZATION
 // --------------------------------------------------------
-const AI_API_KEY = process.env.FREEMODEL_API_KEY || process.env.GEMINI_API_KEY || "";
-const AI_BASE_URL = "https://api.freemodel.ai/v1";
+const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const AI_BASE_URL = "https://openrouter.ai/api/v1";
+const AI_MODEL = "qwen/qwen-2.5-7b-instruct:free";
 
 async function callGemini(prompt: string, systemInstruction: string, jsonSchema?: any): Promise<string> {
   const logId = Math.random().toString(36).substring(2, 11);
@@ -55,9 +56,11 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${AI_API_KEY}`,
+          "HTTP-Referer": "https://war-strategy-bot-production.up.railway.app",
+          "X-Title": "Modern World Strategy Game",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: AI_MODEL,
           messages: [
             { role: "system", content: systemMsg },
             { role: "user", content: userMsg }
@@ -78,7 +81,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
       // Save logs safely
       saveGeminiLog({
         id: logId,
-        prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: gpt-4o-mini`,
+        prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: ${AI_MODEL}`,
         response: responseText,
         timestamp: new Date().toISOString()
       });
