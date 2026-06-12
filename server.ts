@@ -26,82 +26,86 @@ app.use(express.json({ limit: "15mb" }));
 // --------------------------------------------------------
 const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const AI_BASE_URL = "https://openrouter.ai/api/v1";
-const AI_MODEL = "google/gemma-2-9b-it:free";
+const AI_MODELS = [
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "meta-llama/llama-3.1-8b-instruct:free",
+  "google/gemma-2-9b-it:free",
+  "qwen/qwen-2.5-7b-instruct:free",
+];
+let currentModelIndex = 0;
 
 async function callGemini(prompt: string, systemInstruction: string, jsonSchema?: any): Promise<string> {
   const logId = Math.random().toString(36).substring(2, 11);
-  let attempts = 0;
-  const maxAttempts = 3;
   let lastError: any = null;
 
-  while (attempts < maxAttempts) {
-    try {
-      attempts++;
-      if (!AI_API_KEY) {
-        console.error("[AI] OPENROUTER_API_KEY is not set! Available env keys:", Object.keys(process.env).filter(k => k.includes("KEY") || k.includes("API") || k.includes("OPENROUTER")));
-        throw new Error("کلید API معتبر تعریف نشده است. لطفاً OPENROUTER_API_KEY را تنظیم کنید.");
-      }
+  for (let modelIdx = 0; modelIdx < AI_MODELS.length; modelIdx++) {
+    const model = AI_MODELS[(currentModelIndex + modelIdx) % AI_MODELS.length];
+    
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        if (!AI_API_KEY) {
+          throw new Error("کلید API معتبر تعریف نشده است. لطفاً OPENROUTER_API_KEY را تنظیم کنید.");
+        }
 
-      let systemMsg = systemInstruction;
-      let userMsg = prompt;
+        let systemMsg = systemInstruction;
+        let userMsg = prompt;
 
-      if (jsonSchema) {
-        const schemaStr = JSON.stringify(jsonSchema, null, 2);
-        systemMsg += `\n\nپاسخ خود را حتماً در قالب JSON دقیق زیر برگردانید:\n${schemaStr}\nفقط محتوای JSON را برگردانید، بدون هیچ متن اضافی.`;
-      }
+        if (jsonSchema) {
+          const schemaStr = JSON.stringify(jsonSchema, null, 2);
+          systemMsg += `\n\nپاسخ خود را حتماً در قالب JSON دقیق زیر برگردانید:\n${schemaStr}\nفقط محتوای JSON را برگردانید، بدون هیچ متن اضافی.`;
+        }
 
-      console.log(`[AI Request] Attempt ${attempts}/${maxAttempts}`);
+        console.log(`[AI] Model: ${model} | Attempt ${attempt}/2`);
 
-      const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${AI_API_KEY}`,
-          "HTTP-Referer": "https://war-strategy-bot-production.up.railway.app",
-          "X-Title": "Modern World Strategy Game",
-        },
-        body: JSON.stringify({
-          model: AI_MODEL,
-          messages: [
-            { role: "system", content: systemMsg },
-            { role: "user", content: userMsg }
-          ],
-          temperature: 0.7,
-          max_tokens: 2048,
-        }),
-      });
+        const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${AI_API_KEY}`,
+            "HTTP-Referer": "https://war-strategy-bot-production.up.railway.app",
+            "X-Title": "Modern World Strategy Game",
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: "system", content: systemMsg },
+              { role: "user", content: userMsg }
+            ],
+            temperature: 0.7,
+            max_tokens: 2048,
+          }),
+        });
 
-      if (!response.ok) {
-        const errBody = await response.text();
-        throw new Error(`API ${response.status}: ${errBody}`);
-      }
+        if (!response.ok) {
+          const errBody = await response.text();
+          throw new Error(`API ${response.status}: ${errBody}`);
+        }
 
-      const data = await response.json() as any;
-      const responseText = data.choices?.[0]?.message?.content?.trim() || "";
-      
-      // Save logs safely
-      saveGeminiLog({
-        id: logId,
-        prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: ${AI_MODEL}`,
-        response: responseText,
-        timestamp: new Date().toISOString()
-      });
+        const data = await response.json() as any;
+        const responseText = data.choices?.[0]?.message?.content?.trim() || "";
+        
+        currentModelIndex = (currentModelIndex + modelIdx) % AI_MODELS.length;
+        console.log(`[AI] Success with model: ${model}`);
 
-      return responseText;
-    } catch (error: any) {
-      lastError = error;
-      console.error(`AI call attempt ${attempts} failed:`, error.message);
-      
-      if (attempts < maxAttempts) {
-        const backoffDelay = Math.pow(2, attempts) * 1000;
-        console.log(`Waiting ${backoffDelay}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+        saveGeminiLog({
+          id: logId,
+          prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}\n[Model]: ${model}`,
+          response: responseText,
+          timestamp: new Date().toISOString()
+        });
+
+        return responseText;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`[AI] ${model} attempt ${attempt} failed:`, error.message);
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
       }
     }
+    console.log(`[AI] Trying next model...`);
   }
 
   const errMessage = lastError ? lastError.message : "خطای ناشناخته";
-  console.error("All AI attempts failed. Error:", errMessage);
+  console.error("All AI models failed. Error:", errMessage);
   
   saveGeminiLog({
     id: logId,
@@ -111,7 +115,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
     timestamp: new Date().toISOString()
   });
 
-  throw new Error(`خطا در ارتباط با هوش مصنوعی: ${errMessage}`);
+  throw new Error("تمام مدل‌های هوش مصنوعی موقتاً در دسترس نیستند. لطفاً بعداً تلاش کنید.");
 }
 
 // --------------------------------------------------------
