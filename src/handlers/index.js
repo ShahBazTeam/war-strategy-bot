@@ -350,6 +350,19 @@ async function handleDefensePlan(ctx, text, bot) {
 
     const narrative = result.description || 'نبرد به پایان رسید.';
 
+    const formatLosses = (losses) => {
+      const names = {
+        infantry: 'پیاده‌نظام', tank: 'تانک', artillery: 'توپخانه',
+        airdef: 'پدافند هوایی', missile: 'موشک', fighter: 'جنگنده',
+        bomber: 'بمب‌افکن', helicopter: 'بالگرد', destroyer: 'ناوشکن',
+        submarine: 'زیردریایی', capital: 'ناو پایتخت'
+      };
+      const lines = Object.entries(losses)
+        .filter(([_, v]) => v > 0)
+        .map(([k, v]) => `  ❌ ${v.toLocaleString()} ${names[k] || k}`);
+      return lines.length > 0 ? lines.join('\n') : '  ✅ بدون تلفات';
+    };
+
     const resultText = result.result === 'attacker_victory' ? '🏆 پیروزی مهاجم!' :
       result.result === 'defender_victory' ? '🛡️ پیروزی مدافع!' : '⚖️ تساوی!';
 
@@ -359,9 +372,11 @@ async function handleDefensePlan(ctx, text, bot) {
       `${narrative}\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `${attacker.country_flag} **${attacker.country_name}**\n` +
-      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
+      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n` +
+      `📋 تلفات:\n${formatLosses(attLosses)}\n\n` +
       `${defender.country_flag} **${defender.country_name}**\n` +
       `🛡️ قدرت نظامی: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
+      `📋 تلفات:\n${formatLosses(defLosses)}\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       `${resultText}`;
 
@@ -510,6 +525,19 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
     const narrative = result.description || 'نبرد به پایان رسید.';
 
+    const formatLosses = (losses) => {
+      const names = {
+        infantry: 'پیاده‌نظام', tank: 'تانک', artillery: 'توپخانه',
+        airdef: 'پدافند هوایی', missile: 'موشک', fighter: 'جنگنده',
+        bomber: 'بمب‌افکن', helicopter: 'بالگرد', destroyer: 'ناوشکن',
+        submarine: 'زیردریایی', capital: 'ناو پایتخت'
+      };
+      const lines = Object.entries(losses)
+        .filter(([_, v]) => v > 0)
+        .map(([k, v]) => `  ❌ ${v.toLocaleString()} ${names[k] || k}`);
+      return lines.length > 0 ? lines.join('\n') : '  ✅ بدون تلفات';
+    };
+
     const resultText = result.result === 'attacker_victory' ? '🏆 پیروزی مهاجم!' :
       result.result === 'defender_victory' ? '🛡️ پیروزی مدافع!' : '⚖️ تساوی!';
 
@@ -519,9 +547,11 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
       `${narrative}\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `${attacker.country_flag} **${attacker.country_name}**\n` +
-      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
+      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n` +
+      `📋 تلفات:\n${formatLosses(attLosses)}\n\n` +
       `${defender.country_flag} **${defender.country_name}**\n` +
       `🛡️ قدرت نظامی: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
+      `📋 تلفات:\n${formatLosses(defLosses)}\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       `${resultText}`;
 
