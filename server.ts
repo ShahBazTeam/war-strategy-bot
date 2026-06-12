@@ -16,6 +16,16 @@ import { CATALOG, INITIAL_QUANTITIES } from "./src/catalogData";
 
 dotenv.config();
 
+// Minimal JSON-schema-like type constants used to build prompts.
+// (We only use these values for instructing the LLM, not for runtime schema validation.)
+const Type = {
+  OBJECT: "object",
+  STRING: "string",
+  INTEGER: "integer",
+  NUMBER: "number",
+  BOOLEAN: "boolean",
+} as const;
+
 const app = express();
 const PORT = parseInt(process.env.PORT || "8080", 10);
 
@@ -38,17 +48,31 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
   const logId = Math.random().toString(36).substring(2, 11);
   let lastError: any = null;
 
-  // Shuffle models so we don't always hammer the same one
+  // Try models in rotated order starting from currentModelIndex (more fair distribution)
   const models = [...AI_MODELS];
+  const rotateBy = ((currentModelIndex % AI_MODELS.length) + AI_MODELS.length) % AI_MODELS.length;
+  const rotatedModels = models.slice(rotateBy).concat(models.slice(0, rotateBy));
 
-  for (let modelIdx = 0; modelIdx < models.length; modelIdx++) {
-    const model = models[modelIdx];
-    
-    for (let attempt = 1; attempt <= 2; attempt++) {
+  const totalMaxTriesPerRequest = 6; // total (model x attempt) tries
+  let tries = 0;
+
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  const extractFirstJsonObject = (text: string) => {
+    // Best-effort: locate first {...} block (for non-strict JSON responses)
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start >= 0 && end > start) return text.slice(start, end + 1);
+    return text;
+  };
+
+  for (const model of rotatedModels) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      tries++;
+      if (tries > totalMaxTriesPerRequest) break;
+
       try {
-        if (!AI_API_KEY) {
-          throw new Error("OPENROUTER_API_KEY تنظیم نشده");
-        }
+        if (!AI_API_KEY) throw new Error("OPENROUTER_API_KEY تنظیم نشده");
 
         let systemMsg = systemInstruction;
         let userMsg = prompt;
@@ -58,50 +82,64 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
           systemMsg += `\n\nپاسخ خود را حتماً در قالب JSON دقیق زیر برگردانید:\n${schemaStr}\nفقط محتوای JSON را برگردانید، بدون هیچ متن اضافی.`;
         }
 
-        console.log(`[AI] Model: ${model} | Attempt ${attempt}/2`);
+        console.log(`[AI] Model: ${model} | Try ${tries}/${totalMaxTriesPerRequest}`);
 
+        // Longer timeout + abort
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 20000);
+        const timeout = setTimeout(() => controller.abort(), 30000);
 
         const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
           method: "POST",
           signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             "Authorization": `Bearer ${AI_API_KEY}`,
             "HTTP-Referer": "https://war-strategy-bot-production.up.railway.app",
             "X-Title": "Modern World Strategy Game",
           },
           body: JSON.stringify({
-            model: model,
+            model,
             messages: [
               { role: "system", content: systemMsg },
               { role: "user", content: userMsg }
             ],
-            temperature: 0.7,
-            max_tokens: 2048,
+            temperature: 0.4,
+            max_tokens: 1024,
           }),
         });
 
         clearTimeout(timeout);
 
         if (!response.ok) {
-          const errBody = await response.text();
-          throw new Error(`API ${response.status}: ${errBody}`);
+          const errBody = await response.text().catch(() => "");
+          const err = new Error(`API ${response.status}: ${errBody.slice(0, 400)}`);
+          (err as any).status = response.status;
+          (err as any).body = errBody;
+          throw err;
         }
 
         const data = await response.json() as any;
-        let responseText = data.choices?.[0]?.message?.content?.trim() || "";
-        
+        let responseText: string = data.choices?.[0]?.message?.content?.trim() || "";
+
         // Strip markdown code blocks if present
-        responseText = responseText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
-        
-        // Skip if content is null/empty (reasoning models may return everything in reasoning)
+        responseText = responseText
+          .replace(/^```(?:json)?\s*\n?/i, "")
+          .replace(/\n?```\s*$/i, "")
+          .trim();
+
         if (!responseText || responseText.length < 5) {
           throw new Error("Empty response content");
         }
 
-        currentModelIndex = (currentModelIndex + modelIdx) % AI_MODELS.length;
+        // If JSON requested, try to salvage JSON-only content
+        if (jsonSchema) {
+          responseText = extractFirstJsonObject(responseText).trim();
+        }
+
+        // Advance model index (next call rotates)
+        currentModelIndex = (currentModelIndex + 1) % AI_MODELS.length;
+
         console.log(`[AI] Success with model: ${model}`);
 
         saveGeminiLog({
@@ -114,16 +152,32 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
         return responseText;
       } catch (error: any) {
         lastError = error;
-        console.error(`[AI] ${model} attempt ${attempt} failed:`, error.message);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+        const status = (error && (error.status || error?.response?.status)) ? Number(error.status || error.response.status) : null;
+        const msg = error?.message || "Unknown AI error";
+
+        // Only backoff more on gateway/service errors
+        const isRetryable =
+          status === 502 || status === 503 || status === 504 ||
+          (typeof msg === "string" && /Bad Gateway|timeout|ECONNRESET|ETIMEDOUT/i.test(msg));
+
+        console.error(`[AI] ${model} try ${tries} failed: ${msg}`);
+
+        if (!isRetryable && attempt >= 2) {
+          // Fast-fail for non-transient errors after a couple attempts
+          break;
+        }
+
+        const backoffMs = 500 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 250);
+        await sleep(backoffMs);
       }
     }
-    console.log(`[AI] Trying next model...`);
+
+    if (tries > totalMaxTriesPerRequest) break;
   }
 
   const errMessage = lastError ? lastError.message : "خطای ناشناخته";
   console.error("All AI models failed. Error:", errMessage);
-  
+
   saveGeminiLog({
     id: logId,
     prompt: `[System]: ${systemInstruction}\n\n[User]: ${prompt}`,
@@ -132,7 +186,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
     timestamp: new Date().toISOString()
   });
 
-  throw new Error("تمام مدل‌های هوش مصنوعی موقتاً در دسترس نیستند. لطفاً بعداً تلاش کنید.");
+  throw new Error("خطای سرویس هوش مصنوعی (OpenRouter). لطفاً چند ثانیه بعد دوباره تلاش کنید.");
 }
 
 // --------------------------------------------------------
