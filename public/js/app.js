@@ -25,11 +25,11 @@ function showScreen(name) {
   currentScreen = name;
 }
 
-function showSection(name) {
+function showSection(name, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
 
   if (name === 'wars') loadWars();
   if (name === 'army') renderEquipment();
@@ -54,19 +54,14 @@ async function init() {
   const me = await api('/api/me');
   if (!me.registered) {
     showScreen('welcome');
+    loadCountries();
   } else {
     userData = me.user;
     showDashboard();
   }
 }
 
-function selectLang(lang) {
-  document.getElementById('lang-select').style.display = 'none';
-  document.getElementById('country-select').style.display = 'block';
-  loadCountries(lang);
-}
-
-async function loadCountries(lang) {
+async function loadCountries() {
   const countries = await api('/api/countries');
   const grid = document.getElementById('country-grid');
   grid.innerHTML = countries.map(c => `
@@ -82,6 +77,7 @@ async function registerCountry(countryId) {
   if (res.success) {
     userData = res.user;
     showDashboard();
+    tg?.HapticFeedback?.notificationOccurred('success');
   } else {
     alert(res.error);
   }

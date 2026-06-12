@@ -11,21 +11,32 @@
   <div id="app">
     <!-- Loading -->
     <div id="loading" class="screen active">
-      <div class="loader"></div>
-      <p>در حال بارگذاری...</p>
+      <div class="loader-container">
+        <div class="loader"></div>
+        <div class="loader-ring"></div>
+      </div>
+      <h1 class="loading-title">🌍 جنگ جهانی</h1>
+      <p class="loading-sub">در حال بارگذاری...</p>
     </div>
 
     <!-- Welcome / Register -->
     <div id="welcome" class="screen">
+      <div class="welcome-bg">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+      </div>
       <div class="welcome-box">
-        <h1>🌍 جنگ جهانی</h1>
-        <p>بازی استراتژیک آنلاین</p>
-        <div id="lang-select">
-          <button class="btn btn-primary" onclick="selectLang('fa')">🇮🇷 فارسی</button>
-          <button class="btn btn-secondary" onclick="selectLang('en')">🇺🇸 English</button>
+        <div class="logo-container">
+          <div class="logo-glow"></div>
+          <h1 class="logo-text">🌍 جنگ جهانی</h1>
         </div>
-        <div id="country-select" style="display:none">
-          <h2>کشور خود را انتخاب کنید:</h2>
+        <p class="subtitle">بازی استراتژیک آنلاین</p>
+        
+        <div id="country-select">
+          <h2 class="select-title">کشور خود را انتخاب کنید:</h2>
           <div id="country-grid"></div>
         </div>
       </div>
@@ -35,55 +46,107 @@
     <div id="dashboard" class="screen">
       <header class="header">
         <div class="user-info">
-          <span id="user-flag"></span>
-          <span id="user-name"></span>
-          <span class="level-badge">Lv.<span id="user-level">1</span></span>
+          <span id="user-flag" class="user-flag"></span>
+          <div class="user-details">
+            <span id="user-name" class="user-name"></span>
+            <span class="level-badge">Lv.<span id="user-level">1</span></span>
+          </div>
         </div>
       </header>
 
       <div class="stats-bar">
-        <div class="stat"><span class="stat-icon">💰</span><span id="stat-gold">0</span></div>
-        <div class="stat"><span class="stat-icon">🛢</span><span id="stat-oil">0</span></div>
-        <div class="stat"><span class="stat-icon">⚙️</span><span id="stat-steel">0</span></div>
-        <div class="stat"><span class="stat-icon">⚔️</span><span id="stat-power">0</span></div>
+        <div class="stat">
+          <span class="stat-icon">💰</span>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-gold">0</span>
+            <span class="stat-label">طلا</span>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon">🛢</span>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-oil">0</span>
+            <span class="stat-label">نفت</span>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon">⚙️</span>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-steel">0</span>
+            <span class="stat-label">فولاد</span>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon">⚔️</span>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-power">0</span>
+            <span class="stat-label">قدرت</span>
+          </div>
+        </div>
       </div>
 
       <nav class="main-nav">
-        <button class="nav-btn" onclick="showSection('army')">⚔️ ارتش</button>
-        <button class="nav-btn" onclick="showSection('shop')">🏪 فروشگاه</button>
-        <button class="nav-btn" onclick="showSection('wars')">🔥 جنگ‌ها</button>
-        <button class="nav-btn" onclick="showSection('profile')">👤 پروفایل</button>
+        <button class="nav-btn active" data-section="army" onclick="showSection('army', this)">
+          <span class="nav-icon">⚔️</span>
+          <span>ارتش</span>
+        </button>
+        <button class="nav-btn" data-section="shop" onclick="showSection('shop', this)">
+          <span class="nav-icon">🏪</span>
+          <span>فروشگاه</span>
+        </button>
+        <button class="nav-btn" data-section="wars" onclick="showSection('wars', this)">
+          <span class="nav-icon">🔥</span>
+          <span>جنگ‌ها</span>
+        </button>
+        <button class="nav-btn" data-section="profile" onclick="showSection('profile', this)">
+          <span class="nav-icon">👤</span>
+          <span>پروفایل</span>
+        </button>
       </nav>
 
-      <!-- Army Section -->
-      <div id="section-army" class="section active">
-        <h2>تجهیزات نظامی</h2>
-        <div id="equipment-list" class="card-list"></div>
-      </div>
+      <div class="section-content">
+        <!-- Army Section -->
+        <div id="section-army" class="section active">
+          <h2 class="section-title">تجهیزات نظامی</h2>
+          <div id="equipment-list" class="card-list"></div>
+        </div>
 
-      <!-- Shop Section -->
-      <div id="section-shop" class="section">
-        <h2>فروشگاه</h2>
-        <div id="shop-list" class="card-list"></div>
-      </div>
+        <!-- Shop Section -->
+        <div id="section-shop" class="section">
+          <h2 class="section-title">فروشگاه</h2>
+          <div id="shop-list" class="card-list"></div>
+        </div>
 
-      <!-- Wars Section -->
-      <div id="section-wars" class="section">
-        <h2>جنگ‌ها</h2>
-        <button class="btn btn-danger btn-full" onclick="showDeclareWar()">⚔️ اعلان جنگ جدید</button>
-        <div id="wars-list" class="card-list"></div>
-      </div>
+        <!-- Wars Section -->
+        <div id="section-wars" class="section">
+          <h2 class="section-title">جنگ‌ها</h2>
+          <button class="btn btn-danger btn-full btn-glow" onclick="showDeclareWar()">⚔️ اعلان جنگ جدید</button>
+          <div id="wars-list" class="card-list"></div>
+        </div>
 
-      <!-- Profile Section -->
-      <div id="section-profile" class="section">
-        <h2>پروفایل</h2>
-        <div class="profile-card">
-          <div id="profile-flag" class="big-flag"></div>
-          <h3 id="profile-country"></h3>
-          <div class="profile-stats">
-            <div>💰 <span id="profile-gold">0</span></div>
-            <div>⚔️ قدرت: <span id="profile-power">0</span></div>
-            <div>📈 درآمد: <span id="profile-income">0</span>/روز</div>
+        <!-- Profile Section -->
+        <div id="section-profile" class="section">
+          <h2 class="section-title">پروفایل</h2>
+          <div class="profile-card">
+            <div class="profile-flag-container">
+              <div class="profile-flag-glow"></div>
+              <div id="profile-flag" class="big-flag"></div>
+            </div>
+            <h3 id="profile-country" class="profile-country"></h3>
+            <div class="profile-stats">
+              <div class="profile-stat">
+                <span class="profile-stat-icon">💰</span>
+                <span id="profile-gold">0</span>
+              </div>
+              <div class="profile-stat">
+                <span class="profile-stat-icon">⚔️</span>
+                <span id="profile-power">0</span>
+              </div>
+              <div class="profile-stat">
+                <span class="profile-stat-icon">📈</span>
+                <span id="profile-income">0</span>/روز
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -98,12 +161,12 @@
 
       <div id="war-content">
         <div id="war-declare-form" style="display:none">
-          <h3>انتخاب هدف</h3>
+          <h3 class="section-title">انتخاب هدف</h3>
           <div id="target-list" class="card-list"></div>
           <div id="scenario-input" style="display:none">
             <div id="target-info"></div>
             <textarea id="attack-scenario" placeholder="سناریوی حمله خود را بنویسید...&#10;1) دلیل حمله&#10;2) سناریو و استراتژی" rows="6"></textarea>
-            <button class="btn btn-danger btn-full" onclick="declareWar()">اعلان جنگ!</button>
+            <button class="btn btn-danger btn-full btn-glow" onclick="declareWar()">اعلان جنگ!</button>
           </div>
         </div>
 
@@ -111,7 +174,7 @@
           <div id="battle-parties"></div>
           <div id="battle-scenario">
             <textarea id="defense-scenario" placeholder="سناریوی دفاع خود را بنویسید..." rows="6"></textarea>
-            <button class="btn btn-primary btn-full" onclick="acceptWar()">شروع نبرد!</button>
+            <button class="btn btn-primary btn-full btn-glow" onclick="acceptWar()">شروع نبرد!</button>
           </div>
         </div>
 
