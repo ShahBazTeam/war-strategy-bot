@@ -487,6 +487,7 @@ export function setupAPI(botToken) {
 
 export async function handleRequest(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  console.log(`[HTTP] ${req.method} ${url.pathname}`);
 
   if (url.pathname.startsWith('/api/')) {
     const handled = await handleAPI(req, res, BOT_TOKEN);
@@ -494,16 +495,21 @@ export async function handleRequest(req, res) {
   }
 
   let filePath = path.join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname);
-  if (!fs.existsSync(filePath)) filePath = path.join(PUBLIC_DIR, 'index.html');
+  if (!fs.existsSync(filePath)) {
+    console.log(`[HTTP] File not found: ${filePath}, serving index.html`);
+    filePath = path.join(PUBLIC_DIR, 'index.html');
+  }
 
   const ext = path.extname(filePath);
   const contentType = MIME[ext] || 'application/octet-stream';
 
   try {
     const content = fs.readFileSync(filePath);
+    console.log(`[HTTP] Serving: ${filePath} (${contentType})`);
     res.writeHead(200, { 'Content-Type': contentType });
     res.end(content);
   } catch (e) {
+    console.error(`[HTTP] Error serving: ${e.message}`);
     res.writeHead(404);
     res.end('Not found');
   }

@@ -18,8 +18,14 @@ const PORT = process.env.PORT || 3000;
 
 setupAPI(TOKEN);
 
-const server = http.createServer((req, res) => {
-  handleRequest(req, res);
+const server = http.createServer(async (req, res) => {
+  try {
+    await handleRequest(req, res);
+  } catch (err) {
+    console.error('Server error:', err.message);
+    res.writeHead(500);
+    res.end('Server error');
+  }
 });
 
 server.listen(PORT, '0.0.0.0', () => {
