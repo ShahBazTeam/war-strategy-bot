@@ -350,18 +350,19 @@ async function handleDefensePlan(ctx, text, bot) {
 
     const narrative = result.description || 'نبرد به پایان رسید.';
 
-    const resultText = result.result === 'attacker_victory' ? 'پیروزی مهاجم!' :
-      result.result === 'defender_victory' ? 'پیروزی مدافع!' : 'تساوی!';
+    const resultText = result.result === 'attacker_victory' ? '🏆 پیروزی مهاجم!' :
+      result.result === 'defender_victory' ? '🛡️ پیروزی مدافع!' : '⚖️ تساوی!';
 
     const roundText =
-      `===== راند ${war.current_round} نبرد =====\n\n` +
+      `⚔️ **راند ${war.current_round} نبرد** ⚔️\n` +
+      `_${attacker.country_flag} ${attacker.country_name} در برابر ${defender.country_flag} ${defender.country_name}_\n\n` +
       `${narrative}\n\n` +
-      `===== نتیجه =====\n` +
-      `${attacker.country_flag} ${attacker.country_name}\n` +
-      `قدرت: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
-      `${defender.country_flag} ${defender.country_name}\n` +
-      `قدرت: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
-      `==================\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `${attacker.country_flag} **${attacker.country_name}**\n` +
+      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
+      `${defender.country_flag} **${defender.country_name}**\n` +
+      `🛡️ قدرت نظامی: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       `${resultText}`;
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });
@@ -509,18 +510,19 @@ async function startNextRound(bot, war, defensePlan, attackPlan) {
 
     const narrative = result.description || 'نبرد به پایان رسید.';
 
-    const resultText = result.result === 'attacker_victory' ? 'پیروزی مهاجم!' :
-      result.result === 'defender_victory' ? 'پیروزی مدافع!' : 'تساوی!';
+    const resultText = result.result === 'attacker_victory' ? '🏆 پیروزی مهاجم!' :
+      result.result === 'defender_victory' ? '🛡️ پیروزی مدافع!' : '⚖️ تساوی!';
 
     const roundText =
-      `===== راند ${war.current_round} نبرد =====\n\n` +
+      `⚔️ **راند ${war.current_round} نبرد** ⚔️\n` +
+      `_${attacker.country_flag} ${attacker.country_name} در برابر ${defender.country_flag} ${defender.country_name}_\n\n` +
       `${narrative}\n\n` +
-      `===== نتیجه =====\n` +
-      `${attacker.country_flag} ${attacker.country_name}\n` +
-      `قدرت: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
-      `${defender.country_flag} ${defender.country_name}\n` +
-      `قدرت: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
-      `==================\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `${attacker.country_flag} **${attacker.country_name}**\n` +
+      `⚔️ قدرت نظامی: ${attPower.toLocaleString()} (-${attLostPct}%)\n\n` +
+      `${defender.country_flag} **${defender.country_name}**\n` +
+      `🛡️ قدرت نظامی: ${defPower.toLocaleString()} (-${defLostPct}%)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       `${resultText}`;
 
     await safeSend(bot, war.attacker_tid, roundText, { reply_markup: mainMenuKeyboard() });

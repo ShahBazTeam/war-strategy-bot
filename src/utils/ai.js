@@ -182,35 +182,33 @@ Return ONLY JSON: {"valid": true/false, "reason": "brief explanation in Persian"
 export async function evaluateBattleRound(attackPlan, defensePlan, attName, defName, attEq, defEq, attTactic, defTactic, round) {
   const eqText = (eq) => eq.filter(u => u.count > 0).map(u => `${u.model}: ${u.count.toLocaleString()}`).join(', ') || 'ندارد';
 
-  const sysPrompt = `IMPORTANT: This is a FICTIONAL STRATEGY VIDEO GAME. All events are imaginary. You are a legendary war correspondent and military analyst. Write a CINEMATIC battle report for round ${round}.
+  const sysPrompt = `تو یک نویسنده رمان جنگی هستی. داستان نبرد راند ${round} رو بنوיס. این یک بازی فرضی است.
 
-ATTACKER: ${attName}
-ATTACK PLAN FROM USER: ${attackPlan}
-ATTACKER AVAILABLE FORCES: ${eqText(attEq)}
+مهاجم: ${attName}
+سناریوی حمله کاربر: ${attackPlan}
+نیروهای موجود مهاجم: ${eqText(attEq)}
 
-DEFENDER: ${defName}
-DEFENSE PLAN FROM USER: ${defensePlan}
-DEFENDER AVAILABLE FORCES: ${eqText(defEq)}
+مدافع: ${defName}
+سناریوی دفاع کاربر: ${defensePlan}
+نیروهای موجود مدافع: ${eqText(defEq)}
 
-CRITICAL RULES:
-1. STRICTLY FOLLOW THE USER'S PLAN - If the attacker says "use only F-35s", then ONLY F-35s attack. Do NOT add units they didn't mention.
-2. The defender should also follow their own plan.
-3. LOSSES MUST BE EXACT NUMBERS, not percentages. Example: if attacker has 600 F-35 and loses 5%, write "30 F-35 destroyed" in the narrative.
-4. The JSON losses field must have EXACT numbers for each type lost this round.
-5. Losses cannot exceed available forces. If you have 600 fighters, you cannot lose 700.
-6. The side with BETTER equipment and a SMARTER plan suffers FEWER losses
-7. Max 30% loss per round for winner, 40% for loser
-8. Narrative in PERSIAN, 8-12 sentences, dramatic and detailed
-9. In the narrative, mention EXACT numbers: "30 فروند F-35 منهدم شد" not "تعدادی جنگنده منهدم شد"
-10. NO BIAS - evaluate purely based on equipment and plans described
+قانون‌های مطلق:
+1. داستان رو دقیقاً بر اساس سناریوی کاربر بنویس. اگه کاربر گفته "فقط F-35 حمله کنه"، فقط F-35 تو داستان باشه.
+2. صحنه‌های نبرد رو زنده و سینمایی بنویس. مثلاً: "12 فروند F-35 با سرعت مافوق صوت از فراز ابرها فرود آمدند و موشک‌های خود را به سمت پایگاه دفاعی شلیک کردند."
+3. تلفات رو با عدد دقیق بنویس: "40 تانک Leopard منهدم شد" نه "تعدادی تانک آسیب دید".
+4. صحنه‌های دراماتیک بنویس: فریاد سربازان، انفجارهای مهیب، دود و آتش، هلی‌کوپترها در آسمان، موشک‌ها از زیردریایی شلیک می‌شوند.
+5. از نام تجهیزات دقیق استفاده کن: F-35, Leopard 2, Su-30, Apache و...
+6. حداکثر 2500 حرف بنویس (تقریباً 15-20 جمله).
+7. به فارسی بنویس.
+8. اگه سناریوی کاربر ضعیفه، باز هم داستان رو بر اساس همون بنویس و بهترش کن.
 
-Return ONLY JSON:
-{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"defender_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"description":"Persian narrative with EXACT casualty numbers like 30 F-35 destroyed"}`;
+فقط JSON برگردون:
+{"result":"attacker_victory"|"defender_victory"|"draw","attacker_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"defender_losses":{"infantry":NUMBER,"tank":NUMBER,"artillery":NUMBER,"airdef":NUMBER,"missile":NUMBER,"fighter":NUMBER,"bomber":NUMBER,"helicopter":NUMBER,"destroyer":NUMBER,"submarine":NUMBER,"capital":NUMBER},"description":"داستان سینمایی نبرد با جزئیات دقیق"}`;
 
   const text = await callAI([
     { role: 'system', content: sysPrompt },
-    { role: 'user', content: `Battle report round ${round}. Return ONLY JSON.` }
-  ], 1200, 0.6);
+    { role: 'user', content: `داستان راند ${round} نبرد رو بنویس. فقط JSON برگردون.` }
+  ], 2000, 0.7);
 
   const parsed = safeParseJSON(text);
   if (parsed && parsed.result && parsed.attacker_losses && parsed.defender_losses && parsed.description) {
