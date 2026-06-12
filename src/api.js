@@ -473,7 +473,7 @@ async function handleAPI(req, res, botToken) {
     const totalCost = price.gold * quantity;
     if (user.gold < totalCost) return sendJSON(res, { error: 'طلا کافی نیست' }, 400);
 
-    const equipment = JSON.parse(user.equipment || '[]');
+    const equipment = Array.isArray(user.equipment) ? user.equipment : JSON.parse(user.equipment || '[]');
     const existing = equipment.find(e => e.type === item);
     if (existing) {
       existing.count += price.quantity * quantity;
