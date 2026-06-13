@@ -449,9 +449,9 @@ function checkRateLimit(req: express.Request, res: express.Response, next: expre
   // Filter actions within last 60 seconds
   userActionHistory[userId] = userActionHistory[userId].filter(timestamp => now - timestamp < 60000);
 
-  if (userActionHistory[userId].length >= 10) {
+  if (userActionHistory[userId].length >= 100) {
     return res.status(429).json({ 
-      error: "تعداد درخواست‌های ارسالی شما بیش از حد مجاز است. حداکثر ۱۰ اقدام در دقیقه مجاز است. لطفاً کمی صبر کنید." 
+      error: "تعداد درخواست‌های ارسالی شما بیش از حد مجاز است. حداکثر ۱۰۰ اقدام در دقیقه مجاز است. لطفاً کمی صبر کنید." 
     });
   }
 
@@ -2912,6 +2912,24 @@ app.post("/api/admin/recalculate-mp", (req, res) => {
 
   saveDatabase();
   res.json({ message: `MP ${updated} کاربر بازمحاسبه شد بر اساس تجهیزات فعلی.`, updated });
+});
+
+app.post("/api/admin/reset-all-gold", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  let updated = 0;
+  for (const u of db.users) {
+    if (!u.isAdmin) {
+      u.country.assets.gold = 300;
+      u.country.assets.resources = { oil: 0, steel: 0, food: 0 };
+      u.country.assets.lastIncomeUpdate = Date.now();
+      updated++;
+    }
+  }
+
+  saveDatabase();
+  res.json({ message: `طلا و منابع ${updated} کاربر ریست شد.`, updated });
 });
 
 app.post("/api/admin/broadcast", (req, res) => {

@@ -208,6 +208,25 @@ export default function AdminPanel({
             </button>
             <button
               onClick={async () => {
+                if (!confirm("آیا طلا و منابع همه کاربران (غیر از ادمین) ریست شود؟")) return;
+                setIsProcessing("reset_gold");
+                try {
+                  const resp = await fetch("/api/admin/reset-all-gold", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+                  });
+                  const data = await resp.json();
+                  alert(data.message || "انجام شد");
+                } catch { alert("خطا"); }
+                setIsProcessing(null);
+              }}
+              disabled={isProcessing === "reset_gold"}
+              className="flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
+            >
+              {isProcessing === "reset_gold" ? "در حال ریست..." : "💰 ریست طلا و منابع همه"}
+            </button>
+            <button
+              onClick={async () => {
                 if (!confirm("⚠️ هشدار: تمام کشورها، کاربران، جنگ‌ها، اتحادها، معاملات، اختراعات، توییت‌ها و قیمت‌ها پاک می‌شوند!\n\nآیا کاملاً مطمئنید؟")) return;
                 if (!confirm("最后一次 تایید: تمام داده‌ها برای همیشه حذف می‌شوند!")) return;
                 setIsProcessing("delete_all");
