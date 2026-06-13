@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 127824.2,
+          "gold": 82446.9,
           "militaryPower": 1421,
           "economicPower": 186,
           "resources": {
             "oil": 105.6,
-            "steel": 2058.5,
+            "steel": 4057.5,
             "food": 174
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۴۳:۴۵",
-          "gold": 109540.1,
-          "military": 1421,
-          "economy": 186
-        },
         {
           "timestamp": "۲۰:۴۴:۳۷",
           "gold": 109837.7,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۲۰:۴۷:۱۰",
           "gold": 127824.2,
+          "military": 1421,
+          "economy": 186
+        },
+        {
+          "timestamp": "۲۰:۴۷:۱۱",
+          "gold": 82446.9,
           "military": 1421,
           "economy": 186
         }
@@ -1238,12 +1238,12 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 10333.7,
+          "gold": 8063.7,
           "militaryPower": 23041,
           "economicPower": 160,
           "resources": {
             "oil": 12.8,
-            "steel": 118.2,
+            "steel": 218.2,
             "food": 244.5
           },
           "techLevel": 2,
@@ -1272,12 +1272,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۴۵:۰۹",
-          "gold": 957.7,
-          "military": 23041,
-          "economy": 160
-        },
         {
           "timestamp": "۲۰:۴۵:۲۷",
           "gold": 3827.7,
@@ -1359,6 +1353,12 @@
         {
           "timestamp": "۲۰:۴۷:۱۱",
           "gold": 10333.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۰:۴۷:۱۶",
+          "gold": 8063.7,
           "military": 23041,
           "economy": 160
         }
