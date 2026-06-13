@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 6285.7,
+          "gold": 6048.7,
           "militaryPower": 618,
           "economicPower": 224,
           "resources": {
             "oil": 1.6,
-            "steel": 76.5,
+            "steel": 86.5,
             "food": 84.9
           },
           "techLevel": 4,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۳:۲۳",
-          "gold": 5912.5,
-          "military": 620,
-          "economy": 224
-        },
         {
           "timestamp": "۲۰:۲۳:۲۴",
           "gold": 6224.5,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۲۴:۳۴",
           "gold": 6285.7,
+          "military": 618,
+          "economy": 224
+        },
+        {
+          "timestamp": "۲۰:۲۴:۳۶",
+          "gold": 6048.7,
           "military": 618,
           "economy": 224
         }
@@ -1582,6 +1582,17 @@
     }
   ],
   "tweets": [
+    {
+      "id": "aubc1c2",
+      "userId": "user_1781376553710_mgz8a2x",
+      "username": "mahdi",
+      "countryName": "اسرائیل",
+      "flagUrl": "🇮🇱",
+      "text": "🇮🇱\n\nقدرت واقعی در توانایی ساختن روابط پایدار است، نه در تکرار تهدیدها.\n\nاسرائیل از روسیه دعوت می‌کند به جای افزایش تنش‌ها، مسیر گفت‌وگو و همکاری را انتخاب کند. جهان به اندازه کافی با بحران روبه‌رو است.\n\n🤝",
+      "timestamp": "2026-06-13T20:24:36.700Z",
+      "likes": [],
+      "comments": []
+    },
     {
       "id": "s4r5sc0",
       "userId": "user_1781376553710_mgz8a2x",
