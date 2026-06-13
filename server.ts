@@ -192,7 +192,16 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
 // --------------------------------------------------------
 // FAUX JSON DATABASE SCHEME (ATOMIC DUMP ON WRITE)
 // --------------------------------------------------------
-const DB_FILE = path.join(process.cwd(), "db.json");
+// Support persistent storage via DATA_DIR env var (Railway Volume)
+const DATA_DIR = process.env.DATA_DIR || "";
+const DB_FILE = DATA_DIR ? path.join(DATA_DIR, "db.json") : path.join(process.cwd(), "db.json");
+console.log(`[DB] Storage path: ${DB_FILE}`);
+
+// Ensure DATA_DIR exists
+if (DATA_DIR && !fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  console.log(`[DB] Created data directory: ${DATA_DIR}`);
+}
 
 const AVAILABLE_COUNTRIES = [
   { name: "ایران", englishName: "Iran", slogan: "استقلال، آزادی، جمهوری اسلامی", flagUrl: "🇮🇷" },
@@ -256,21 +265,34 @@ let db: GameDatabase = {
 
 // Synchronized read write database functions
 function loadDatabase() {
+  const backupFile = DB_FILE + ".backup";
   try {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.users)) {
+      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
         db = parsed as GameDatabase;
         console.log(`[DB] Loaded: ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
-      } else {
-        console.log("[DB] Invalid DB file, starting fresh");
-        saveDatabase();
+        // Save backup copy
+        fs.writeFileSync(backupFile, raw, "utf-8");
+        return;
       }
-    } else {
-      console.log("[DB] No DB file found, starting fresh");
-      saveDatabase();
     }
+    // Main file missing or empty - try backup
+    if (fs.existsSync(backupFile)) {
+      const raw = fs.readFileSync(backupFile, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+        db = parsed as GameDatabase;
+        console.log(`[DB] Restored from backup: ${db.users.length} users, ${db.inventions.length} inventions`);
+        // Restore main file
+        fs.writeFileSync(DB_FILE, raw, "utf-8");
+        return;
+      }
+    }
+    // Nothing found - fresh start
+    console.log("[DB] No data found, starting fresh");
+    saveDatabase();
   } catch (e) {
     console.error("[DB] Load error:", e);
     saveDatabase();

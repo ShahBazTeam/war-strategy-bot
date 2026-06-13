@@ -7,4 +7,4 @@ coverage/
 .env*
 !.env.example
 db.json
-db.backup.json
+db.json.backup
