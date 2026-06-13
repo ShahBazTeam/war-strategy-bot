@@ -263,18 +263,25 @@ function loadDatabase() {
       // Validate parsed has essential fields
       if (parsed && parsed.users && Array.isArray(parsed.users)) {
         db = { ...db, ...parsed };
-        // Also save backup
-        fs.writeFileSync(BACKUP_FILE, raw, "utf-8");
+        // Only save backup if there are actual users (prevents overwriting good backup with empty db)
+        if (db.users.length > 0) {
+          fs.writeFileSync(BACKUP_FILE, raw, "utf-8");
+        }
         console.log(`[DB] Loaded ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
       } else {
         throw new Error("Invalid DB structure");
       }
     } else if (fs.existsSync(BACKUP_FILE)) {
-      // Restore from backup
+      // Only restore from backup if main file is MISSING (not if it was intentionally cleared)
       const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
-      db = { ...db, ...parsed };
-      saveDatabase();
-      console.log(`[DB] Restored from backup: ${db.users.length} users`);
+      if (parsed && parsed.users && parsed.users.length > 0) {
+        db = { ...db, ...parsed };
+        saveDatabase();
+        console.log(`[DB] Restored from backup: ${db.users.length} users`);
+      } else {
+        saveDatabase();
+        console.log("[DB] Created fresh database (backup was empty)");
+      }
     } else {
       saveDatabase();
       console.log("[DB] Created fresh database");
@@ -284,9 +291,11 @@ function loadDatabase() {
     try {
       if (fs.existsSync(BACKUP_FILE)) {
         const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
-        db = { ...db, ...parsed };
-        saveDatabase();
-        console.log(`[DB] Recovered from backup: ${db.users.length} users`);
+        if (parsed && parsed.users && parsed.users.length > 0) {
+          db = { ...db, ...parsed };
+          saveDatabase();
+          console.log(`[DB] Recovered from backup: ${db.users.length} users`);
+        }
       }
     } catch (e2) {
       console.error("[DB] Backup also failed:", e2);
@@ -2523,17 +2532,28 @@ app.post("/api/admin/delete-all-users", (req, res) => {
   if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
 
   const count = db.users.length;
-  db.users = [];
-  db.wars = [];
-  db.alliances = [];
-  db.tradeOffers = [];
-  db.unProposals = [];
-  db.inventions = [];
-  db.tweets = [];
-  db.globalAnnouncements = ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"];
-  db.resourcePrices = { oil: 12, steel: 18, food: 7, lastUpdated: new Date().toISOString() };
+  
+  // FULLY RESET DATABASE TO FRESH STATE
+  db = {
+    users: [],
+    tradeOffers: [],
+    wars: [],
+    alliances: [],
+    unProposals: [],
+    tweets: [],
+    inventions: [],
+    geminiLogs: [],
+    resourcePrices: { oil: 12, steel: 18, food: 7, lastUpdated: new Date().toISOString() },
+    globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."]
+  };
+  
   saveDatabase();
-  res.json({ message: `ریست کامل انجام شد. ${count} کاربر حذف شدند. تمام داده‌ها پاک شد.` });
+  
+  // Also delete backup file to prevent restore
+  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
+  try { fs.unlinkSync(BACKUP_FILE); } catch {}
+  
+  res.json({ message: `ریست کامل انجام شد. ${count} کاربر حذف شد. تمام داده‌ها از اول شروع می‌شود.` });
 });
 
 app.get("/api/inventions", (req, res) => {
