@@ -1239,17 +1239,17 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 735.5,
+          "gold": 754.7,
           "militaryPower": 23101,
           "economicPower": 120,
           "resources": {
-            "oil": 21.2,
-            "steel": 46.3,
-            "food": 55
+            "oil": 21.3,
+            "steel": 47.2,
+            "food": 56.2
           },
           "techLevel": 2,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781380207030
+          "lastIncomeUpdate": 1781380267030
         }
       },
       "equipmentSlots": [
@@ -1273,12 +1273,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۵:۱۱",
-          "gold": 797.2,
-          "military": 23107,
-          "economy": 120
-        },
         {
           "timestamp": "۱۹:۴۶:۰۹",
           "gold": 816.4,
@@ -1360,6 +1354,12 @@
         {
           "timestamp": "۱۹:۵۱:۰۵",
           "gold": 735.5,
+          "military": 23101,
+          "economy": 120
+        },
+        {
+          "timestamp": "۱۹:۵۱:۰۷",
+          "gold": 754.7,
           "military": 23101,
           "economy": 120
         }
