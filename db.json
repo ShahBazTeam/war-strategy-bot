@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 1222.5,
+          "gold": 1826.5,
           "militaryPower": 650,
           "economicPower": 158,
           "resources": {
             "oil": 90.1,
-            "steel": 21.7,
+            "steel": 1.7,
             "food": 23.8
           },
           "techLevel": 3,
@@ -302,18 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۵۰:۲۵",
-          "gold": 993.3,
-          "military": 650,
-          "economy": 158
-        },
-        {
-          "timestamp": "۱۹:۵۰:۳۲",
-          "gold": 848.3,
-          "military": 650,
-          "economy": 158
-        },
         {
           "timestamp": "۱۹:۵۰:۴۰",
           "gold": 898.9,
@@ -389,6 +377,18 @@
         {
           "timestamp": "۱۹:۵۲:۰۲",
           "gold": 1222.5,
+          "military": 650,
+          "economy": 158
+        },
+        {
+          "timestamp": "۱۹:۵۲:۰۳",
+          "gold": 1524.5,
+          "military": 650,
+          "economy": 158
+        },
+        {
+          "timestamp": "۱۹:۵۲:۰۳",
+          "gold": 1826.5,
           "military": 650,
           "economy": 158
         }
@@ -822,17 +822,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 235.2,
-          "militaryPower": 47981,
-          "economicPower": 139,
+          "gold": 301.9,
+          "militaryPower": 47979,
+          "economicPower": 138,
           "resources": {
-            "oil": 4.9,
-            "steel": 11.9,
-            "food": 4.9
+            "oil": 8.2,
+            "steel": 15.2,
+            "food": 8.2
           },
           "techLevel": 2,
           "factoryLevel": 3,
-          "lastIncomeUpdate": 1781380258616
+          "lastIncomeUpdate": 1781380318616
         }
       },
       "equipmentSlots": [
@@ -858,12 +858,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۸:۲۶",
-          "gold": 1491.4,
-          "military": 47983,
-          "economy": 130
-        },
         {
           "timestamp": "۱۹:۴۸:۲۷",
           "gold": 1612.4,
@@ -947,6 +941,12 @@
           "gold": 235.2,
           "military": 47981,
           "economy": 139
+        },
+        {
+          "timestamp": "۱۹:۵۲:۰۵",
+          "gold": 301.9,
+          "military": 47979,
+          "economy": 138
         }
       ]
     },
