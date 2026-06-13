@@ -34,13 +34,12 @@ app.use(express.json({ limit: "15mb" }));
 // --------------------------------------------------------
 // OPENROUTER API INITIALIZATION
 // --------------------------------------------------------
-const AI_API_KEY = process.env.OPENROUTER_API_KEY || "";
-const AI_BASE_URL = "https://openrouter.ai/api/v1";
+const AI_API_KEY = process.env.AI_API_KEY || "7eca7225-3d5d-45bd-9e3c-e521fdc72d7e";
+const AI_BASE_URL = "https://aki.io/v1";
 const AI_MODELS = [
-  "google/gemma-4-31b-it:free",
-  "openai/gpt-oss-120b:free",
-  "nvidia/nemotron-nano-9b-v2:free",
-  "nvidia/nemotron-3-super-120b-a12b:free",
+  "gpt-oss-120b",
+  "qwen3.6-chat-35b",
+  "llama3-chat-70b",
 ];
 let currentModelIndex = 0;
 
@@ -72,7 +71,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
       if (tries > totalMaxTriesPerRequest) break;
 
       try {
-        if (!AI_API_KEY) throw new Error("OPENROUTER_API_KEY تنظیم نشده");
+        if (!AI_API_KEY) throw new Error("کلید API هوش مصنوعی تنظیم نشده");
 
         let systemMsg = systemInstruction;
         let userMsg = prompt;
@@ -97,6 +96,7 @@ async function callGemini(prompt: string, systemInstruction: string, jsonSchema?
             "Authorization": `Bearer ${AI_API_KEY}`,
             "HTTP-Referer": "https://war-strategy-bot-production.up.railway.app",
             "X-Title": "Modern World Strategy Game",
+            "x-api-key": AI_API_KEY,
           },
           body: JSON.stringify({
             model,
