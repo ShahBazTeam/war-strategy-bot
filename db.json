@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 76420,
+          "gold": 76580,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 6124.7,
-            "steel": 9947,
-            "food": 9947
+            "oil": 6127.3,
+            "steel": 9973,
+            "food": 9973
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781387668567
+          "lastIncomeUpdate": 1781387728567
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۱:۴۰:۳۴",
-          "gold": 74180,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۱:۴۱:۳۱",
           "gold": 74340,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۲۱:۵۴:۴۸",
           "gold": 76420,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۲۱:۵۵:۴۸",
+          "gold": 76580,
           "military": 100,
           "economy": 100
         }
