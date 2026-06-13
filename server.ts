@@ -1536,40 +1536,35 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   const attackerWeapons = getInventoryDesc(attacker);
   const defenderWeapons = getInventoryDesc(defender);
 
-  const prompt = `شبیه‌سازی نبرد ژئوپلیتیک واقعی و مدرن بین:
-کشور مهاجم: "${attacker.country.name}"
-کشور مدافع: "${defender.country.name}"
+  const prompt = `🔴 بلیط جنگ: شبیه‌سازی سینمایی نبرد حماسی بین:
 
-علت آغاز تنش دیپلماتیک و جنگ: "${war.casusBelli}"
-سناریوی اولیه دفاع سرزمینی مدافع: "${war.defenderDefenseScenario || "استقرار پدافندی غیرفعال در خطوط مرزی"}"
+⚔️ مهاجم: "${attacker.country.name}" (MP: ${attacker.country.assets.militaryPower} | GDP: ${attacker.country.assets.economicPower} | TECH: ${attacker.country.assets.techLevel})
+🛡️ مدافع: "${defender.country.name}" (MP: ${defender.country.assets.militaryPower} | GDP: ${defender.country.assets.economicPower} | TECH: ${defender.country.assets.techLevel})
 
-راند عملیاتی فعلی: ${roundNum}
-دستورات تاکتیکی صادر شده توسط ستاد کل ارتش در این راند: "${tacticalScenario || "پیشروی متعارف پیاده‌نظام زرهی به همراه پوشش توپخانه‌ای"}"
+📜 علت جنگ: "${war.casusBelli}"
+🎯 سناریوی دفاع مدافع: "${war.defenderDefenseScenario || "استقرار پدافندی در خطوط مرزی"}"
+🎬 راند شماره: ${roundNum}
+⚡ دستورات تاکتیکی: "${tacticalScenario || "پیشروی متعارف زرهی"}"
 
-اطلاعات رزمی و دارایی‌های استراتژیک ارتش مهاجم ("${attacker.country.name}"):
-- توان رزمی (Military Power): ${attacker.country.assets.militaryPower}
-- قدرت اقتصادی (Economic Power): ${attacker.country.assets.economicPower}
-- سطح فناوری (Tech Level): ${attacker.country.assets.techLevel}
-- تسلیحات فعال خط مقدم: ${attackerWeapons}
+🔫 تسلیحات مهاجم: ${attackerWeapons}
+🔫 تسلیحات مدافع: ${defenderWeapons}
 
-اطلاعات رزمی و دارایی‌های استراتژیک ارتش مدافع ("${defender.country.name}"):
-- توان رزمی (Military Power): ${defender.country.assets.militaryPower}
-- قدرت اقتصادی (Economic Power): ${defender.country.assets.economicPower}
-- سطح فناوری (Tech Level): ${defender.country.assets.techLevel}
-- تسلیحات فعال خط مقدم: ${defenderWeapons}
+تو یک فیلمنامه‌نویس جنگی هالیوودی و تحلیلگر نظامی CNN هستی. این راند نبرد را مانند یک صحنه سینمایی اکشن روایت کن.
 
-شما به‌عنوان ابررایانه شبیه‌ساز جنگی و تحلیلگر ارشد نظامی پنتاگون و ستاد مشترک ارتش‌های جهان موظف هستید نتیجه این راند نبرد را با رعایت کامل منطق استراتژیک، بردهای تسلیحاتی، نفوذ اطلاعاتی، پدافند موشکی و با بکارگیری اصطلاحات رسمی و دقیق نظامی در فالب ساختار JSON زیر تحلیل و پیش‌بینی کنید.
+قوانین:
+- از اصطلاحات نظامی واقعی استفاده کن (مثل: عملیات آفندی، پاتک، شکست محاصره، بمباران دقیق)
+- نام تسلیحات واقعی را بیاور (F-35، S-400، Abrams، کروزموشک)
+- صحنه‌های دراماتیک بنویس (دود، آتش، انفجار، فرار نیروها)
+- حداکثر ۱۵۰ کلمه فارسی روان و سینمایی
+- اعداد تلفات باید واقعی باشد (بین ۵ تا ۳۰)
 
-مثال منطق نظامی: اگر مهاجم فاقد موشک یا پهپاد باشد اما مدافع پدافند MIM-104 Patriot داشته باشد، پدافند مدافع بسیار موثر عمل کرده و تلفات مهاجم را مهار می‌کند. یا اگر یکی از طرفین از تکاوران زبده (Navy SEALs / SAS) برای شبیخون یا خرابکاری استفاده کند، خسارات سنگینی به زیرساخت لجستیکی حریف وارد می‌شود.
-قانون مهم و حیاتی: شما باید با دقت مضاعف چک کنید که آیا کاربر در "دستورات تاکتیکی" خود قصد استفاده از تسلیحات بیش از تعداد واقعی که در لیست دارایی‌ها اعلام شده است را دارد یا خیر (مثلا مدعی استفاده از ۱۰۰۰ جنگنده در صورتی که ۵۰ جنگنده در لیست دارد). اگر قصد دارد با تعداد دروغین و بسیار فراتر از موجودی‌اش حمله کند، این دستورات را توهم‌آمیز و دروغین تلقی کنید و به خاطر فرامین جنون‌آمیز و غیرواقعی برای ارتشش جریمه و افتضاح نظامی لحاظ کرده (مثل تلفات بسیار بالا) و در متن روایت این رسوایی و کمبود منابع را با لحن جدی نظامی گزارش دهید.
-
-قالب پاسخ الزامی:
+قالب JSON:
 {
-  "narrative": "گزارش فوق‌العاده دقیق و حرفه‌ای نظامی به زبان فارسی روان شامل حرکات مهندسی رزمی، رزم آوری هوایی یا دریایی، اختلال سیگنالی، خسارت به خطوط مواصلاتی و تلفات جانی واقعی و بکارگیری نام کشورها و تسلیحات به کار رفته (حداکثر ۱۲۰ کلمه)",
-  "attacker_loss": integer (کاهش واقعی توان رزمی مهاجم بر مبنای منطق تبادل آتش بین ۵ تا ۲۵),
-  "defender_loss": integer (کاهش واقعی توان رزمی مدافع بین ۵ تا ۲۵),
-  "attacker_economy_damage": integer (آسیب اقتصادی ناشی از مخارج جنگی یا بمباران به مهاجم بین ۱ تا ۱۰),
-  "defender_economy_damage": integer (آسیب اقتصادی زيرساختی به مدافع بین ۱ تا ۱۵),
+  "narrative": "متن سینمایی جنگ به فارسی...",
+  "attacker_loss": integer (5-30),
+  "defender_loss": integer (5-30),
+  "attacker_economy_damage": integer (1-15),
+  "defender_economy_damage": integer (1-15),
   "attacker_resource_loss": { "oil": integer, "steel": integer, "food": integer },
   "defender_resource_loss": { "oil": integer, "steel": integer, "food": integer },
   "winner_advantage": "attacker" | "defender" | "none",
@@ -1659,7 +1654,7 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
 
     const text = await callGemini(
       prompt,
-      "تو رایانه شبیه‌ساز راهبردی ستاد مشترک ارتش‌های جهان (Joint Chiefs of Staff Tactical Simulator) هستی. گزارش‌ها را بسیار فنی، واقعی، مقتدرانه، جدی و با بکارگیری واژگان رسمی ستادی و نظامی تدوین کن. از عبارات فانتزی، خیالی یا شاهنامه‌ای پرهیز کن.",
+      "تو فیلمنامه‌نویس جنگی هالیوودی و گزارشگر نظامی CNN هستی. صحنه‌های نبرد را مانند فیلم اکشن سینمایی روایت کن. از اصطلاحات نظامی واقعی و نام تسلیحات استفاده کن. لحن گزارش باید دراماتیک و هیجان‌انگیز باشد.",
       schema
     );
     const parsed: CombatRoundResponse = JSON.parse(text);
@@ -1762,6 +1757,24 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     updateAndLogUserAssets(attacker);
     updateAndLogUserAssets(defender);
 
+    // Auto-post to War Room Twitter feed
+    try {
+      const warRoomTweet = {
+        id: `warroom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: "warroom_system",
+        username: "اتاق_جنگ",
+        displayName: "🔴 اتاق جنگ | War Room",
+        avatar: "🔴",
+        countryName: "system",
+        flagUrl: "",
+        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🔴 مهاجم MP: ${attacker.country.assets.militaryPower} | 🛡️ مدافع MP: ${defender.country.assets.militaryPower}`,
+        timestamp: new Date().toISOString(),
+        likes: [],
+        comments: []
+      };
+      db.tweets.unshift(warRoomTweet);
+    } catch (e) { /* ignore */ }
+
     // Create automatic UN proposals periodically or specifically after war rounds action
     if (roundNum % 2 === 0) {
       await autoDraftUNProposal(attacker, defender);
@@ -1800,7 +1813,7 @@ async function autoDraftUNProposal(attacker: User, defender: User) {
   try {
     const text = await callGemini(
       prompt,
-      "تو دبیرکل عادل سازمان ملل متحد ملل متحد هستی که به جهت تثبیت مرزها و صلح لایحه صادر می‌کنی.",
+      "تو فیلمنامه‌نویس جنگی هالیوودی و گزارشگر نظامی CNN هستی. صحنه‌های نبرد را مانند فیلم اکشن سینمایی روایت کن. از اصطلاحات نظامی واقعی و نام تسلیحات استفاده کن.",
       schema
     );
     const parsed = JSON.parse(text);
