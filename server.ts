@@ -317,6 +317,105 @@ function checkRateLimit(req: express.Request, res: express.Response, next: expre
 // --------------------------------------------------------
 // USER SESSIONS MANAGEMENT (MOCK TOKEN COOKIE SIMULATION VIA HEADER)
 // --------------------------------------------------------
+// --------------------------------------------------------
+// REAL-WORLD RESOURCE PRODUCTION RATES (per minute in game)
+// Based on actual 2024 production data, scaled for gameplay
+// --------------------------------------------------------
+const RESOURCE_PRODUCTION: { [country: string]: { oil: number; steel: number; food: number } } = {
+  // Major Oil Producers
+  "usa": { oil: 22, steel: 15, food: 18 },
+  "آمریکا": { oil: 22, steel: 15, food: 18 },
+  "saudi arabia": { oil: 11, steel: 3, food: 2 },
+  "عربستان سعودی": { oil: 11, steel: 3, food: 2 },
+  "عربستان": { oil: 11, steel: 3, food: 2 },
+  "russia": { oil: 10.5, steel: 12, food: 10 },
+  "روسیه": { oil: 10.5, steel: 12, food: 10 },
+  "canada": { oil: 6, steel: 8, food: 12 },
+  "کانادا": { oil: 6, steel: 8, food: 12 },
+  "china": { oil: 5.3, steel: 20, food: 15 },
+  "چین": { oil: 5.3, steel: 20, food: 15 },
+  "iran": { oil: 4.6, steel: 4, food: 6 },
+  "ایران": { oil: 4.6, steel: 4, food: 6 },
+  "iraq": { oil: 4.5, steel: 1, food: 3 },
+  "عراق": { oil: 4.5, steel: 1, food: 3 },
+  "uae": { oil: 4.5, steel: 2, food: 1 },
+  "امارات": { oil: 4.5, steel: 2, food: 1 },
+  "brazil": { oil: 4.3, steel: 10, food: 14 },
+  "برزیل": { oil: 4.3, steel: 10, food: 14 },
+  "kuwait": { oil: 2.8, steel: 1, food: 1 },
+  "کویت": { oil: 2.8, steel: 1, food: 1 },
+  "mexico": { oil: 2, steel: 5, food: 8 },
+  "مکزیک": { oil: 2, steel: 5, food: 8 },
+  "nigeria": { oil: 1.6, steel: 2, food: 7 },
+  "نیجریه": { oil: 1.6, steel: 2, food: 7 },
+  "norway": { oil: 2, steel: 6, food: 3 },
+  "نروژ": { oil: 2, steel: 6, food: 3 },
+  "kazakhstan": { oil: 1.9, steel: 3, food: 4 },
+  "قزاقستان": { oil: 1.9, steel: 3, food: 4 },
+  "qatar": { oil: 1.8, steel: 1, food: 1 },
+  "قطر": { oil: 1.8, steel: 1, food: 1 },
+  "algeria": { oil: 1.4, steel: 2, food: 3 },
+  "الجزایر": { oil: 1.4, steel: 2, food: 3 },
+  "libya": { oil: 1.2, steel: 1, food: 2 },
+  "لیبی": { oil: 1.2, steel: 1, food: 2 },
+  "angola": { oil: 1.2, steel: 1, food: 3 },
+  "آنگولا": { oil: 1.2, steel: 1, food: 3 },
+  "oman": { oil: 1, steel: 1, food: 1 },
+  "عمان": { oil: 1, steel: 1, food: 1 },
+  "india": { oil: 0.9, steel: 12, food: 16 },
+  "هند": { oil: 0.9, steel: 12, food: 16 },
+  "venezuela": { oil: 0.9, steel: 2, food: 4 },
+  "ونزوئلا": { oil: 0.9, steel: 2, food: 4 },
+  "argentina": { oil: 0.9, steel: 4, food: 8 },
+  "آرژانتین": { oil: 0.9, steel: 4, food: 8 },
+  "indonesia": { oil: 0.8, steel: 5, food: 10 },
+  "اندونزی": { oil: 0.8, steel: 5, food: 10 },
+  "egypt": { oil: 0.6, steel: 3, food: 6 },
+  "مصر": { oil: 0.6, steel: 3, food: 6 },
+  "uk": { oil: 0.7, steel: 6, food: 5 },
+  "بریتانیا": { oil: 0.7, steel: 6, food: 5 },
+  "colombia": { oil: 0.8, steel: 2, food: 5 },
+  "کلمبیا": { oil: 0.8, steel: 2, food: 5 },
+  "azerbaijan": { oil: 0.6, steel: 1, food: 2 },
+  "آذربایجان": { oil: 0.6, steel: 1, food: 2 },
+  "malaysia": { oil: 0.5, steel: 3, food: 4 },
+  "مالزی": { oil: 0.5, steel: 3, food: 4 },
+  "australia": { oil: 0.4, steel: 5, food: 8 },
+  "استرالیا": { oil: 0.4, steel: 5, food: 8 },
+  "thailand": { oil: 0.4, steel: 3, food: 6 },
+  "تایلند": { oil: 0.4, steel: 3, food: 6 },
+  "vietnam": { oil: 0.2, steel: 4, food: 8 },
+  "ویتنام": { oil: 0.2, steel: 4, food: 8 },
+  "germany": { oil: 0.2, steel: 10, food: 6 },
+  "آلمان": { oil: 0.2, steel: 10, food: 6 },
+  "france": { oil: 0.1, steel: 7, food: 7 },
+  "فرانسه": { oil: 0.1, steel: 7, food: 7 },
+  "italy": { oil: 0.1, steel: 5, food: 5 },
+  "ایتالیا": { oil: 0.1, steel: 5, food: 5 },
+  "turkey": { oil: 0.1, steel: 5, food: 7 },
+  "ترکیه": { oil: 0.1, steel: 5, food: 7 },
+  "japan": { oil: 0.1, steel: 8, food: 4 },
+  "ژاپن": { oil: 0.1, steel: 8, food: 4 },
+  "south korea": { oil: 0.1, steel: 9, food: 3 },
+  "کره جنوبی": { oil: 0.1, steel: 9, food: 3 },
+  "pakistan": { oil: 0.08, steel: 2, food: 6 },
+  "پاکستان": { oil: 0.08, steel: 2, food: 6 },
+  "bangladesh": { oil: 0.02, steel: 1, food: 5 },
+  "بنگلادش": { oil: 0.02, steel: 1, food: 5 },
+  "poland": { oil: 0.05, steel: 5, food: 5 },
+  "لهستان": { oil: 0.05, steel: 5, food: 5 },
+  "sweden": { oil: 0.01, steel: 4, food: 3 },
+  "سوئد": { oil: 0.01, steel: 4, food: 3 },
+  "ukraine": { oil: 0.05, steel: 4, food: 6 },
+  "اوکراین": { oil: 0.05, steel: 4, food: 6 },
+  "south africa": { oil: 0.09, steel: 3, food: 4 },
+  "آفریقای جنوبی": { oil: 0.09, steel: 3, food: 4 },
+  "israel": { oil: 0.01, steel: 3, food: 2 },
+  "اسرائیل": { oil: 0.01, steel: 3, food: 2 },
+  "north korea": { oil: 0.001, steel: 2, food: 3 },
+  "کره شمالی": { oil: 0.001, steel: 2, food: 3 },
+};
+
 function updatePassiveIncome(user: User) {
   if (!user.country.assets.lastIncomeUpdate) {
     user.country.assets.lastIncomeUpdate = Date.now();
@@ -328,14 +427,37 @@ function updatePassiveIncome(user: User) {
   const elapsedMinutes = Math.floor(elapsedMs / 60000);
   
   if (elapsedMinutes > 0) {
-    // 15 gold per minute at factory level 1, increasing with factory level and economic power
-    // e.g. base = 15. factoryMultiplier = factoryLevel * 1.5. economic bonus = economicPower / 100.
     const factoryLvl = user.country.assets.factoryLevel || 1;
-    const incomePerMinute = 60 * factoryLvl * (user.country.assets.economicPower / 100);
-    const goldEarned = elapsedMinutes * incomePerMinute;
+    const ecoBonus = user.country.assets.economicPower / 100;
     
+    // Gold income
+    const incomePerMinute = 60 * factoryLvl * ecoBonus;
+    const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
-    user.country.assets.lastIncomeUpdate = now - (elapsedMs % 60000); // retain remainder ms
+
+    // Resource income based on real-world production
+    const countryKey = (user.country.originalName || "").toLowerCase();
+    const production = RESOURCE_PRODUCTION[countryKey] || { oil: 0.1, steel: 1, food: 1 };
+    
+    const oilPerMinute = production.oil * factoryLvl * ecoBonus;
+    const steelPerMinute = production.steel * factoryLvl * ecoBonus;
+    const foodPerMinute = production.food * factoryLvl * ecoBonus;
+
+    user.country.assets.resources.oil += elapsedMinutes * oilPerMinute;
+    user.country.assets.resources.steel += elapsedMinutes * steelPerMinute;
+    user.country.assets.resources.food += elapsedMinutes * foodPerMinute;
+
+    // Resource bonus for military power (oil fuels military operations)
+    if (user.country.assets.resources.oil < 10) {
+      user.country.assets.militaryPower = Math.max(10, user.country.assets.militaryPower - 2);
+    }
+
+    // Food bonus for economic power (food sustains economy)
+    if (user.country.assets.resources.food < 10) {
+      user.country.assets.economicPower = Math.max(10, user.country.assets.economicPower - 1);
+    }
+
+    user.country.assets.lastIncomeUpdate = now - (elapsedMs % 60000);
     updateAndLogUserAssets(user);
     saveDatabase();
   }
