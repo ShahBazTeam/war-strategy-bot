@@ -272,17 +272,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 26729.9,
+          "gold": 27235.5,
           "militaryPower": 1276,
           "economicPower": 316,
           "resources": {
-            "oil": 12.9,
-            "steel": 80.3,
-            "food": 401.2
+            "oil": 13.1,
+            "steel": 100.8,
+            "food": 409.4
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781385878012
+          "lastIncomeUpdate": 1781385938012
         }
       },
       "equipmentSlots": [
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۲۱:۱۴",
-          "gold": 14385.4,
-          "military": 1276,
-          "economy": 316
-        },
         {
           "timestamp": "۲۱:۲۱:۴۲",
           "gold": 14891,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۱:۲۴:۴۰",
           "gold": 26729.9,
+          "military": 1276,
+          "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۲۵:۴۲",
+          "gold": 27235.5,
           "military": 1276,
           "economy": 316
         }
