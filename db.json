@@ -843,7 +843,8 @@
         "rus_kilo",
         "rus_s400",
         "rus_sarmat",
-        "rus_nuke"
+        "rus_nuke",
+        "rus_kuznetsov"
       ],
       "warehouse": {
         "rus_t14": 58,
