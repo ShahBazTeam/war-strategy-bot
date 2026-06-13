@@ -359,7 +359,7 @@ let db: GameDatabase = {
   tweets: [],
   inventions: [],
   geminiLogs: [],
-  resourcePrices: { oil: 12, steel: 18, food: 7, lastUpdated: new Date().toISOString() },
+  resourcePrices: { oil: 360, steel: 540, food: 210, lastUpdated: new Date().toISOString() },
   globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"]
 };
 
@@ -3018,7 +3018,7 @@ app.post("/api/admin/delete-all-users", (req, res) => {
     tweets: [],
     inventions: [],
     geminiLogs: [],
-  resourcePrices: { oil: 4, steel: 6, food: 2, lastUpdated: new Date().toISOString() },
+    resourcePrices: { oil: 120, steel: 180, food: 60, lastUpdated: new Date().toISOString() },
     globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."]
   };
   
