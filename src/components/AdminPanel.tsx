@@ -408,9 +408,9 @@ export default function AdminPanel({
       {/* UN PROPOSALS ADMIN SECTION */}
       <div className="rounded-lg border border-white/10 bg-black/40 p-5 space-y-4">
         <h2 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-          <Vote className="h-4 w-4" /> لوایح سازمان ملل (در انتظار تایید)
+          <Vote className="h-4 w-4" /> لوایح سازمان ملل (منتظر تایید نهایی)
         </h2>
-        <p className="text-[10px] text-slate-400">لوایح ارسالی کاربران و سیستم خودکار فقط با تایید شما اجرا می‌شوند.</p>
+        <p className="text-[10px] text-slate-400">لوایح پس از رای‌گیری موفق، برای تایید نهایی شما ارسال می‌شوند.</p>
         
         {proposals.filter(p => p.status === "pending").length === 0 ? (
           <p className="text-[10px] text-slate-500 py-4 text-center">هیچ لایحه در انتظاری وجود ندارد.</p>

@@ -1946,7 +1946,7 @@ async function autoDraftUNProposal(attacker: User, defender: User) {
       targetUserId: parsed.targetUserId,
       votesYes: [],
       votesNo: [],
-      status: "pending",
+      status: "active",
       createdAt: new Date().toISOString(),
       durationMs: 3600000
     };
@@ -2068,43 +2068,15 @@ app.post("/api/un/evaluate", checkRateLimit, (req, res) => {
   }
 
   if (yesCount > noCount) {
-    proposal.status = "approved";
-    // Execute server-side actions automatically!
-    if (proposal.actionType === "sanctions" && proposal.targetUserId) {
-      const targetUser = db.users.find(u => u.id === proposal.targetUserId);
-      if (targetUser) {
-        const fines = Math.floor(targetUser.country.assets.gold * 0.20);
-        targetUser.country.assets.gold -= fines;
-        updateAndLogUserAssets(targetUser);
-        db.globalAnnouncements.unshift(`🛡️ اجرای قطعنامه سازمان ملل: جریمه سنگین تحریمی ۲۰ درصدی طلا (${fines} طلا) بر ضد کشور خط شکن ${targetUser.country.name} با رای اکثریت اعمال گردید!`);
-      }
-    } else if (proposal.actionType === "ceasefire" && proposal.targetUserId) {
-      // Find active war is ceasefire
-      const activeWars = db.wars.filter(w => 
-        (w.attackerId === proposal.targetUserId || w.defenderId === proposal.targetUserId) && w.status !== "ended"
-      );
-      for (const w of activeWars) {
-        w.status = "ended";
-        w.peaceTermsNarrative = "جنگ به حکم مستقیم مجمع عالی سازمان ملل صلح‌بان به پایان رسید.";
-      }
-      db.globalAnnouncements.unshift(`🕊️ قطعنامه کلاه‌آبی‌های سازمان ملل مصوب شد: آتش‌بس اجباری و متوقف‌سازی سراسری جنگ بلافاصله به اجرا گذاشته شد.`);
-    } else if (proposal.actionType === "aid" && proposal.targetUserId) {
-      const targetUser = db.users.find(u => u.id === proposal.targetUserId);
-      if (targetUser) {
-        targetUser.country.assets.gold += 300;
-        updateAndLogUserAssets(targetUser);
-        db.globalAnnouncements.unshift(`🎁 اهدا بسته‌های کمکی سازمان ملل متحد: با تایید مجمع، مبلغ ۳۰۰ طلا بلاعوض جهت پشتیبانی دارویی و غذایی به ${targetUser.country.name} انتقال یافت.`);
-      }
-    } else {
-      db.globalAnnouncements.unshift(`📜 قطعنامه عمومی UN تحت عنوان "${proposal.title}" با اکثریت آرای قاطع موافق تصویب و بیانیه جهانی آن به ملل صادر شد.`);
-    }
+    proposal.status = "pending";
+    db.globalAnnouncements.unshift(`✅ رای‌گیری پایان یافت: لایحه "${proposal.title}" با اکثریت آرا (${yesCount} موافق / ${noCount} مخالف) تصویب شد. منتظر تایید نهایی ادمین.`);
   } else {
     proposal.status = "rejected";
     db.globalAnnouncements.unshift(`❌ رد لایحه: قطعنامه پیشنهادی شورانگیز "${proposal.title}" به خاطر اکثریت آرای موافقِ ضعیف مردود اعلام شد.`);
   }
 
   saveDatabase();
-  res.json({ proposal, message: `پایان دور نظرسنجی و تصمیم‌گیری. وضعیت قطعنامه: ${proposal.status === 'approved' ? 'تصویب شده' : 'رد شده'}` });
+  res.json({ proposal, message: `پایان دور نظرسنجی. وضعیت قطعنامه: ${proposal.status === 'pending' ? 'منتظر تایید ادمین' : 'رد شده'}` });
 });
 
 // --------------------------------------------------------
@@ -2246,16 +2218,16 @@ app.post("/api/un/custom-bill", checkRateLimit, async (req, res) => {
       sourceUserId: user.id,
       votesYes: [],
       votesNo: [],
-      status: "pending",
+      status: "active",
       createdAt: new Date().toISOString(),
       durationMs: 7200000
     };
 
     db.unProposals.unshift(newProposal);
-    db.globalAnnouncements.unshift(`📢 لایحه جدید: بیانیه فرستاده دیپلماتیک ${user.country.name} جهت تایید نهایی به دبیرخانه ادمین ارسال شد.`);
+    db.globalAnnouncements.unshift(`📢 لایحه جدید: بیانیه دیپلماتیک ${user.country.name} پس از تایید هوش مصنوعی برای رای‌گیری ملل ارسال شد!`);
 
     saveDatabase();
-    res.json({ proposal: newProposal, message: "لایحه شما پس از ممیزی هوش مصنوعی به ادمین ارسال شد. منتظر تایید نهایی باشید." });
+    res.json({ proposal: newProposal, message: "لایحه شما پس از تایید هوش مصنوعی برای رای‌گیری ثبت شد. منتظر رأی کشورها باشید." });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

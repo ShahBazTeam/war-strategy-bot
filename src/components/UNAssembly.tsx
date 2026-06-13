@@ -48,7 +48,7 @@ export default function UNAssembly({
           </div>
           <div>
             <h2 className="text-base font-black uppercase tracking-wider text-white">شورای امنیت و مجمع عمومی سازمان ملل متحد</h2>
-            <p className="text-slate-400 text-sm mt-1 leading-relaxed">تریبون قانون‌گذاری و ایجاد ثبات مابین ملل بازی. لوایح پیشنهادی ابتدا توسط دبیرخانه ادمین بررسی و تایید شده، سپس اجرا می‌شوند!</p>
+            <p className="text-slate-400 text-sm mt-1 leading-relaxed">تریبون قانون‌گذاری و ایجاد ثبات مابین ملل بازی. لوایح پس از تایید هوش مصنوعی به رای‌گیری گذاشته شده و پس از تصویب، برای تایید نهایی ادمین ارسال می‌شوند!</p>
           </div>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default function UNAssembly({
                     {proposal.status === "pending" && (
                       <div className="pt-3 border-t border-white/5">
                         <p className="text-amber-400 text-[10px] font-bold flex items-center gap-1.5">
-                          <RefreshCw className="h-3 w-3 animate-spin" /> این لایحه توسط ادمین در حال بررسی است. رأی‌گیری پس از تایید ادمین آغاز می‌شود.
+                          <RefreshCw className="h-3 w-3 animate-spin" /> رای‌گیری پایان یافت. لایحه برای تایید نهایی به ادمین ارسال شده است.
                         </p>
                       </div>
                     )}
@@ -162,7 +162,7 @@ export default function UNAssembly({
             <Sparkles className="h-4 w-4 text-cyan-400" /> لایحه جدید شورای امنیت
           </h2>
           <p className="text-slate-400 text-xs leading-relaxed font-serif text-slate-300">
-            لایحه خود را بنویسید. هوش مصنوعی آن را ویرایش کرده و سپس برای تایید نهایی به ادمین ارسال می‌شود. پس از تایید ادمین، قطعنامه اجرا خواهد شد.
+            لایحه خود را بنویسید. هوش مصنوعی آن را بررسی و ویرایش می‌کند. در صورت تایید، برای رای‌گیری کشورها ارسال شده و پس از تصویب، تایید نهایی ادمین اعمال می‌شود.
           </p>
 
           <form onSubmit={handleBillSubmit} className="space-y-3.5">
