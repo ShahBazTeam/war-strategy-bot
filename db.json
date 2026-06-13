@@ -129,17 +129,17 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 531713,
+          "gold": 532138.6,
           "militaryPower": 24721,
           "economicPower": 266,
           "resources": {
-            "oil": 426.4,
-            "steel": 325.4,
-            "food": 709.7
+            "oil": 434.7,
+            "steel": 332.3,
+            "food": 723.5
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781386655409
+          "lastIncomeUpdate": 1781386715409
         }
       },
       "equipmentSlots": [
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۲۶:۳۷",
-          "gold": 470490.6,
-          "military": 24721,
-          "economy": 186
-        },
         {
           "timestamp": "۲۱:۲۶:۵۶",
           "gold": 532859.4,
@@ -258,6 +252,12 @@
           "gold": 531713,
           "military": 24721,
           "economy": 266
+        },
+        {
+          "timestamp": "۲۱:۳۸:۳۸",
+          "gold": 532138.6,
+          "military": 24721,
+          "economy": 266
         }
       ]
     },
@@ -272,8 +272,8 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 23182.7,
-          "militaryPower": 10056,
+          "gold": 21432.7,
+          "militaryPower": 10356,
           "economicPower": 316,
           "resources": {
             "oil": 15.5,
@@ -294,7 +294,7 @@
         "jp_type12"
       ],
       "warehouse": {
-        "jp_type10": 5,
+        "jp_type10": 15,
         "jp_f35": 53,
         "jp_maya": 22,
         "jp_soryu": 92,
@@ -302,12 +302,6 @@
         "jp_type12": 43
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۳۶:۳۶",
-          "gold": 64961.5,
-          "military": 1276,
-          "economy": 316
-        },
         {
           "timestamp": "۲۱:۳۶:۳۷",
           "gold": 67971.5,
@@ -390,6 +384,12 @@
           "timestamp": "۲۱:۳۸:۲۴",
           "gold": 23182.7,
           "military": 10056,
+          "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۳۸:۳۲",
+          "gold": 21432.7,
+          "military": 10356,
           "economy": 316
         }
       ]
