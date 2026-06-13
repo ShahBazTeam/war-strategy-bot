@@ -429,6 +429,19 @@ export default function App() {
     } catch {}
   };
 
+  const repayLoan = async () => {
+    try {
+      const data = await apiCall("/api/market/loan-repay", {
+        method: "POST",
+        body: JSON.stringify({})
+      });
+      updateUser(data.user);
+      showTemporarySuccess(data.message);
+    } catch (err: any) {
+      showTemporaryError(err.message || "خطا در بازپرداخت وام");
+    }
+  };
+
   // DIPLOMACY ACTIONS
   const declareCasusBelliWar = async (targetId: string, casusBelli: string) => {
     return await apiCall("/api/diplomacy/declare-war", {
@@ -1104,6 +1117,7 @@ export default function App() {
                     onTriggerAIMarketUpdate={triggerAIMarketForecast}
                     onReqIMFLoan={requestIMFLoanProposal}
                     onAcceptIMFLoan={acceptIMFLoanOffer}
+                    onRepayLoan={repayLoan}
                   />
                 )}
                 {activeTab === "diplomacy" && (

@@ -564,6 +564,9 @@ const RESOURCE_PRODUCTION: { [country: string]: { oil: number; steel: number; fo
 };
 
 function updatePassiveIncome(user: User) {
+  // Check for overdue loans first
+  checkOverdueLoans(user);
+  
   if (!user.country.assets.lastIncomeUpdate) {
     user.country.assets.lastIncomeUpdate = Date.now();
     user.country.assets.factoryLevel = user.country.assets.factoryLevel || 1;
@@ -1463,29 +1466,100 @@ const imfAcceptHandler = (req, res) => {
   if (!user) return res.status(401).json({ error: "نام کاربری نامعتبر" });
 
   const { loanAmount, repaymentAmount, proposal } = req.body;
-  const targetLoanAmount = loanAmount || proposal?.loanAmount;
-  const targetRepaymentAmount = repaymentAmount || proposal?.repaymentAmount;
+  const targetLoanAmount = parseFloat(loanAmount || proposal?.loanAmount);
+  const targetRepaymentAmount = parseFloat(repaymentAmount || proposal?.repaymentAmount);
 
-  if (!targetLoanAmount || !targetRepaymentAmount) {
+  if (!targetLoanAmount || targetLoanAmount <= 0) {
     return res.status(400).json({ error: "اطلاعات وام معتبر نیست" });
   }
 
-  user.country.assets.gold += parseFloat(targetLoanAmount);
+  // Check if user already has an active loan
+  if (user.loan && !user.loan.repaid) {
+    return res.status(400).json({ error: "شما در حال حاضر یک وام فعال دارید. ابتدا آن را بازپرداخت کنید." });
+  }
+
+  user.country.assets.gold += targetLoanAmount;
+  
+  // Store loan data (3 real days to repay, 10% interest)
+  user.loan = {
+    amount: targetLoanAmount,
+    borrowedAt: Date.now(),
+    repaid: false
+  };
   
   // Create an automatic deduction note or reduce economy power index
-  user.country.assets.economicPower = Math.max(5, user.country.assets.economicPower - 10); // temporary IMF structural constraints!
+  user.country.assets.economicPower = Math.max(5, user.country.assets.economicPower - 10);
   
-  // We simulate immediate interest payoff from future earnings, or simple deduction
   updateAndLogUserAssets(user);
   
-  db.globalAnnouncements.unshift(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} با بهره متغیر نهایی مصوب کرد.`);
+  db.globalAnnouncements.unshift(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} تصویب کرد. مهلت بازپرداخت: ۳ روز واقعی با سود ۱۰٪.`);
   
   saveDatabase();
-  res.json({ user, message: "وام با موفقیت به صندوق ملی واریز شد! شاخص اقتصادی موقتا به خاطر بدهی کاهش یافت." });
+  res.json({ user, message: `وام ${targetLoanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۳ روز واقعی. سود: ۱۰٪.` });
 };
 
 app.post("/api/trade/imf/accept", checkRateLimit, imfAcceptHandler);
 app.post("/api/market/imf-accept", checkRateLimit, imfAcceptHandler);
+
+// LOAN REPAYMENT ENDPOINT
+const LOAN_DEADLINE_MS = 3 * 24 * 60 * 60 * 1000; // 3 real days in milliseconds
+const LOAN_INTEREST_RATE = 0.10; // 10% interest
+
+app.post("/api/market/loan-repay", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  if (!user.loan || user.loan.repaid) {
+    return res.status(400).json({ error: "شما وام فعالی ندارید." });
+  }
+
+  const loan = user.loan;
+  const totalOwed = Math.ceil(loan.amount * (1 + LOAN_INTEREST_RATE)); // 10% interest
+  const elapsed = Date.now() - loan.borrowedAt;
+  const isOverdue = elapsed > LOAN_DEADLINE_MS;
+
+  if (user.country.assets.gold < totalOwed) {
+    return res.status(400).json({ error: `طلای کافی ندارید! مبلغ بازپرداخت: ${totalOwed} طلا (اصل: ${loan.amount} + سود ۱۰٪)` });
+  }
+
+  // Deduct gold
+  user.country.assets.gold -= totalOwed;
+  user.loan.repaid = true;
+
+  // If overdue, apply penalty (extra 20% economic damage)
+  if (isOverdue) {
+    user.country.assets.economicPower = Math.max(5, user.country.assets.economicPower - 20);
+    db.globalAnnouncements.unshift(`⚠️ تأخیر بازپرداخت وام: ${user.country.name} دیرکرد داشت! ۲۰ واحد قدرت اقتصادی جریمه شد.`);
+  } else {
+    // Good behavior: restore some economic power
+    user.country.assets.economicPower = Math.min(100, user.country.assets.economicPower + 5);
+  }
+
+  updateAndLogUserAssets(user);
+  saveDatabase();
+
+  const penalty = isOverdue ? " (شامل جریمه دیرکرد)" : " (بازپرداخت به‌موقع - پاداش اقتصادی)";
+  res.json({ user, message: `وام ${loan.amount} طلا با سود ۱۰٪ (مجموع: ${totalOwed}) بازپرداخت شد.${penalty}` });
+});
+
+// CHECK OVERDUE LOANS (called on passive income)
+function checkOverdueLoans(user: User) {
+  if (!user.loan || user.loan.repaid) return;
+  
+  const elapsed = Date.now() - user.loan.borrowedAt;
+  if (elapsed > LOAN_DEADLINE_MS) {
+    // Overdue: gold goes negative!
+    const totalOwed = Math.ceil(user.loan.amount * (1 + LOAN_INTEREST_RATE));
+    user.country.assets.gold -= totalOwed;
+    user.loan.repaid = true;
+    
+    // Heavy penalty
+    user.country.assets.economicPower = Math.max(1, user.country.assets.economicPower - 30);
+    user.country.assets.militaryPower = Math.max(0, user.country.assets.militaryPower - 10);
+    
+    db.globalAnnouncements.unshift(`🚨 عدم بازپرداخت وام: ${user.country.name} بدهی ${totalOwed} طلا را پرداخت نکرد! طلا منفی شد و ۳۰ واحد اقتصادی جریمه شد.`);
+  }
+}
 
 // --------------------------------------------------------
 // WARFARE MANAGEMENT & DIALOGUES (GEMINI CORE RESOLUTION)

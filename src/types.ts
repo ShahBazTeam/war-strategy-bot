@@ -37,6 +37,7 @@ export interface User {
   equipmentSlots: string[]; // Active military equipment IDs (max 6)
   warehouse: Record<string, number>; // Equipment IDs stored in warehouse with quantities
   assetLog: { timestamp: string; gold: number; military: number; economy: number }[]; // History tracker for charts
+  loan?: { amount: number; borrowedAt: number; repaid: boolean }; // IMF loan tracking
 }
 
 export interface EquipmentItem {

@@ -21,6 +21,7 @@ interface MarketProps {
   // IMF Loan
   onReqIMFLoan: () => Promise<LoanProposal>;
   onAcceptIMFLoan: (proposal: LoanProposal) => void;
+  onRepayLoan: () => void;
 }
 
 export default function Market({
@@ -34,7 +35,8 @@ export default function Market({
   onSendAid,
   onTriggerAIMarketUpdate,
   onReqIMFLoan,
-  onAcceptIMFLoan
+  onAcceptIMFLoan,
+  onRepayLoan
 }: MarketProps) {
   // Direct Trade state
   const [tradeAction, setTradeAction] = useState<"buy" | "sell">("buy");
@@ -143,8 +145,64 @@ export default function Market({
           <div className="rounded-lg border border-white/10 bg-black/20 p-4">
             <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 leading-none mb-1.5">قیمت خرید هر بقچه غله اساسی (غذا)</p>
             <p className="font-mono text-2xl font-bold text-orange-400 mt-2">{prices.food} <span className="text-[11px] font-sans text-slate-500 font-normal">GOLD/UNIT</span></p>
-          </div>
         </div>
+
+        {/* ACTIVE LOAN STATUS & REPAYMENT */}
+        {user.loan && !user.loan.repaid && (
+          <div className="rounded-lg border border-red-500/30 bg-red-950/20 p-6 space-y-4">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-red-400 mb-2">🏦 وام فعال - بازپرداخت</h2>
+            {(() => {
+              const loan = user.loan!;
+              const totalOwed = Math.ceil(loan.amount * 1.10);
+              const elapsed = Date.now() - loan.borrowedAt;
+              const deadlineMs = 3 * 24 * 60 * 60 * 1000;
+              const remainingMs = deadlineMs - elapsed;
+              const remainingHours = Math.max(0, Math.floor(remainingMs / (1000 * 60 * 60)));
+              const remainingMinutes = Math.max(0, Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60)));
+              const isOverdue = remainingMs <= 0;
+              const progress = Math.min(100, (elapsed / deadlineMs) * 100);
+              
+              return (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="bg-black/20 p-2 rounded border border-white/5">
+                      <span className="text-slate-500 text-[9px] block uppercase">اصل وام:</span>
+                      <span className="text-white font-bold text-sm">{loan.amount} G</span>
+                    </div>
+                    <div className="bg-black/20 p-2 rounded border border-white/5">
+                      <span className="text-slate-500 text-[9px] block uppercase">بازپرداخت (با سود ۱۰٪):</span>
+                      <span className="text-red-400 font-bold text-sm">{totalOwed} G</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/20 p-2 rounded border border-white/5">
+                    <span className="text-slate-500 text-[9px] block uppercase mb-1">زمان باقی‌مانده:</span>
+                    {isOverdue ? (
+                      <span className="text-red-500 font-bold text-sm">⏰ مهلت تمام شده! جریمه اعمال می‌شود</span>
+                    ) : (
+                      <span className="text-amber-400 font-bold text-sm">⏱️ {remainingHours} ساعت و {remainingMinutes} دقیقه</span>
+                    )}
+                    <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2">
+                      <div 
+                        className={`h-1.5 rounded-full transition-all ${isOverdue ? 'bg-red-500' : progress > 70 ? 'bg-amber-500' : 'bg-green-500'}`}
+                        style={{ width: `${Math.min(100, progress)}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={onRepayLoan}
+                    className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded transition cursor-pointer text-sm"
+                  >
+                    💰 بازپرداخت وام ({totalOwed} طلا)
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+      </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
