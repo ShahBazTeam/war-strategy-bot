@@ -129,17 +129,17 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 538097,
+          "gold": 539373.8,
           "militaryPower": 24721,
           "economicPower": 266,
           "resources": {
-            "oil": 550.9,
-            "steel": 429,
-            "food": 917.1
+            "oil": 575.8,
+            "steel": 449.7,
+            "food": 958.6
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781387555409
+          "lastIncomeUpdate": 1781387735409
         }
       },
       "equipmentSlots": [
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۲۸:۳۷",
-          "gold": 527882.6,
-          "military": 24721,
-          "economy": 266
-        },
         {
           "timestamp": "۲۱:۳۱:۴۳",
           "gold": 529159.4,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۲۱:۵۳:۲۹",
           "gold": 538097,
+          "military": 24721,
+          "economy": 266
+        },
+        {
+          "timestamp": "۲۱:۵۵:۳۸",
+          "gold": 539373.8,
           "military": 24721,
           "economy": 266
         }
@@ -405,17 +405,17 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 63745.5,
+          "gold": 62064.5,
           "militaryPower": 37932,
           "economicPower": 140,
           "resources": {
-            "oil": "4351.9101.81999999999999981.81999999999999981.81999999999999981.8199999999999998100100100100",
-            "steel": 6020.800000000001,
-            "food": 6080.519999999999
+            "oil": "4351.9101.81999999999999981.81999999999999981.81999999999999981.81999999999999981001001001001.819999999999999810100",
+            "steel": 6029.9000000000015,
+            "food": 6087.799999999998
           },
           "techLevel": 1,
           "factoryLevel": 5,
-          "lastIncomeUpdate": 1781387657856
+          "lastIncomeUpdate": 1781387717856
         }
       },
       "equipmentSlots": [
