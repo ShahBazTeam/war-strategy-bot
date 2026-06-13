@@ -26,53 +26,6 @@
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": []
-    },
-    {
-      "id": "user_1781376196970_r0zgu9q",
-      "username": "mohsen",
-      "password": "eAb4FMyqPLKde9NeiAdp",
-      "isAdmin": false,
-      "country": {
-        "name": "کره شمالی",
-        "originalName": "North Korea",
-        "slogan": "کشورمان قدرتمند است، هرگز تسلیم نمی‌شویم",
-        "flagUrl": "🇰🇵",
-        "assets": {
-          "gold": 300,
-          "militaryPower": 8930,
-          "economicPower": 100,
-          "resources": {
-            "oil": 20,
-            "steel": 20,
-            "food": 20
-          },
-          "techLevel": 1,
-          "factoryLevel": 1,
-          "lastIncomeUpdate": 1781376196970
-        }
-      },
-      "equipmentSlots": [
-        "nk_pokpung",
-        "nk_mig29",
-        "nk_sub",
-        "nk_hwasong",
-        "nk_nuke"
-      ],
-      "warehouse": {
-        "nk_pokpung": 40,
-        "nk_mig29": 10,
-        "nk_sub": 1,
-        "nk_hwasong": 1,
-        "nk_nuke": 8
-      },
-      "assetLog": [
-        {
-          "timestamp": "ثبت‌نام توسط ادمین",
-          "gold": 300,
-          "military": 8930,
-          "economy": 100
-        }
-      ]
     }
   ],
   "tradeOffers": [],
