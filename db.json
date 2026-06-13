@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 6434.3,
+          "gold": 6766.3,
           "militaryPower": 612,
           "economicPower": 224,
           "resources": {
             "oil": 1.9,
-            "steel": 118.4,
+            "steel": 108.4,
             "food": 93.6
           },
           "techLevel": 4,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۳:۴۸",
-          "gold": 7890.7,
-          "military": 618,
-          "economy": 224
-        },
         {
           "timestamp": "۲۰:۲۴:۱۷",
           "gold": 7669.7,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۲۶:۵۲",
           "gold": 6434.3,
+          "military": 612,
+          "economy": 224
+        },
+        {
+          "timestamp": "۲۰:۲۶:۵۷",
+          "gold": 6766.3,
           "military": 612,
           "economy": 224
         }
@@ -1238,12 +1238,12 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 2239.3,
+          "gold": 8846.1,
           "militaryPower": 23059,
           "economicPower": 120,
           "resources": {
             "oil": 5.5,
-            "steel": 208,
+            "steel": 9,
             "food": 98.5
           },
           "techLevel": 2,
@@ -1272,12 +1272,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۰:۳۲",
-          "gold": 3870,
-          "military": 23071,
-          "economy": 120
-        },
         {
           "timestamp": "۲۰:۲۱:۰۵",
           "gold": 4155,
@@ -1359,6 +1353,12 @@
         {
           "timestamp": "۲۰:۲۶:۱۳",
           "gold": 2239.3,
+          "military": 23059,
+          "economy": 120
+        },
+        {
+          "timestamp": "۲۰:۲۶:۵۳",
+          "gold": 8846.1,
           "military": 23059,
           "economy": 120
         }
