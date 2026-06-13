@@ -153,6 +153,61 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376377856_xprspbp",
+      "username": "yuki",
+      "password": "By3WjdfEJtU",
+      "isAdmin": false,
+      "country": {
+        "name": "چین",
+        "originalName": "China",
+        "slogan": "احیای مجدد ملت بزرگ چین",
+        "flagUrl": "🇨🇳",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 37990,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376377856
+        }
+      },
+      "equipmentSlots": [
+        "chn_type99",
+        "chn_zbd04",
+        "chn_j20",
+        "chn_z10",
+        "chn_liaoning",
+        "chn_type055",
+        "chn_hq9",
+        "chn_df41",
+        "chn_nuke"
+      ],
+      "warehouse": {
+        "chn_type99": 68,
+        "chn_zbd04": 30,
+        "chn_j20": 5,
+        "chn_z10": 3,
+        "chn_liaoning": 1,
+        "chn_type055": 5,
+        "chn_hq9": 5,
+        "chn_df41": 3,
+        "chn_nuke": 35
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 37990,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -169,6 +224,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: چین (yuki) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ژاپن (aidy) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایران (mohsen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایتالیا (mohsen) به نقشه جهان پیوست!",
