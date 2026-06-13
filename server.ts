@@ -363,6 +363,14 @@ let db: GameDatabase = {
   globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"]
 };
 
+const MAX_ANNOUNCEMENTS = 100;
+function addAnnouncement(msg: string) {
+  addAnnouncement(msg);
+  if (db.globalAnnouncements.length > MAX_ANNOUNCEMENTS) {
+    db.globalAnnouncements.length = MAX_ANNOUNCEMENTS;
+  }
+}
+
 // Synchronized read write database functions
 async function loadDatabase() {
   const backupFile = DB_FILE + ".backup";
@@ -746,7 +754,7 @@ app.post("/api/admin/create-user", checkRateLimit, (req, res) => {
   };
 
   db.users.push(newUser);
-  db.globalAnnouncements.unshift(`🎮 کشور جدید: ${picked.name} (${username}) به نقشه جهان پیوست!`);
+  addAnnouncement(`🎮 کشور جدید: ${picked.name} (${username}) به نقشه جهان پیوست!`);
   saveDatabase();
 
   res.json({ 
@@ -835,7 +843,8 @@ app.post("/api/auth/restore", (req, res) => {
   // Only find existing user - NEVER auto-create
   const existing = db.users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
   if (existing) {
-    return res.json({ user: existing });
+    const { password: _, ...safeExisting } = existing as any;
+    return res.json({ user: safeExisting });
   }
   // User was deleted - clear localStorage on client side
   res.status(404).json({ error: "کاربر یافت نشد - لطفاً دوباره وارد شوید", deleted: true });
@@ -844,7 +853,8 @@ app.post("/api/auth/restore", (req, res) => {
 app.get("/api/user/me", (req, res) => {
   const currentUser = getCurrentUser(req);
   if (!currentUser) return res.status(401).json({ error: "لطفاً ابتدا وارد شوید" });
-  res.json({ user: currentUser });
+  const { password: _, ...safeUser } = currentUser as any;
+  res.json({ user: safeUser });
 });
 
 app.post("/api/user/update-country", (req, res) => {
@@ -1137,7 +1147,7 @@ app.post("/api/market/quick-loan", checkRateLimit, (req, res) => {
 
   updateAndLogUserAssets(user);
 
-  db.globalAnnouncements.unshift(`💸 وام ${loanAmount} طلا به دولت ${user.country.name} اعطا شد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
+  addAnnouncement(`💸 وام ${loanAmount} طلا به دولت ${user.country.name} اعطا شد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
 
   saveDatabase();
   res.json({ user, message: `وام ${loanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۵ روز. سود: ۱۰٪.` });
@@ -1491,7 +1501,7 @@ const sendDiplomaticAidHandler = (req, res) => {
   updateAndLogUserAssets(user);
   updateAndLogUserAssets(target);
   
-  db.globalAnnouncements.unshift(`🤝 کشور قدرتمند ${user.country.name} کمک‌های نقدی و غیرنقدی قابل توجهی را به کشور همسایه ${target.country.name} با هدف دوستی دیپلماتیک صادر کرد!`);
+  addAnnouncement(`🤝 کشور قدرتمند ${user.country.name} کمک‌های نقدی و غیرنقدی قابل توجهی را به کشور همسایه ${target.country.name} با هدف دوستی دیپلماتیک صادر کرد!`);
   
   saveDatabase();
   res.json({ user, message: "انتقال کالا و امتیازات دیپلماتیک به بهترین شکل صورت گرفت!" });
@@ -1575,7 +1585,7 @@ const imfAcceptHandler = (req, res) => {
   
   updateAndLogUserAssets(user);
   
-  db.globalAnnouncements.unshift(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} تصویب کرد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
+  addAnnouncement(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} تصویب کرد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
   
   saveDatabase();
   res.json({ user, message: `وام ${targetLoanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۵ روز. سود: ۱۰٪.` });
@@ -1612,7 +1622,7 @@ app.post("/api/market/loan-repay", checkRateLimit, (req, res) => {
   // If overdue, apply penalty (extra 20% economic damage)
   if (isOverdue) {
     user.country.assets.economicPower = Math.max(5, user.country.assets.economicPower - 20);
-    db.globalAnnouncements.unshift(`⚠️ تأخیر بازپرداخت وام: ${user.country.name} دیرکرد داشت! ۲۰ واحد قدرت اقتصادی جریمه شد.`);
+    addAnnouncement(`⚠️ تأخیر بازپرداخت وام: ${user.country.name} دیرکرد داشت! ۲۰ واحد قدرت اقتصادی جریمه شد.`);
   } else {
     // Good behavior: restore some economic power
     user.country.assets.economicPower = Math.min(100, user.country.assets.economicPower + 5);
@@ -1640,7 +1650,7 @@ function checkOverdueLoans(user: User) {
     user.country.assets.economicPower = Math.max(1, user.country.assets.economicPower - 30);
     user.country.assets.militaryPower = Math.max(0, user.country.assets.militaryPower - 10);
     
-    db.globalAnnouncements.unshift(`🚨 عدم بازپرداخت وام: ${user.country.name} بدهی ${totalOwed} طلا را پرداخت نکرد! طلا منفی شد و ۳۰ واحد اقتصادی جریمه شد.`);
+    addAnnouncement(`🚨 عدم بازپرداخت وام: ${user.country.name} بدهی ${totalOwed} طلا را پرداخت نکرد! طلا منفی شد و ۳۰ واحد اقتصادی جریمه شد.`);
   }
 }
 
@@ -1737,7 +1747,7 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
     };
 
     db.wars.push(newWar);
-    db.globalAnnouncements.unshift(`🚨 بحران فوری: کشور ${user.country.name} رسما علیه ${defender.country.name} با انگیزه "${casusBelli.substring(0, 70)}..." اعلان جنگ داد! تنش جهانی به ${result.tension_points}% رسید.`);
+    addAnnouncement(`🚨 بحران فوری: کشور ${user.country.name} رسما علیه ${defender.country.name} با انگیزه "${casusBelli.substring(0, 70)}..." اعلان جنگ داد! تنش جهانی به ${result.tension_points}% رسید.`);
     
     saveDatabase();
     res.json({ valid: true, war: newWar, message: "اعلان جنگ ثبت شد! در انتظار پاسخ و ارائه سناریوی دفاعی کشور حریف." });
@@ -1757,7 +1767,7 @@ app.post("/api/diplomacy/submit-defense", checkRateLimit, (req, res) => {
   war.defenderDefenseScenario = defenseScenario || "آماده‌باش دفاع همه‌جانبه دفاع بدون شرح";
   war.status = "active";
 
-  db.globalAnnouncements.unshift(`🛡️ دفاع ملی: ${user.country.name} آماده‌باش دفاعی خود را در برابر ارتش مهاجم اعلام کرد. درگیری‌ها رسماً آغاز شد!`);
+  addAnnouncement(`🛡️ دفاع ملی: ${user.country.name} آماده‌باش دفاعی خود را در برابر ارتش مهاجم اعلام کرد. درگیری‌ها رسماً آغاز شد!`);
   
   saveDatabase();
   res.json({ war, message: "سناریو دفاعی با موفقیت ثبت و جنگ وارد وضعیت برخورد نظامی شد" });
@@ -1817,7 +1827,7 @@ app.post("/api/diplomacy/join-war", checkRateLimit, (req, res) => {
   }
 
   const sideName = side === 'attacker' ? 'مهاجم' : 'مدافع';
-  db.globalAnnouncements.unshift(`⚔️ ${user.country.name} به عنوان متحد ${sideName} به جنگ ${war.attackerCountry} علیه ${war.defenderCountry} پیوست!`);
+  addAnnouncement(`⚔️ ${user.country.name} به عنوان متحد ${sideName} به جنگ ${war.attackerCountry} علیه ${war.defenderCountry} پیوست!`);
 
   saveDatabase();
   res.json({ war, message: `${user.country.name} به عنوان متحد ${sideName} به جنگ پیوست!` });
@@ -2221,7 +2231,7 @@ MP باقی‌مانده تیم بازنده: ${attackerWon ? totalDefenderMP : 
         war.peaceTermsNarrative = peaceObj.peace_summary;
         endNarrative = peaceObj.peace_summary;
 
-        db.globalAnnouncements.unshift(`🏆 پایان بحران جنگی: تیم ${winner.country.name}${winnerAllies.length > 0 ? ` و متحدینش` : ""} پیروز شد! مفاد عهدنامه صلح: ${peaceObj.peace_summary}`);
+        addAnnouncement(`🏆 پایان بحران جنگی: تیم ${winner.country.name}${winnerAllies.length > 0 ? ` و متحدینش` : ""} پیروز شد! مفاد عهدنامه صلح: ${peaceObj.peace_summary}`);
       } catch (e: any) {
         // Fallback default booty transfer if AI fails
         const gGain = Math.min(loserMainUser.country.assets.gold, 200);
@@ -2386,7 +2396,7 @@ app.post("/api/wars/:warId/resolve", checkRateLimit, async (req, res) => {
   const remainingCountries = db.users.filter(u => u.id !== winner.id && u.country.assets.militaryPower > MIN_MP_FOR_VICTORY_CHECK);
   if (remainingCountries.length === 0) {
     // WINNER!
-    db.globalAnnouncements.unshift(`🏆🏆🏆 پیروز نهایی: کشور ${winner.country.name} به رهبری ${winner.username} تمام کشورهای جهان را فتح کرد و برنده بازی شد! 🏆🏆🏆`);
+    addAnnouncement(`🏆🏆🏆 پیروز نهایی: کشور ${winner.country.name} به رهبری ${winner.username} تمام کشورهای جهان را فتح کرد و برنده بازی شد! 🏆🏆🏆`);
     try {
       db.tweets.unshift({
         id: `victory_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -2487,8 +2497,26 @@ app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
   if (!war.nuclearLaunched) war.nuclearLaunched = [];
   war.nuclearLaunched.push(user.id);
 
-  // Find target (must be war participant)
-  const targetUserId = (war.attackerId === user.id ? war.defenderId : war.attackerId);
+  // Find target (must be war participant - main user or ally)
+  let targetUserId: string;
+  if (targetId) {
+    // Validate target is a war participant
+    const isAttacker = war.attackerId === targetId || war.attackerAllies?.includes(targetId);
+    const isDefender = war.defenderId === targetId || war.defenderAllies?.includes(targetId);
+    const userIsAttacker = war.attackerId === user.id || war.attackerAllies?.includes(user.id);
+    const userIsDefender = war.defenderId === user.id || war.defenderAllies?.includes(user.id);
+    
+    if (userIsAttacker && isDefender) {
+      targetUserId = targetId;
+    } else if (userIsDefender && isAttacker) {
+      targetUserId = targetId;
+    } else {
+      return res.status(400).json({ error: "هدف انتخابی یکی از شرکت‌کنندگان جنگ نیست." });
+    }
+  } else {
+    // Default: target the main enemy participant
+    targetUserId = (war.attackerId === user.id ? war.defenderId : war.attackerId);
+  }
   const target = db.users.find(u => u.id === targetUserId);
   let actualMilitaryDamage = 0, actualEconomicDamage = 0, actualGoldDamage = 0;
 
@@ -2508,7 +2536,7 @@ app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
     target.country.assets.resources.steel = Math.max(0, target.country.assets.resources.steel * 0.5);
     target.country.assets.resources.food = Math.max(0, target.country.assets.resources.food * 0.5);
 
-    db.globalAnnouncements.unshift(`☢️ حمله هسته‌ای: ${user.country.name} یک کلاهک هسته‌ای بر ${target.country.name} پرتاب کرد! خسارات سنگین: ${militaryDamage} قدرت نظامی، ${economicDamage} قدرت اقتصادی، ${goldDamage} طلا نابود شد.`);
+    addAnnouncement(`☢️ حمله هسته‌ای: ${user.country.name} یک کلاهک هسته‌ای بر ${target.country.name} پرتاب کرد! خسارات سنگین: ${militaryDamage} قدرت نظامی، ${economicDamage} قدرت اقتصادی، ${goldDamage} طلا نابود شد.`);
     
     try {
       db.tweets.unshift({
@@ -2601,7 +2629,7 @@ app.post("/api/diplomacy/ceasefire-propose", (req, res) => {
 
   war.status = "ceasefire";
   war.ceasefireProposedBy = user.id;
-  db.globalAnnouncements.unshift(`🕊️ مذاکره صلح: کشور ${user.country.name} رسما خواستار معاهده آتش‌بس توافقی بین طرفین جنگ شد.`);
+  addAnnouncement(`🕊️ مذاکره صلح: کشور ${user.country.name} رسما خواستار معاهده آتش‌بس توافقی بین طرفین جنگ شد.`);
   
   saveDatabase();
   res.json({ war, message: "درخواست آتش‌بس ارسال شد. منتظر تایید صلح توسط حریف جنگی شما." });
@@ -2627,11 +2655,12 @@ app.post("/api/diplomacy/ceasefire-respond", (req, res) => {
   if (accept) {
     war.status = "ended";
     war.peaceTermsNarrative = "آتش‌بس متقابل مورد موافقت طرفین جنگ قرار گرفت و عملیات‌های جنگی خاتمه یافت.";
-    db.globalAnnouncements.unshift(`☮️ تنش‌زدایی: آتش‌بس مابین کشورهای مبارز برقرار شد و صلح موقت حکمفرما گردید!`);
+    addAnnouncement(`☮️ تنش‌زدایی: آتش‌بس مابین کشورهای مبارز برقرار شد و صلح موقت حکمفرما گردید!`);
   } else {
     war.status = "active";
     war.ceasefireProposedBy = undefined;
-    db.globalAnnouncements.unshift(`⚔️ شکست صلح غیورانه: درخواست آتش‌بس رد شد و حملات پی‌درپی با شدت بیشتر ادامه دارد!`);
+    war.pendingScenarios = {};
+    addAnnouncement(`⚔️ شکست صلح غیورانه: درخواست آتش‌بس رد شد و حملات پی‌درپی با شدت بیشتر ادامه دارد!`);
   }
 
   saveDatabase();
@@ -2714,10 +2743,10 @@ app.post("/api/un/evaluate", checkRateLimit, (req, res) => {
 
   if (yesCount > noCount) {
     proposal.status = "pending";
-    db.globalAnnouncements.unshift(`✅ رای‌گیری پایان یافت: لایحه "${proposal.title}" با اکثریت آرا (${yesCount} موافق / ${noCount} مخالف) تصویب شد. منتظر تایید نهایی ادمین.`);
+    addAnnouncement(`✅ رای‌گیری پایان یافت: لایحه "${proposal.title}" با اکثریت آرا (${yesCount} موافق / ${noCount} مخالف) تصویب شد. منتظر تایید نهایی ادمین.`);
   } else {
     proposal.status = "rejected";
-    db.globalAnnouncements.unshift(`❌ رد لایحه: قطعنامه پیشنهادی شورانگیز "${proposal.title}" به خاطر اکثریت آرای موافقِ ضعیف مردود اعلام شد.`);
+    addAnnouncement(`❌ رد لایحه: قطعنامه پیشنهادی شورانگیز "${proposal.title}" به خاطر اکثریت آرای موافقِ ضعیف مردود اعلام شد.`);
   }
 
   saveDatabase();
@@ -2753,7 +2782,7 @@ app.post("/api/admin/un/approve", (req, res) => {
       targetUser.country.assets.gold -= fines;
       targetUser.country.assets.economicPower = Math.max(10, targetUser.country.assets.economicPower - 15);
       updateAndLogUserAssets(targetUser);
-      db.globalAnnouncements.unshift(`🛡️ اجرای قطعنامه سازمان ملل: تحریم سنگین ۲۰٪ طلا (${fines} طلا) و کاهش ۱۵ واحد قدرت اقتصادی بر ضد ${targetUser.country.name} توسط ادمین تایید و اعمال شد!`);
+      addAnnouncement(`🛡️ اجرای قطعنامه سازمان ملل: تحریم سنگین ۲۰٪ طلا (${fines} طلا) و کاهش ۱۵ واحد قدرت اقتصادی بر ضد ${targetUser.country.name} توسط ادمین تایید و اعمال شد!`);
     }
   } else if (proposal.actionType === "ceasefire" && proposal.targetUserId) {
     const activeWars = db.wars.filter(w => 
@@ -2763,7 +2792,7 @@ app.post("/api/admin/un/approve", (req, res) => {
       w.status = "ended";
       w.peaceTermsNarrative = "آتش‌بس اجباری به حکم شورای امنیت سازمان ملل و تایید نهایی ادمین اعمال شد.";
     }
-    db.globalAnnouncements.unshift(`🕊️ قطعنامه آتش‌بس شورای امنیت: تمام جنگ‌های فعال کشور هدف با تایید ادمین متوقف شد!`);
+    addAnnouncement(`🕊️ قطعنامه آتش‌بس شورای امنیت: تمام جنگ‌های فعال کشور هدف با تایید ادمین متوقف شد!`);
   } else if (proposal.actionType === "aid" && proposal.targetUserId) {
     const targetUser = db.users.find(u => u.id === proposal.targetUserId);
     if (targetUser) {
@@ -2772,17 +2801,17 @@ app.post("/api/admin/un/approve", (req, res) => {
       targetUser.country.assets.resources.steel += 30;
       targetUser.country.assets.resources.food += 30;
       updateAndLogUserAssets(targetUser);
-      db.globalAnnouncements.unshift(`🎁 بسته کمکی سازمان ملل: ۵۰۰ طلا + ۳۰ واحد منابع به ${targetUser.country.name} با تایید ادمین اهدا شد.`);
+      addAnnouncement(`🎁 بسته کمکی سازمان ملل: ۵۰۰ طلا + ۳۰ واحد منابع به ${targetUser.country.name} با تایید ادمین اهدا شد.`);
     }
   } else if (proposal.actionType === "peacekeepers" && proposal.targetUserId) {
     const targetUser = db.users.find(u => u.id === proposal.targetUserId);
     if (targetUser) {
       targetUser.country.assets.militaryPower = Math.max(10, targetUser.country.assets.militaryPower - 20);
       updateAndLogUserAssets(targetUser);
-      db.globalAnnouncements.unshift(`🔵 حافظان صلح سازمان ملل: ۲۰ واحد قدرت نظامی ${targetUser.country.name} با تایید ادمین کاهش یافت.`);
+      addAnnouncement(`🔵 حافظان صلح سازمان ملل: ۲۰ واحد قدرت نظامی ${targetUser.country.name} با تایید ادمین کاهش یافت.`);
     }
   } else {
-    db.globalAnnouncements.unshift(`📜 قطعنامه "${proposal.title}" توسط ادمین تایید و اجرا شد.`);
+    addAnnouncement(`📜 قطعنامه "${proposal.title}" توسط ادمین تایید و اجرا شد.`);
   }
 
   saveDatabase();
@@ -2803,7 +2832,7 @@ app.post("/api/admin/un/reject", (req, res) => {
 
   const sourceUser = proposal.sourceUserId ? db.users.find(u => u.id === proposal.sourceUserId) : null;
   const countryName = sourceUser?.country.name || "ناشناس";
-  db.globalAnnouncements.unshift(`❌ لایحه "${proposal.title}" از ${countryName} توسط ادمین رد شد.`);
+  addAnnouncement(`❌ لایحه "${proposal.title}" از ${countryName} توسط ادمین رد شد.`);
 
   saveDatabase();
   res.json({ proposal, message: `لایحه "${proposal.title}" رد شد.` });
@@ -2869,7 +2898,7 @@ app.post("/api/un/custom-bill", checkRateLimit, async (req, res) => {
     };
 
     db.unProposals.unshift(newProposal);
-    db.globalAnnouncements.unshift(`📢 لایحه جدید: بیانیه دیپلماتیک ${user.country.name} پس از تایید هوش مصنوعی برای رای‌گیری ملل ارسال شد!`);
+    addAnnouncement(`📢 لایحه جدید: بیانیه دیپلماتیک ${user.country.name} پس از تایید هوش مصنوعی برای رای‌گیری ملل ارسال شد!`);
 
     saveDatabase();
     res.json({ proposal: newProposal, message: "لایحه شما پس از تایید هوش مصنوعی برای رای‌گیری ثبت شد. منتظر رأی کشورها باشید." });
@@ -2922,7 +2951,7 @@ app.post("/api/alliances/create", checkRateLimit, (req, res) => {
   };
 
   db.alliances.push(newAlliance);
-  db.globalAnnouncements.unshift(`🛡️ ائتلاف نوین جهانی: فدراسیون اتحاد نظامی و دیپلماتیک مستقل "${name}" به محوریت کادر مدیریتی ${user.country.name} پایه‌گذاری شد!`);
+  addAnnouncement(`🛡️ ائتلاف نوین جهانی: فدراسیون اتحاد نظامی و دیپلماتیک مستقل "${name}" به محوریت کادر مدیریتی ${user.country.name} پایه‌گذاری شد!`);
 
   updateAndLogUserAssets(user);
   saveDatabase();
@@ -2951,7 +2980,7 @@ app.post("/api/alliances/join", checkRateLimit, (req, res) => {
     militaryPower: user.country.assets.militaryPower
   });
 
-  db.globalAnnouncements.unshift(`🤝 همبستگی دیپلماسی: کشور ${user.country.name} با امضای پیمان، رسماً به ائتلاف همسانی "${alliance.name}" ملحق گردید.`);
+  addAnnouncement(`🤝 همبستگی دیپلماسی: کشور ${user.country.name} با امضای پیمان، رسماً به ائتلاف همسانی "${alliance.name}" ملحق گردید.`);
   
   saveDatabase();
   res.json({ alliance, message: `به ائتلاف مقتدر "${alliance.name}" خوش آمدید!` });
@@ -2968,14 +2997,14 @@ app.post("/api/alliances/leave", (req, res) => {
 
   if (alliance.members.length === 0) {
     db.alliances = db.alliances.filter(a => a.id !== alliance.id);
-    db.globalAnnouncements.unshift(`❌ انحلال اتحاد: ائتلاف "${alliance.name}" به دلیل خروج تمام اعضا از نقشه بازی محو شد.`);
+    addAnnouncement(`❌ انحلال اتحاد: ائتلاف "${alliance.name}" به دلیل خروج تمام اعضا از نقشه بازی محو شد.`);
   } else {
     if (alliance.leaderId === user.id) {
       // Pass leadership
       alliance.leaderId = alliance.members[0].userId;
       alliance.leaderCountry = alliance.members[0].countryName;
     }
-    db.globalAnnouncements.unshift(`🚶 خروج دیپلماتیک: کشور ${user.country.name} شراکت و حضور خود را در پیمان "${alliance.name}" پایان بخشید.`);
+    addAnnouncement(`🚶 خروج دیپلماتیک: کشور ${user.country.name} شراکت و حضور خود را در پیمان "${alliance.name}" پایان بخشید.`);
   }
 
   saveDatabase();
@@ -3005,7 +3034,7 @@ app.post("/api/alliances/kick", checkRateLimit, (req, res) => {
   const removedMember = alliance.members[memberIndex];
   alliance.members.splice(memberIndex, 1);
 
-  db.globalAnnouncements.unshift(`🚫 اخراج نظامی: کشور ${removedMember.countryName} توسط رهبری ائتلاف "${alliance.name}" از اتحاد اخراج گردید.`);
+  addAnnouncement(`🚫 اخراج نظامی: کشور ${removedMember.countryName} توسط رهبری ائتلاف "${alliance.name}" از اتحاد اخراج گردید.`);
 
   saveDatabase();
   res.json({ alliance, message: `کشور ${removedMember.countryName} از ائتلاف اخراج شد.` });
@@ -3043,7 +3072,7 @@ app.post("/api/alliances/aid/financial", checkRateLimit, (req, res) => {
   updateAndLogUserAssets(user);
   updateAndLogUserAssets(targetUser);
 
-  db.globalAnnouncements.unshift(`💰 کمک مالی ائتلافی: کشور ${user.country.name} مبلغ ${goldAmount} طلا به کشور ${targetUser.country.name} در راستای همپیمانی اقتصادی اهدا کرد.`);
+  addAnnouncement(`💰 کمک مالی ائتلافی: کشور ${user.country.name} مبلغ ${goldAmount} طلا به کشور ${targetUser.country.name} در راستای همپیمانی اقتصادی اهدا کرد.`);
 
   saveDatabase();
   res.json({ user, message: `${goldAmount} طلا به ${targetUser.country.name} اهدا شد.` });
@@ -3087,7 +3116,7 @@ app.post("/api/alliances/aid/military", checkRateLimit, (req, res) => {
   updateAndLogUserAssets(user);
   updateAndLogUserAssets(targetUser);
 
-  db.globalAnnouncements.unshift(`⚔️ کمک نظامی ائتلافی: کشور ${user.country.name} واحد ${mpAmount} قدرت نظامی را به کشور ${targetUser.country.name} در چارچوب پیمان دفاعی مشترک واگذار کرد.`);
+  addAnnouncement(`⚔️ کمک نظامی ائتلافی: کشور ${user.country.name} واحد ${mpAmount} قدرت نظامی را به کشور ${targetUser.country.name} در چارچوب پیمان دفاعی مشترک واگذار کرد.`);
 
   saveDatabase();
   res.json({ user, message: `${mpAmount} قدرت نظامی به ${targetUser.country.name} منتقل شد.` });
@@ -3107,6 +3136,11 @@ app.post("/api/admin/override-war", (req, res) => {
   if (!user || !user.isAdmin) return res.status(403).json({ error: "تکذیب درخواست ادمین" });
 
   const { warId, status } = req.body;
+  const validStatuses = ["waiting_defender", "active", "ended", "ceasefire"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: `وضعیت نامعتبر. مقادیر مجاز: ${validStatuses.join(", ")}` });
+  }
+
   const war = db.wars.find(w => w.id === warId);
   if (!war) return res.status(404).json({ error: "جنگ یافت نشد" });
 
@@ -3115,7 +3149,7 @@ app.post("/api/admin/override-war", (req, res) => {
     war.peaceTermsNarrative = "مداخله مستقیم ناظر عالی بازی (ادمین). صلح اجباری برقرار شد.";
   }
 
-  db.globalAnnouncements.unshift(`🛡️ مداخله عالی ادمین: وضعیت منازعه ${war.attackerCountry} و ${war.defenderCountry} به صورت نظارتی به "${status}" تغییر داده شد.`);
+  addAnnouncement(`🛡️ مداخله عالی ادمین: وضعیت منازعه ${war.attackerCountry} و ${war.defenderCountry} به صورت نظارتی به "${status}" تغییر داده شد.`);
 
   saveDatabase();
   res.json({ war, message: "فایل جنگ بازنویسی شد" });
@@ -3195,7 +3229,7 @@ app.post("/api/admin/broadcast", (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "متنی ارسال نشده است" });
 
-  db.globalAnnouncements.unshift(`📣 بیانیه رهبری عالی ادمین: ${text}`);
+  addAnnouncement(`📣 بیانیه رهبری عالی ادمین: ${text}`);
   saveDatabase();
 
   res.json({ list: db.globalAnnouncements });
@@ -3274,7 +3308,7 @@ app.post("/api/admin/delete-all-users", (req, res) => {
     tweets: [],
     inventions: [],
     geminiLogs: [],
-    resourcePrices: { oil: 120, steel: 180, food: 60, lastUpdated: new Date().toISOString() },
+    resourcePrices: { oil: 15, steel: 25, food: 10, lastUpdated: new Date().toISOString() },
     globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."]
   };
   
@@ -3399,6 +3433,11 @@ app.post("/api/inventions/:id/buy", checkRateLimit, (req, res) => {
 
 // CRON-LIKE FORCE UPDATE OF PRICES USING GEMINI VALUE FORECASTING
 app.post("/api/market/update-prices-ai", checkRateLimit, async (req, res) => {
+  const currentUser = getCurrentUser(req);
+  if (!currentUser || !currentUser.isAdmin) {
+    return res.status(403).json({ error: "فقط ادمین مجاز به بروزرسانی قیمت‌هاست." });
+  }
+
   const prompt = `نرخ ارزش معاملاتی روز گذشته منابع حیاتی و استراتژیک در کلان بازار ملل:
 نفت خام: ${db.resourcePrices.oil} طلا در هر واحد
 فولاد سازه: ${db.resourcePrices.steel} طلا در هر واحد
@@ -3434,7 +3473,7 @@ app.post("/api/market/update-prices-ai", checkRateLimit, async (req, res) => {
     db.resourcePrices.food = parseFloat(parsed.food.toFixed(1));
     db.resourcePrices.lastUpdated = new Date().toISOString();
 
-    db.globalAnnouncements.unshift(`📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت ${db.resourcePrices.oil} | فولاد ${db.resourcePrices.steel} | ارزاق عمومی ${db.resourcePrices.food}`);
+    addAnnouncement(`📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت ${db.resourcePrices.oil} | فولاد ${db.resourcePrices.steel} | ارزاق عمومی ${db.resourcePrices.food}`);
 
     saveDatabase();
     res.json({ prices: db.resourcePrices });
