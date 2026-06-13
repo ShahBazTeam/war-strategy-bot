@@ -1553,10 +1553,11 @@
       "actionType": "ceasefire",
       "sourceUserId": "user_1781376598616_0e84d2a",
       "votesYes": [
-        "user_1781376598616_0e84d2a",
+        "user_1781376598616_0e84d2a"
+      ],
+      "votesNo": [
         "user_1781376553710_mgz8a2x"
       ],
-      "votesNo": [],
       "status": "active",
       "createdAt": "2026-06-13T19:52:37.325Z",
       "durationMs": 7200000
