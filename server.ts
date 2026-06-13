@@ -3644,46 +3644,86 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
     return res.status(400).json({ error: "اختراع هسته‌ای نیازمند توضیحات بسیار دقیق (حداقل ۲۰۰ کاراکتر) شامل: نوع کلاهک، مواد شکافت‌پذیر، سیستم چاشنی، ابعاد، وزن، بازده انفجاری (کیلوتن/مگاتن)، سیستم حمل و پرتاب." });
   }
 
-  // Reference values for the AI to compare against
+  // Reference values for the AI to compare against (matching actual CATALOG MP values)
   const REFERENCE_WEAPONS: Record<string, { name: string; mp: number; specs: string }[]> = {
     ground_forces: [
-      { name: "M1A2 Abrams", mp: 8, specs: "تانک اصلی میدان نبرد، زره کامپوزیتی Chobham، توپ ۱۲۰mm، سرعت ۶۷km/h" },
-      { name: "T-90M", mp: 7, specs: "تانک روسی، زره реакتیوی ERA، توپ ۱۲۵mm، سیستم هدفگیری خودکار" },
-      { name: "Leopard 2A7", mp: 8, specs: "تانک آلمانی، زره کامپوزیتی، توپ ۱۲۰mm L/55، سرعت ۶۸km/h" }
+      { name: "M1A2 Abrams", mp: 25, specs: "تانک اصلی میدان نبرد، زره کامپوزیتی Chobham، توپ ۱۲۰mm، سرعت ۶۷km/h" },
+      { name: "T-14/T-90M", mp: 22, specs: "تانک روسی پیشرفته، زره ERA، توپ ۱۲۵mm، سیستم هدفگیری خودکار" },
+      { name: "Leopard 2A7", mp: 28, specs: "تانک آلمانی، زره کامپوزیتی، توپ ۱۲۰mm L/55، سرعت ۶۸km/h" },
+      { name: "Merkava Mk4", mp: 26, specs: "تانک اسرائیلی، سیستم دفاعی فعال، توپ ۱۲۰mm" },
+      { name: "Type 99/15", mp: 24, specs: "تانک چینی اصلی میدان نبرد" },
+      { name: "K2 Black Panther", mp: 28, specs: "تانک پیشرفته کره جنوبی" }
     ],
     air_force: [
-      { name: "F-35A Lightning II", mp: 12, specs: "جنگنده نسل پنجم، رادارگریز، سرعت ۱.۶ ماخ، برد ۲۲۰۰km، حمل ۸ تیر بمب" },
-      { name: "Su-57 Felon", mp: 11, specs: "جنگنده روسی نسل پنجم، رادارگریز، سرعت ۲ ماخ، برد ۱۵۰۰km" },
-      { name: "F-22 Raptor", mp: 13, specs: "جنگنده برتری هوایی، رادارگریز، سرعت ۲.۲۵ ماخ، برد ۲۹۶۰km" }
+      { name: "F-35A/B/C Lightning II", mp: 60, specs: "جنگنده نسل پنجم، رادارگریز، سرعت ۱.۶ ماخ، برد ۲۲۰۰km، حمل ۸ تیر بمب" },
+      { name: "F-22 Raptor", mp: 65, specs: "جنگنده برتری هوایی، رادارگریز، سرعت ۲.۲۵ ماخ، برد ۲۹۶۰km" },
+      { name: "Su-57 Felon", mp: 55, specs: "جنگنده روسی نسل پنجم، رادارگریز، سرعت ۲ ماخ، برد ۱۵۰۰km" },
+      { name: "F-35I Adir / F-15", mp: 65, specs: "جنگنده پنهان‌کار پیشرفته اسرائیلی" },
+      { name: "J-20 / J-16", mp: 50, specs: "جنگنده پنهان‌کار چینی" },
+      { name: "Rafale", mp: 48, specs: "جنگنده چندمنظوره فرانسوی" },
+      { name: "Typhoon / F-15K", mp: 45, specs: "جنگنده چندمنظوره" },
+      { name: "KF-21", mp: 46, specs: "جنگنده نسل ۴.۵ کره جنوبی" },
+      { name: "F-16 / F-4", mp: 35, specs: "جنگنده چندمنظوره ترکیه" },
+      { name: "Su-30MKI / Rafale", mp: 50, specs: "جنگنده قدرتمند هند" },
+      { name: "F-35A / F-15J", mp: 55, specs: "جنگنده ژاپن" },
+      { name: "کوثر / F-14", mp: 25, specs: "جنگنده و رهگیر بومی ایران" }
     ],
     navy: [
-      { name: "USS Nimitz Carrier", mp: 15, specs: "ناو هواپیمابر هسته‌ای، ۹۰ هواپیما، سرعت ۳۰+ گره، خدمه ۵۰۰۰ نفر" },
-      { name: "Type 055 Destroyer", mp: 10, specs: "ناوشکن چینی، ۱۱۲ سلول VLS، رادار AESA، سرعت ۳۰ گره" }
+      { name: "USS Nimitz Carrier", mp: 150, specs: "ناو هواپیمابر هسته‌ای، ۹۰ هواپیما، سرعت ۳۰+ گره، خدمه ۵۰۰۰ نفر" },
+      { name: "Queen Elizabeth", mp: 130, specs: "ناو هواپیمابر بریتانیا" },
+      { name: "Charles de Gaulle", mp: 110, specs: "ناو هواپیمابر اتمی فرانسه" },
+      { name: "Kuznetsov", mp: 100, specs: "ناو هواپیمابر روسیه" },
+      { name: "Liaoning / Fujian", mp: 120, specs: "ناو هواپیمابر چین" },
+      { name: "Vikrant / Vikramaditya", mp: 100, specs: "ناو هواپیمابر هند" },
+      { name: "Type 055 Destroyer", mp: 38, specs: "ناوشکن چینی، ۱۱۲ سلول VLS" },
+      { name: "Arleigh Burke", mp: 35, specs: "ناوشکن مجهز به سیستم اجیس" },
+      { name: "Sejong the Great", mp: 36, specs: "ناوشکن سنگین کره جنوبی" },
+      { name: "Kolkata", mp: 29, specs: "ناوشکن رادارگریز هند" }
     ],
     missile: [
-      { name: "BGM-109 Tomahawk", mp: 9, specs: "موشک کروز، برد ۱۶۰۰km، سرعت ۸۸۰km/h، هدفگیری GPS/TERCOM" },
-      { name: "Iskander-M", mp: 10, specs: "موشک بالستیک کوتاه‌برد، برد ۵۰۰km، سرعت ۷۲۰۰km/h، ارتفاع پرواز ۵۰km" },
-      { name: "DF-17 Hypersonic", mp: 14, specs: "موشک هایپرسونیک، برد ۲۵۰۰km، سرعت ۱۲۲۰۰km/h، اوج ۳۰۰km" }
+      { name: "LGM-30 Minuteman", mp: 80, specs: "موشک بالستیک قاره‌پیمای آمریکا" },
+      { name: "RS-28 Sarmat", mp: 90, specs: "موشک بالستیک قاره‌پیمای روسیه" },
+      { name: "DF-41", mp: 85, specs: "موشک بالستیک قاره‌پیمای چین" },
+      { name: "DF-17 Hypersonic", mp: 85, specs: "موشک هایپرسونیک چین" },
+      { name: "Agni-V", mp: 80, specs: "موشک بالستیک قاره‌پیمای هند" },
+      { name: "Trident II D5", mp: 95, specs: "موشک هسته‌ای دریاپایه بریتانیا" },
+      { name: "M51 SLBM", mp: 90, specs: "موشک هسته‌ای زیردریایی‌پایه فرانسه" },
+      { name: "خرمشهر / سجیل", mp: 60, specs: "موشک بالستیک دوربرد ایران" },
+      { name: "فتاح هایپرسونیک", mp: 85, specs: "موشک هایپرسونیک پیشرفته ایران" },
+      { name: "Jericho", mp: 70, specs: "موشک بالستیک اسرائیل" },
+      { name: "Bora / Tayfun", mp: 30, specs: "موشک بالستیک/کروز ترکیه" },
+      { name: "Hyunmoo", mp: 40, specs: "موشک کروز/بالستیک کره جنوبی" }
     ],
     nuclear: [
-      { name: "W88 Warhead", mp: 20, specs: "کلاهک هسته‌ای ۴۷۵ کیلوتن، چاشنی.implosion، قابل حمل بر ICBM" },
-      { name: "Thermonuclear B83", mp: 25, specs: "بمب هسته‌ای حرارتی ۱.۲ مگاتن، قوی‌ترین بمب آمریکایی" }
+      { name: "W87 Warhead", mp: 1000, specs: "کلاهک هسته‌ای ۴۷۵ کیلوتن، چاشنی implosion" },
+      { name: "Thermonuclear B83", mp: 1000, specs: "بمب هسته‌ای حرارتی ۱.۲ مگاتن" },
+      { name: "کلاهک هسته‌ای روسیه", mp: 1000, specs: "کلاهک ترموهسته‌ای" },
+      { name: "کلاهک هسته‌ای چین", mp: 1000, specs: "کلاهک ترموهسته‌ای" }
     ],
     drone: [
-      { name: "MQ-9 Reaper", mp: 6, specs: "پهپاد مسلح، برد ۱۹۰۰km، پرواز ۲۷ ساعت، حمل ۴ موشک Hellfire" },
-      { name: "Bayraktar TB2", mp: 5, specs: "پهپاد ترکی، برد ۱۵۰km، پرواز ۲۷ ساعت، حمل ۴ بمب MAM" }
+      { name: "MQ-9 Reaper", mp: 15, specs: "پهپاد مسلح، برد ۱۹۰۰km، پرواز ۲۷ ساعت، حمل ۴ موشک Hellfire" },
+      { name: "Bayraktar TB2", mp: 12, specs: "پهپاد ترکی، برد ۱۵۰km، پرواز ۲۷ ساعت" },
+      { name: "پهپاد شاهد", mp: 15, specs: "پهپاد انتحاری و رزمی ایران" }
     ],
     air_defense: [
-      { name: "S-400 Triumf", mp: 11, specs: "سیستم پدافند، برد ۴۰۰km، ردیابی ۳۰۰ هدف، رهگیری ۷۲ هدف همزمان" },
-      { name: "Patriot PAC-3", mp: 10, specs: "سیستم پدافند، برد ۱۸۰km، رهگیری بالستیکی، رادار AN/MPQ-65" }
+      { name: "S-400 Triumf", mp: 30, specs: "سیستم پدافند روسی، برد ۴۰۰km، ردیابی ۳۰۰ هدف" },
+      { name: "Patriot PAC-3", mp: 25, specs: "سیستم پدافند آمریکایی، برد ۱۸۰km" },
+      { name: "Iron Dome", mp: 35, specs: "پدافند ضدموشکی کوتاه‌برد اسرائیل" },
+      { name: "HQ-9", mp: 25, specs: "پدافند چینی" },
+      { name: "باور ۳۷۳", mp: 20, specs: "سامانه دفاع هوایی بومی ایران" },
+      { name: "L-SAM / KM-SAM", mp: 24, specs: "سامانه پدافند ضدموشکی کره جنوبی" },
+      { name: "IRIS-T SLM", mp: 20, specs: "سامانه پدافند هوایی آلمان" },
+      { name: "Sky Sabre", mp: 21, specs: "سامانه پدافند مدرن بریتانیا" },
+      { name: "HISAR", mp: 18, specs: "سامانه دفاع هوایی ترکیه" },
+      { name: "Akash / Barak-8", mp: 16, specs: "پدافند ضدهوایی هند" }
     ],
     artillery: [
-      { name: "M777 Howitzer", mp: 5, specs: "توپ ۱۵۵mm، برد ۲۴km، وزن ۴.۲ تن، نیروی هوایی" },
-      { name: "PzH 2000", mp: 6, specs: "توپ خودکشی، برد ۵۶km، نرخ شلیک ۱۰ گلوله/دقیقه، زره سبک" }
+      { name: "M777 Howitzer", mp: 12, specs: "توپ ۱۵۵mm، برد ۲۴km، وزن ۴.۲ تن" },
+      { name: "PzH 2000", mp: 15, specs: "توپ خودکشی، برد ۵۶km، نرخ شلیک ۱۰ گلوله/دقیقه" }
     ],
     special_forces: [
-      { name: "Navy SEALs Team", mp: 4, specs: "تیم ۱۲ نفره، تسلیحات پیشرفته، عملیات ویژه دریایی" },
-      { name: "SAS Squadron", mp: 4, specs: "تیم ۱۶ نفره، تخصص جنگ شهری و ضد تروریسم" }
+      { name: "Navy SEALs Team", mp: 10, specs: "تیم ۱۲ نفره، تسلیحات پیشرفته، عملیات ویژه دریایی" },
+      { name: "SAS Squadron", mp: 10, specs: "تیم ۱۶ نفره، تخصص جنگ شهری و ضد تروریسم" }
     ]
   };
 
