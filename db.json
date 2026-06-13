@@ -39,6 +39,65 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376275409_diulep1",
+      "username": "mohsen",
+      "password": "eAb4FMyqPLKde9NeiAdp",
+      "isAdmin": false,
+      "country": {
+        "name": "ایران",
+        "originalName": "Iran",
+        "slogan": "استقلال، آزادی، جمهوری اسلامی",
+        "flagUrl": "🇮🇷",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 1479,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376275409
+        }
+      },
+      "equipmentSlots": [
+        "irn_karrar",
+        "irn_bmp2",
+        "irn_kowsar",
+        "irn_chopper",
+        "irn_jamaran",
+        "irn_submarine",
+        "irn_bavar",
+        "irn_khorramshahr",
+        "irn_fattah",
+        "irn_hoveyzeh",
+        "irn_shahed"
+      ],
+      "warehouse": {
+        "irn_karrar": 15,
+        "irn_bmp2": 10,
+        "irn_kowsar": 3,
+        "irn_chopper": 1,
+        "irn_jamaran": 1,
+        "irn_submarine": 1,
+        "irn_bavar": 1,
+        "irn_khorramshahr": 5,
+        "irn_fattah": 2,
+        "irn_hoveyzeh": 3,
+        "irn_shahed": 20
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 1479,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -55,6 +114,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: ایران (mohsen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایتالیا (mohsen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایران (mosen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: کره شمالی (mohsen) به نقشه جهان پیوست!",
