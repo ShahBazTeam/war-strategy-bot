@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 122810.6,
+          "gold": 81231.4,
           "militaryPower": 18421,
           "economicPower": 186,
           "resources": {
             "oil": 291.2,
-            "steel": 10208.2,
+            "steel": 12207.2,
             "food": 484.3
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۱۵:۵۱",
-          "gold": 155700.9,
-          "military": 18421,
-          "economy": 186
-        },
         {
           "timestamp": "۲۱:۱۵:۵۱",
           "gold": 212672.4,
@@ -258,6 +252,12 @@
           "gold": 122810.6,
           "military": 18421,
           "economy": 186
+        },
+        {
+          "timestamp": "۲۱:۱۹:۰۸",
+          "gold": 81231.4,
+          "military": 18421,
+          "economy": 186
         }
       ]
     },
@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 13790.2,
+          "gold": 13374.2,
           "militaryPower": 1276,
           "economicPower": 316,
           "resources": {
             "oil": 11.7,
-            "steel": 298.3,
+            "steel": 318.3,
             "food": 352
           },
           "techLevel": 5,
@@ -302,18 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۱۷:۴۲",
-          "gold": 25859,
-          "military": 1276,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۱۷:۴۳",
-          "gold": 26173,
-          "military": 1276,
-          "economy": 277
-        },
         {
           "timestamp": "۲۱:۱۷:۴۳",
           "gold": 26487,
@@ -389,6 +377,18 @@
         {
           "timestamp": "۲۱:۱۹:۰۴",
           "gold": 13790.2,
+          "military": 1276,
+          "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۱۹:۰۸",
+          "gold": 13582.2,
+          "military": 1276,
+          "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۱۹:۰۸",
+          "gold": 13374.2,
           "military": 1276,
           "economy": 316
         }
@@ -961,12 +961,12 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 3554,
+          "gold": 3158.8,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
             "oil": 17.7,
-            "steel": 204.7,
+            "steel": 223.7,
             "food": 189.8
           },
           "techLevel": 1,
@@ -997,12 +997,6 @@
         "uk_nuke": 22
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۵۰:۵۵",
-          "gold": 2751,
-          "military": 22847,
-          "economy": 100
-        },
         {
           "timestamp": "۲۰:۵۰:۵۷",
           "gold": 4781,
@@ -1084,6 +1078,12 @@
         {
           "timestamp": "۲۱:۱۹:۰۴",
           "gold": 3554,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۲۱:۱۹:۰۹",
+          "gold": 3158.8,
           "military": 22847,
           "economy": 100
         }
