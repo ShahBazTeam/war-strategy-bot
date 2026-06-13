@@ -1,5 +1,33 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": "admin_9uvl7ub",
+      "username": "admin",
+      "isAdmin": true,
+      "country": {
+        "name": "سازمان ملل",
+        "originalName": "UN",
+        "slogan": "صلح جهانی",
+        "flagUrl": "🇺🇳",
+        "assets": {
+          "gold": 50000,
+          "militaryPower": 100,
+          "economicPower": 100,
+          "resources": {
+            "oil": 500,
+            "steel": 500,
+            "food": 500
+          },
+          "techLevel": 5,
+          "factoryLevel": 10,
+          "lastIncomeUpdate": 1781370881163
+        }
+      },
+      "equipmentSlots": [],
+      "warehouse": {},
+      "assetLog": []
+    }
+  ],
   "tradeOffers": [],
   "wars": [],
   "alliances": [],
