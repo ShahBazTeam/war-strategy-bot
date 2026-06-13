@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 4488.5,
+          "gold": 4206.5,
           "militaryPower": 650,
           "economicPower": 171,
           "resources": {
             "oil": 10.1,
-            "steel": 40.4,
+            "steel": 50.4,
             "food": 38.8
           },
           "techLevel": 3,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۴:۴۲",
-          "gold": 3089.3,
-          "military": 650,
-          "economy": 171
-        },
         {
           "timestamp": "۲۰:۰۵:۰۱",
           "gold": 3374.3,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۰۶:۴۴",
           "gold": 4488.5,
+          "military": 650,
+          "economy": 171
+        },
+        {
+          "timestamp": "۲۰:۰۶:۵۱",
+          "gold": 4206.5,
           "military": 650,
           "economy": 171
         }
@@ -822,16 +822,16 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 4673.1,
+          "gold": 1273.1,
           "militaryPower": 47977,
-          "economicPower": 138,
+          "economicPower": 148,
           "resources": {
             "oil": 3.3,
             "steel": 0.3,
             "food": 3.3
           },
           "techLevel": 2,
-          "factoryLevel": 3,
+          "factoryLevel": 4,
           "lastIncomeUpdate": 1781381158616
         }
       },
@@ -858,12 +858,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۲:۲۷",
-          "gold": 2374.3,
-          "military": 47979,
-          "economy": 138
-        },
         {
           "timestamp": "۲۰:۰۲:۲۹",
           "gold": 2598.3,
@@ -947,6 +941,12 @@
           "gold": 4673.1,
           "military": 47977,
           "economy": 138
+        },
+        {
+          "timestamp": "۲۰:۰۶:۴۵",
+          "gold": 1273.1,
+          "military": 47977,
+          "economy": 148
         }
       ]
     },
