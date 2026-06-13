@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 392,
+          "gold": 694,
           "militaryPower": 1463,
           "economicPower": 99,
           "resources": {
             "oil": 2.7,
-            "steel": 10.8,
+            "steel": 0.8,
             "food": 1.3
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۰۸:۵۷",
-          "gold": 54.7,
-          "military": 1463,
-          "economy": 101
-        },
         {
           "timestamp": "۱۹:۰۸:۵۷",
           "gold": 73.2,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۱۹:۱۱:۳۹",
           "gold": 392,
+          "military": 1463,
+          "economy": 99
+        },
+        {
+          "timestamp": "۱۹:۱۱:۴۲",
+          "gold": 694,
           "military": 1463,
           "economy": 99
         }
@@ -512,7 +512,7 @@
       "country": {
         "name": "اسرائیل",
         "originalName": "Israel",
-        "slogan": "آزادی و بازیابی اقتدار تاریخی",
+        "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
           "gold": 1416.4,
