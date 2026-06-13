@@ -143,15 +143,15 @@ export default function AdminPanel({
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="text-slate-400 block mb-1">قیمت نفت (طلا)</label>
-                <input type="number" step="0.1" value={oilPrice} onChange={(e) => setOilPrice(e.target.value)} inputMode="numeric" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
+                <input type="text" step="0.1" value={oilPrice} onChange={(e) => setOilPrice(e.target.value)} inputMode="decimal" pattern="[0-9]*" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
               </div>
               <div>
                 <label className="text-slate-400 block mb-1">قیمت فولاد (طلا)</label>
-                <input type="number" step="0.1" value={steelPrice} onChange={(e) => setSteelPrice(e.target.value)} inputMode="numeric" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
+                <input type="text" step="0.1" value={steelPrice} onChange={(e) => setSteelPrice(e.target.value)} inputMode="decimal" pattern="[0-9]*" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
               </div>
               <div>
                 <label className="text-slate-400 block mb-1">قیمت گندم (طلا)</label>
-                <input type="number" step="0.1" value={foodPrice} onChange={(e) => setFoodPrice(e.target.value)} inputMode="numeric" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
+                <input type="text" step="0.1" value={foodPrice} onChange={(e) => setFoodPrice(e.target.value)} inputMode="decimal" pattern="[0-9]*" className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800" />
               </div>
             </div>
 

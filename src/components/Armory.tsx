@@ -224,13 +224,14 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
                 <Minus className="h-4 w-4" />
               </button>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*"
                 min="1"
                 max={scrapModal.maxQty}
                 value={scrapQty}
-                onChange={(e) => setScrapQty(Math.min(scrapModal.maxQty, Math.max(1, parseInt(e.target.value) || 1)))}
+                onChange={(e) => setScrapQty(Math.min(scrapModal.maxQty, Math.max(1, parseFloat(e.target.value) || 1)))}
                 className="w-20 h-10 bg-black/50 border border-white/10 rounded-lg text-center text-white font-mono"
-                inputMode="numeric"
               />
               <button
                 onClick={() => setScrapQty(Math.min(scrapModal.maxQty, scrapQty + 1))}
@@ -274,13 +275,14 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
             <div>
               <label className="block text-[10px] text-slate-400 mb-1">قیمت فروش (طلا)</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*"
                 min="10"
                 max="5000"
                 value={newPrice}
-                onChange={(e) => setNewPrice(Math.max(10, parseInt(e.target.value) || 100))}
+                onChange={(e) => setNewPrice(Math.max(10, parseFloat(e.target.value) || 100))}
                 className="w-full bg-black/50 border border-amber-500/20 rounded-lg p-2 text-white font-mono text-sm"
-                inputMode="numeric"
               />
             </div>
 
@@ -441,12 +443,13 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
                             <Minus className="h-3 w-3" />
                           </button>
                           <input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
+                            pattern="[0-9]*"
                             min="1" 
                             value={quantity} 
-                            onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Math.max(1, parseInt(e.target.value) || 1) }))}
+                            onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Math.max(1, parseFloat(e.target.value) || 1) }))}
                             className="w-12 h-8 bg-transparent text-white text-xs text-center border-x border-white/10 focus:outline-none"
-                            inputMode="numeric"
                           />
                           <button
                             onClick={() => incrementQty(item.id)}

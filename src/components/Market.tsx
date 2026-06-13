@@ -41,7 +41,7 @@ export default function Market({
   // Direct Trade state
   const [tradeAction, setTradeAction] = useState<"buy" | "sell">("buy");
   const [tradeResource, setTradeResource] = useState<"oil" | "steel" | "food">("oil");
-  const [tradeAmount, setTradeAmount] = useState(10);
+  const [tradeAmount, setTradeAmount] = useState("10");
 
   // IMF State
   const [imfProposal, setImfProposal] = useState<LoanProposal | null>(null);
@@ -49,22 +49,22 @@ export default function Market({
 
   // Peer-to-Peer trade send state
   const [p2pReceiverId, setP2pReceiverId] = useState("");
-  const [p2pOfferGold, setP2pOfferGold] = useState(0);
-  const [p2pOfferOil, setP2pOfferOil] = useState(0);
-  const [p2pOfferSteel, setP2pOfferSteel] = useState(0);
-  const [p2pOfferFood, setP2pOfferFood] = useState(0);
+  const [p2pOfferGold, setP2pOfferGold] = useState<number>(0);
+  const [p2pOfferOil, setP2pOfferOil] = useState<number>(0);
+  const [p2pOfferSteel, setP2pOfferSteel] = useState<number>(0);
+  const [p2pOfferFood, setP2pOfferFood] = useState<number>(0);
   
-  const [p2pRequestGold, setP2pRequestGold] = useState(0);
-  const [p2pRequestOil, setP2pRequestOil] = useState(0);
-  const [p2pRequestSteel, setP2pRequestSteel] = useState(0);
-  const [p2pRequestFood, setP2pRequestFood] = useState(0);
+  const [p2pRequestGold, setP2pRequestGold] = useState<number>(0);
+  const [p2pRequestOil, setP2pRequestOil] = useState<number>(0);
+  const [p2pRequestSteel, setP2pRequestSteel] = useState<number>(0);
+  const [p2pRequestFood, setP2pRequestFood] = useState<number>(0);
 
   // Diplomatic Aid Sending State
   const [aidReceiverId, setAidReceiverId] = useState("");
-  const [aidGold, setAidGold] = useState(0);
-  const [aidOil, setAidOil] = useState(0);
-  const [aidSteel, setAidSteel] = useState(0);
-  const [aidFood, setAidFood] = useState(0);
+  const [aidGold, setAidGold] = useState<number>(0);
+  const [aidOil, setAidOil] = useState<number>(0);
+  const [aidSteel, setAidSteel] = useState<number>(0);
+  const [aidFood, setAidFood] = useState<number>(0);
 
   const formatResource = (key: string) => {
     if (key === "oil") return "نفت خام";
@@ -270,11 +270,12 @@ export default function Market({
           <div>
             <label className="block text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5">تعداد کالا برای معامله</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*"
               min="1"
               value={tradeAmount}
-              onChange={(e) => setTradeAmount(parseInt(e.target.value) || 1)}
-              inputMode="numeric"
+              onChange={(e) => setTradeAmount(parseFloat(e.target.value) || 1)}
               className="w-full rounded bg-white/5 border border-white/10 p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
             />
           </div>
@@ -382,20 +383,20 @@ export default function Market({
                 <h3 className="text-[10px] font-black uppercase tracking-wider text-emerald-400">کالایی که صادر می‌کنید (واگذاری)</h3>
                 <div>
                   <label className="text-[9px] text-slate-500 block uppercase font-mono">GOLD_AMOUNT_OFFER</label>
-                  <input type="number" min="0" value={p2pOfferGold} onChange={(e) => setP2pOfferGold(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none font-mono" inputMode="numeric" />
+                  <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pOfferGold} onChange={(e) => setP2pOfferGold(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none font-mono" />
                 </div>
                 <div className="grid grid-cols-3 gap-2 font-mono">
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">OIL</label>
-                    <input type="number" min="0" value={p2pOfferOil} onChange={(e) => setP2pOfferOil(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pOfferOil} onChange={(e) => setP2pOfferOil(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">STEEL</label>
-                    <input type="number" min="0" value={p2pOfferSteel} onChange={(e) => setP2pOfferSteel(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pOfferSteel} onChange={(e) => setP2pOfferSteel(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">FOOD</label>
-                    <input type="number" min="0" value={p2pOfferFood} onChange={(e) => setP2pOfferFood(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pOfferFood} onChange={(e) => setP2pOfferFood(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                 </div>
               </div>
@@ -405,20 +406,20 @@ export default function Market({
                 <h3 className="text-[10px] font-black uppercase tracking-wider text-cyan-405">چیزی که تقاضا دارید (واردات)</h3>
                 <div>
                   <label className="text-[9px] text-slate-500 block uppercase font-mono">GOLD_AMOUNT_REQ</label>
-                  <input type="number" min="0" value={p2pRequestGold} onChange={(e) => setP2pRequestGold(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none font-mono" inputMode="numeric" />
+                  <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pRequestGold} onChange={(e) => setP2pRequestGold(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none font-mono" />
                 </div>
                 <div className="grid grid-cols-3 gap-2 font-mono">
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">OIL</label>
-                    <input type="number" min="0" value={p2pRequestOil} onChange={(e) => setP2pRequestOil(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pRequestOil} onChange={(e) => setP2pRequestOil(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">STEEL</label>
-                    <input type="number" min="0" value={p2pRequestSteel} onChange={(e) => setP2pRequestSteel(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pRequestSteel} onChange={(e) => setP2pRequestSteel(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase block mb-1">FOOD</label>
-                    <input type="number" min="0" value={p2pRequestFood} onChange={(e) => setP2pRequestFood(parseInt(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" inputMode="numeric" />
+                    <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={p2pRequestFood} onChange={(e) => setP2pRequestFood(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none" />
                   </div>
                 </div>
               </div>
@@ -520,19 +521,19 @@ export default function Market({
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_GOLD</label>
-              <input type="number" min="0" value={aidGold} onChange={(e) => setAidGold(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={aidGold} onChange={(e) => setAidGold(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_OIL</label>
-              <input type="number" min="0" value={aidOil} onChange={(e) => setAidOil(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={aidOil} onChange={(e) => setAidOil(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_STEEL</label>
-              <input type="number" min="0" value={aidSteel} onChange={(e) => setAidSteel(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={aidSteel} onChange={(e) => setAidSteel(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_FOOD</label>
-              <input type="number" min="0" value={aidFood} onChange={(e) => setAidFood(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="text" inputMode="decimal" pattern="[0-9]*" min="0" value={aidFood} onChange={(e) => setAidFood(parseFloat(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
           </div>
           <button type="submit" className="mt-4 rounded border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold px-6 py-2 text-[10px] uppercase tracking-widest cursor-pointer transition">
