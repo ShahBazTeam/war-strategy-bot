@@ -46,23 +46,25 @@ body {
   animation: pulse-glow 3s infinite;
 }
 
-/* Marquee Ticker Animation */
-@keyframes marquee {
-  0% { transform: translateX(100%); }
+/* News Ticker - like TV channel subtitles */
+@keyframes ticker-scroll {
+  0% { transform: translateX(100vw); }
   100% { transform: translateX(-100%); }
 }
-@keyframes marquee-rtl {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  direction: ltr;
 }
-.animate-marquee {
-  animation: marquee-rtl 20s linear infinite;
+.ticker-content {
+  display: inline-block;
   white-space: nowrap;
-  min-width: max-content;
+  animation: ticker-scroll 25s linear infinite;
+  padding-left: 100vw;
 }
 @media (max-width: 640px) {
-  .animate-marquee {
-    animation-duration: 15s;
+  .ticker-content {
+    animation-duration: 18s;
     font-size: 9px;
   }
 }
