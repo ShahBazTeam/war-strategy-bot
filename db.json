@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 6517.3,
+          "gold": 7697.3,
           "militaryPower": 1302,
           "economicPower": 277,
           "resources": {
             "oil": 5.8,
-            "steel": 235.1,
+            "steel": 195.1,
             "food": 191.5
           },
           "techLevel": 5,
@@ -302,30 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۴۵:۱۴",
-          "gold": 5824.9,
-          "military": 1306,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۰:۴۵:۲۰",
-          "gold": 5537.9,
-          "military": 1306,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۰:۴۵:۳۸",
-          "gold": 5848.1,
-          "military": 1304,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۰:۴۵:۳۸",
-          "gold": 6085.1,
-          "military": 1304,
-          "economy": 277
-        },
         {
           "timestamp": "۲۰:۴۵:۴۴",
           "gold": 5802.1,
@@ -389,6 +365,30 @@
         {
           "timestamp": "۲۰:۴۷:۳۵",
           "gold": 6517.3,
+          "military": 1302,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۴۷:۳۵",
+          "gold": 6812.3,
+          "military": 1302,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۴۷:۳۶",
+          "gold": 7107.3,
+          "military": 1302,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۴۷:۳۶",
+          "gold": 7402.3,
+          "military": 1302,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۴۷:۳۶",
+          "gold": 7697.3,
           "military": 1302,
           "economy": 277
         }
@@ -960,12 +960,12 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 1592,
+          "gold": 2123,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
             "oil": 15.7,
-            "steel": 98.2,
+            "steel": 80.2,
             "food": 77.2
           },
           "techLevel": 1,
@@ -996,12 +996,6 @@
         "uk_nuke": 22
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۰۴:۱۹",
-          "gold": 418,
-          "military": 22847,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۳۶:۵۲",
           "gold": 946,
@@ -1083,6 +1077,12 @@
         {
           "timestamp": "۲۰:۴۷:۳۰",
           "gold": 1592,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۲۰:۴۷:۳۵",
+          "gold": 2123,
           "military": 22847,
           "economy": 100
         }
