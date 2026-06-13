@@ -1,0 +1,60 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "aki/gpt-oss-120b",
+  "provider": {
+    "aki": {
+      "api": "openai",
+      "name": "AKI.IO",
+      "options": {
+        "apiKey": "7eca7225-3d5d-45bd-9e3c-e521fdc72d7e",
+        "baseURL": "https://aki.io/v1",
+        "timeout": 120000
+      },
+      "models": {
+        "gpt-oss-120b": {
+          "id": "gpt-oss-120b",
+          "name": "GPT-OSS 120B",
+          "family": "gpt",
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 128000,
+            "output": 32768
+          }
+        },
+        "qwen3.6-chat-35b": {
+          "id": "qwen3.6-chat-35b",
+          "name": "Qwen 3.6 35B",
+          "family": "qwen",
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        },
+        "llama3-chat-70b": {
+          "id": "llama3-chat-70b",
+          "name": "Llama 3.3 70B",
+          "family": "llama",
+          "tool_call": true,
+          "limit": {
+            "context": 128000,
+            "output": 32768
+          }
+        },
+        "kimi-k2.7-code-1100b": {
+          "id": "kimi-k2.7-code-1100b",
+          "name": "Kimi K2.7 Code 1100B",
+          "family": "kimi",
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 262144,
+            "output": 81920
+          }
+        }
+      }
+    }
+  }
+}
