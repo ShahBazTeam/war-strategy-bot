@@ -129,11 +129,11 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 361,
+          "gold": 179,
           "militaryPower": 1463,
           "economicPower": 100,
           "resources": {
-            "oil": 2.4,
+            "oil": 12.4,
             "steel": 10.5,
             "food": 0.8
           },
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۰۸:۰۳",
-          "gold": 1.4,
-          "military": 1463,
-          "economy": 102
-        },
         {
           "timestamp": "۱۹:۰۸:۳۶",
           "gold": 17.7,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۱۹:۱۱:۰۸",
           "gold": 361,
+          "military": 1463,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۱۱:۲۲",
+          "gold": 179,
           "military": 1463,
           "economy": 100
         }
@@ -654,17 +654,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 190.2,
+          "gold": 209.4,
           "militaryPower": 48005,
           "economicPower": 120,
           "resources": {
-            "oil": 27.3,
-            "steel": 14.3,
-            "food": 27.3
+            "oil": 28.2,
+            "steel": 15.2,
+            "food": 28.2
           },
           "techLevel": 2,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781377738616
+          "lastIncomeUpdate": 1781377858616
         }
       },
       "equipmentSlots": [
@@ -690,12 +690,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۱۸:۵۵:۲۳",
-          "gold": 681,
-          "military": 48005,
-          "economy": 100
-        },
         {
           "timestamp": "۱۸:۵۶:۰۵",
           "gold": 687,
@@ -777,6 +771,12 @@
         {
           "timestamp": "۱۹:۰۹:۰۱",
           "gold": 190.2,
+          "military": 48005,
+          "economy": 120
+        },
+        {
+          "timestamp": "۱۹:۱۱:۲۲",
+          "gold": 209.4,
           "military": 48005,
           "economy": 120
         }
