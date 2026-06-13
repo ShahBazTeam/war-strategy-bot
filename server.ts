@@ -359,7 +359,7 @@ let db: GameDatabase = {
   tweets: [],
   inventions: [],
   geminiLogs: [],
-  resourcePrices: { oil: 360, steel: 540, food: 210, lastUpdated: new Date().toISOString() },
+  resourcePrices: { oil: 15, steel: 25, food: 10, lastUpdated: new Date().toISOString() },
   globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"]
 };
 
@@ -581,7 +581,7 @@ function updatePassiveIncome(user: User) {
     const ecoBonus = Math.max(0.1, user.country.assets.economicPower / 100); // minimum 10% income even with 0 EP
     
     // Gold income
-    const incomePerMinute = Math.max(22.5, 240 * factoryLvl * ecoBonus); // 15x income
+    const incomePerMinute = Math.max(2, 8 * factoryLvl * ecoBonus); // balanced income
     const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
 
@@ -1059,7 +1059,7 @@ const techUpgradeHandler = (req, res) => {
     return res.status(400).json({ error: "سطح فناوری شما هم‌اکنون در بیشترین مقدار خود (۲۰) قرار دارد" });
   }
 
-  const upgradeCosts = [0, 12000, 24000, 45000, 90000, 150000, 250000, 400000, 600000, 900000, 1200000, 1600000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000]; // Cost for levels 1→2 through 19→20 (30x)
+  const upgradeCosts = [0, 600, 1200, 2500, 5000, 8000, 12000, 18000, 25000, 35000, 50000, 70000, 100000, 140000, 200000, 280000, 400000, 550000, 750000, 1000000]; // balanced tech costs
   const multipliers = getCatchUpMultipliers(user);
   const cost = Math.round(upgradeCosts[currentTech] * multipliers.costMultiplier);
 
@@ -1090,9 +1090,9 @@ app.post("/api/factory/upgrade", checkRateLimit, (req, res) => {
     return res.status(400).json({ error: "کارخانه شما به بالاترین سطح ممکن رسیده است." });
   }
 
-  // Cost calculation: base 30000 + 24000 per level (30x of original)
+  // Cost calculation: base 1500 + 1200 per level
   const multipliers = getCatchUpMultipliers(user);
-  const cost = Math.round((30000 + 24000 * currentLevel) * multipliers.costMultiplier);
+  const cost = Math.round((1500 + 1200 * currentLevel) * multipliers.costMultiplier);
 
   if (user.country.assets.gold < cost) {
     return res.status(400).json({ error: `ارتقای کارخانه به سطح ${currentLevel + 1} نیازمند ${cost} طلا است!` });
@@ -2953,6 +2953,33 @@ app.post("/api/admin/reset-all-gold", (req, res) => {
 
   saveDatabase();
   res.json({ message: `طلا و منابع ${updated} کاربر ریست شد.`, updated });
+});
+
+app.post("/api/admin/full-reset", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  const { confirm } = req.body;
+  if (confirm !== true) return res.status(400).json({ error: "برای ریست کامل، confirm=true ارسال کنید." });
+
+  // Delete all non-admin users
+  const beforeCount = db.users.length;
+  db.users = db.users.filter(u => u.isAdmin);
+
+  // Reset resource prices
+  db.resourcePrices = { oil: 15, steel: 25, food: 10, lastUpdated: new Date().toISOString() };
+
+  // Reset wars, alliances, tweets, etc.
+  db.wars = [];
+  db.alliances = [];
+  db.tradeOffers = [];
+  db.tweets = [];
+  db.unProposals = [];
+  db.globalAnnouncements = ["بازی ریست شد! همه چیز از اول شروع می‌شود."];
+
+  const deleted = beforeCount - db.users.length;
+  saveDatabase();
+  res.json({ message: `ریست کامل انجام شد! ${deleted} کاربر حذف شد.`, deleted });
 });
 
 app.post("/api/admin/broadcast", (req, res) => {

@@ -230,7 +230,22 @@ export default function AdminPanel({
                 if (!confirm("⚠️ هشدار: تمام کشورها، کاربران، جنگ‌ها، اتحادها، معاملات، اختراعات، توییت‌ها و قیمت‌ها پاک می‌شوند!\n\nآیا کاملاً مطمئنید؟")) return;
                 if (!confirm("最后一次 تایید: تمام داده‌ها برای همیشه حذف می‌شوند!")) return;
                 setIsProcessing("delete_all");
-                await onAdminDeleteAllUsers();
+                try {
+                  const resp = await fetch("/api/admin/full-reset", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "x-user-id": user.id
+                    },
+                    body: JSON.stringify({ confirm: true })
+                  });
+                  const data = await resp.json();
+                  if (!resp.ok) throw new Error(data.error);
+                  alert(data.message);
+                  window.location.reload();
+                } catch (err: any) {
+                  alert(err.message || "خطا");
+                }
                 setIsProcessing(null);
               }}
               disabled={isProcessing === "delete_all"}

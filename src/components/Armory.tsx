@@ -349,7 +349,7 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
             onClick={onUpgradeTech}
             className="w-full md:w-auto rounded border border-cyan-500/50 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 font-bold py-3 px-6 text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-3 font-sans"
           >
-            <RefreshCw className="h-4 w-4" /> ارتقا به سطح {user.country.assets.techLevel + 1} ({[0, 12000, 24000, 45000, 90000, 150000, 250000, 400000, 600000, 900000, 1200000, 1600000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000][user.country.assets.techLevel]} طلا)
+            <RefreshCw className="h-4 w-4" /> ارتقا به سطح {user.country.assets.techLevel + 1} ({[0, 600, 1200, 2500, 5000, 8000, 12000, 18000, 25000, 35000, 50000, 70000, 100000, 140000, 200000, 280000, 400000, 550000, 750000, 1000000][user.country.assets.techLevel]} طلا)
           </button>
         ) : (
           <div className="rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 px-4 py-2.5 text-xs font-bold font-mono">
@@ -375,7 +375,7 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
             onClick={onUpgradeFactory}
             className="w-full md:w-auto rounded border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold py-3 px-6 text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-3 font-sans"
           >
-            <RefreshCw className="h-4 w-4" /> ارتقا کارخانه به سطح {(user.country.assets.factoryLevel || 1) + 1} ({30000 + 24000 * (user.country.assets.factoryLevel || 1)} طلا)
+            <RefreshCw className="h-4 w-4" /> ارتقا کارخانه به سطح {(user.country.assets.factoryLevel || 1) + 1} ({1500 + 1200 * (user.country.assets.factoryLevel || 1)} طلا)
           </button>
         ) : (
           <div className="rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 px-4 py-2.5 text-xs font-bold font-mono">
