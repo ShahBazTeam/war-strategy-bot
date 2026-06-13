@@ -1469,7 +1469,29 @@
       ]
     }
   ],
-  "tradeOffers": [],
+  "tradeOffers": [
+    {
+      "id": "offer_puv0rw",
+      "senderId": "user_1781379207697_vi1r9o3",
+      "senderCountry": "آلمان",
+      "receiverId": "user_1781376553710_mgz8a2x",
+      "receiverCountry": "اسرائیل",
+      "offerGold": 0,
+      "offerResources": {
+        "oil": 0,
+        "steel": 0,
+        "food": 0
+      },
+      "requestGold": 0,
+      "requestResources": {
+        "oil": 0,
+        "steel": 0,
+        "food": 0
+      },
+      "status": "pending",
+      "timestamp": "2026-06-13T19:46:23.138Z"
+    }
+  ],
   "wars": [],
   "alliances": [
     {
