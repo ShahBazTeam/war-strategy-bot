@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 6883.9,
+          "gold": 7104.9,
           "militaryPower": 1316,
           "economicPower": 277,
           "resources": {
             "oil": 4.4,
-            "steel": 26.9,
+            "steel": 16.9,
             "food": 156.5
           },
           "techLevel": 5,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۳۶:۳۱",
-          "gold": 3773.1,
-          "military": 1324,
-          "economy": 277
-        },
         {
           "timestamp": "۲۰:۳۶:۳۱",
           "gold": 3552.1,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۴۰:۰۲",
           "gold": 6883.9,
+          "military": 1316,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۴۰:۱۵",
+          "gold": 7104.9,
           "military": 1316,
           "economy": 277
         }
@@ -544,7 +544,7 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 10925.4,
+          "gold": 25.4,
           "militaryPower": 54858,
           "economicPower": 220,
           "resources": {
@@ -580,12 +580,6 @@
         "usa_nuke": 50
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۳۲:۴۳",
-          "gold": 960.6,
-          "military": 54858,
-          "economy": 210
-        },
         {
           "timestamp": "۲۰:۳۳:۱۶",
           "gold": 6420.6,
@@ -669,6 +663,12 @@
           "gold": 10925.4,
           "military": 54858,
           "economy": 220
+        },
+        {
+          "timestamp": "۲۰:۴۰:۱۵",
+          "gold": 25.4,
+          "military": 54858,
+          "economy": 220
         }
       ]
     },
@@ -683,9 +683,9 @@
         "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 379.9,
+          "gold": 11279.9,
           "militaryPower": 15665,
-          "economicPower": 77,
+          "economicPower": 82,
           "resources": {
             "oil": 0,
             "steel": 2,
@@ -719,12 +719,6 @@
         "isr_nuke": 15
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۴:۱۵",
-          "gold": 1975.6,
-          "military": 15689,
-          "economy": 66
-        },
         {
           "timestamp": "۲۰:۲۵:۱۸",
           "gold": 1996.7,
@@ -808,6 +802,12 @@
           "gold": 379.9,
           "military": 15665,
           "economy": 77
+        },
+        {
+          "timestamp": "۲۰:۴۰:۱۵",
+          "gold": 11279.9,
+          "military": 15665,
+          "economy": 82
         }
       ]
     },
@@ -2504,6 +2504,7 @@
     "lastUpdated": "2026-06-13T20:40:13.009Z"
   },
   "globalAnnouncements": [
+    "🤝 کشور قدرتمند ایالات متحده آمریکا کمک‌های نقدی و غیرنقدی قابل توجهی را به کشور همسایه اسرائیل با هدف دوستی دیپلماتیک صادر کرد!",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 18.2 | فولاد 22.1 | ارزاق عمومی 11.5",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 22.4 | فولاد 28.7 | ارزاق عمومی 9.8",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 19.5 | فولاد 30.2 | ارزاق عمومی 11.3",
