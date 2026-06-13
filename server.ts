@@ -581,7 +581,7 @@ function updatePassiveIncome(user: User) {
     const ecoBonus = Math.max(0.1, user.country.assets.economicPower / 100); // minimum 10% income even with 0 EP
     
     // Gold income
-    const incomePerMinute = Math.max(1.5, 16 * factoryLvl * ecoBonus); // doubled income
+    const incomePerMinute = Math.max(22.5, 240 * factoryLvl * ecoBonus); // 15x income
     const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
 
