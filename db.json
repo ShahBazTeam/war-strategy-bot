@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 55140,
+          "gold": 55300,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 584.1,
-            "steel": 1341,
-            "food": 1341
+            "oil": 586.7,
+            "steel": 1367,
+            "food": 1367
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781379688567
+          "lastIncomeUpdate": 1781379748567
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۱۹:۲۸:۲۷",
-          "gold": 53140,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۲۹:۲۷",
           "gold": 53220,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۱۹:۴۱:۳۰",
           "gold": 55140,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۴۲:۳۳",
+          "gold": 55300,
           "military": 100,
           "economy": 100
         }
@@ -1058,17 +1058,17 @@
         "slogan": "آزادی، برابری، برادری",
         "flagUrl": "🇫🇷",
         "assets": {
-          "gold": 788,
+          "gold": 804,
           "militaryPower": 25976,
           "economicPower": 100,
           "resources": {
             "oil": 20.1,
-            "steel": 35.9,
-            "food": 35.9
+            "steel": 36.4,
+            "food": 36.4
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781379688311
+          "lastIncomeUpdate": 1781379748311
         }
       },
       "equipmentSlots": [
@@ -1094,12 +1094,6 @@
         "fra_nuke": 25
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۱۴:۳۲",
-          "gold": 476,
-          "military": 25976,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۱۸:۵۶",
           "gold": 508,
@@ -1181,6 +1175,12 @@
         {
           "timestamp": "۱۹:۴۱:۳۰",
           "gold": 788,
+          "military": 25976,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۴۲:۳۴",
+          "gold": 804,
           "military": 25976,
           "economy": 100
         }
