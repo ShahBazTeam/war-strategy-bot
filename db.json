@@ -463,6 +463,61 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376651736_mrr5asa",
+      "username": "arash",
+      "password": "yUn8Njc0",
+      "isAdmin": false,
+      "country": {
+        "name": "بریتانیا",
+        "originalName": "UK",
+        "slogan": "حق من و خداوند من",
+        "flagUrl": "🇬🇧",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 22847,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376651736
+        }
+      },
+      "equipmentSlots": [
+        "uk_challenger",
+        "uk_warrior",
+        "uk_typhoon",
+        "uk_queen",
+        "uk_daring",
+        "uk_astute",
+        "uk_skysabre",
+        "uk_trident",
+        "uk_nuke"
+      ],
+      "warehouse": {
+        "uk_challenger": 3,
+        "uk_warrior": 8,
+        "uk_typhoon": 6,
+        "uk_queen": 1,
+        "uk_daring": 1,
+        "uk_astute": 1,
+        "uk_skysabre": 1,
+        "uk_trident": 1,
+        "uk_nuke": 22
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 22847,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -492,6 +547,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: بریتانیا (arash) به نقشه جهان پیوست!",
     "🎮 کشور جدید: روسیه (sorena) به نقشه جهان پیوست!",
     "🎮 کشور جدید: اسرائیل (mahdi) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایالات متحده آمریکا (kiakia) به نقشه جهان پیوست!",
