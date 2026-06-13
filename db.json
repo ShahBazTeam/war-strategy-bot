@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 743.2,
+          "gold": 986.2,
           "militaryPower": 672,
           "economicPower": 127,
           "resources": {
             "oil": 0.1,
-            "steel": 32.4,
+            "steel": 22.4,
             "food": 25
           },
           "techLevel": 2,
@@ -335,6 +335,12 @@
         {
           "timestamp": "۱۹:۲۴:۲۵",
           "gold": 743.2,
+          "military": 672,
+          "economy": 127
+        },
+        {
+          "timestamp": "۱۹:۲۴:۳۳",
+          "gold": 986.2,
           "military": 672,
           "economy": 127
         }
