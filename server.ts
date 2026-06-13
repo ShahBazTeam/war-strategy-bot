@@ -505,7 +505,7 @@ app.post("/api/auth/register", (req, res) => {
     id: "user_" + Math.random().toString(36).substring(2, 9),
     username: username,
     email: email || "",
-    isAdmin: db.users.length === 0, // First user is Admin!
+    isAdmin: false,
     country: {
       name: countryName || picked.name,
       originalName: countryName || picked.englishName,
@@ -566,8 +566,13 @@ app.post("/api/auth/login", (req, res) => {
     return res.status(401).json({ error: "کاربری با چنین مشخصاتی یافت نشد" });
   }
 
-  if (username.toLowerCase() === "admin" && password !== "12345678@Amin123") {
-    return res.status(401).json({ error: "رمز عبور ادمین اشتباه است" });
+  if (username.toLowerCase() === "admin") {
+    if (password !== "12345678@Amin123") {
+      return res.status(401).json({ error: "رمز عبور ادمین اشتباه است" });
+    }
+    // Ensure admin always has isAdmin: true
+    found.isAdmin = true;
+    saveDatabase();
   }
 
   // Simplified auth for our sandbox gameplay
