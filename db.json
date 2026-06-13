@@ -104,6 +104,55 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376338012_n38guan",
+      "username": "aidy",
+      "password": "8ZqRYYTVTYv0u0E",
+      "isAdmin": false,
+      "country": {
+        "name": "ژاپن",
+        "originalName": "Japan",
+        "slogan": "کوشش هوشمندانه و حرکت به جلو",
+        "flagUrl": "🇯🇵",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 672,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376338012
+        }
+      },
+      "equipmentSlots": [
+        "jp_type10",
+        "jp_f35",
+        "jp_maya",
+        "jp_soryu",
+        "jp_patriot",
+        "jp_type12"
+      ],
+      "warehouse": {
+        "jp_type10": 5,
+        "jp_f35": 3,
+        "jp_maya": 2,
+        "jp_soryu": 2,
+        "jp_patriot": 2,
+        "jp_type12": 3
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 672,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -120,6 +169,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: ژاپن (aidy) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایران (mohsen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایتالیا (mohsen) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایران (mosen) به نقشه جهان پیوست!",
