@@ -800,7 +800,7 @@ function getInitialInventoryAndMP(countryFa: string, countryEn?: string) {
     if (wpnConfig && count > 0) {
       warehouse[wpnId] = count;
       totalStartingMp += wpnConfig.mp * count;
-      if (equipmentSlots.length < 6) {
+      if (equipmentSlots.length < 15) {
         equipmentSlots.push(wpnId);
       }
     }
@@ -864,7 +864,7 @@ const buyWeaponHandler = (req, res) => {
   }
   user.warehouse[itemType] += q;
   
-  if (user.equipmentSlots.length < 6 && !user.equipmentSlots.includes(itemType)) {
+  if (user.equipmentSlots.length < 15 && !user.equipmentSlots.includes(itemType)) {
     user.equipmentSlots.push(itemType);
   }
 
@@ -1526,7 +1526,9 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   // Compile active weapons detailed catalog to Gemini for evaluation
   const getInventoryDesc = (u: User) => {
     const list = u.equipmentSlots.map(wpnId => {
-      const name = CATALOG.find(c => c.id === wpnId)?.name || "سلاح جنگی";
+      const catItem = CATALOG.find(c => c.id === wpnId);
+      const invItem = db.inventions.find(i => i.id === wpnId);
+      const name = catItem?.name || invItem?.name || "سلاح جنگی";
       const qty = u.warehouse && u.warehouse[wpnId] ? u.warehouse[wpnId] : 0;
       return `${name} (${qty} عدد)`;
     });
@@ -1567,9 +1569,13 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   "defender_economy_damage": integer (1-15),
   "attacker_resource_loss": { "oil": integer, "steel": integer, "food": integer },
   "defender_resource_loss": { "oil": integer, "steel": integer, "food": integer },
+  "attacker_casualties": { "killed": integer, "wounded": integer, "civilians": integer, "aircraft_lost": integer, "tanks_lost": integer, "ships_lost": integer },
+  "defender_casualties": { "killed": integer, "wounded": integer, "civilians": integer, "aircraft_lost": integer, "tanks_lost": integer, "ships_lost": integer },
   "winner_advantage": "attacker" | "defender" | "none",
   "suggested_next_action": "continue" | "ceasefire"
 }`;
+
+// توضیح تلفات: کشته‌ها بین ۵۰ تا ۵۰۰، زخمی‌ها ۲-۳ برابر کشته‌ها، غیرنظامی ۱۰-۳۰٪ کل، جنگنده ۰-۱۰، تانک ۰-۲۰، کشتی ۰-۵
 
   const schema = {
     type: Type.OBJECT,
@@ -1597,6 +1603,30 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         },
         required: ["oil", "steel", "food"]
       },
+      attacker_casualties: {
+        type: Type.OBJECT,
+        properties: {
+          killed: { type: Type.INTEGER, description: "System killed" },
+          wounded: { type: Type.INTEGER, description: "Zakhmi" },
+          civilians: { type: Type.INTEGER, description: "Civilian casualties" },
+          aircraft_lost: { type: Type.INTEGER, description: "Aircraft destroyed" },
+          tanks_lost: { type: Type.INTEGER, description: "Tanks destroyed" },
+          ships_lost: { type: Type.INTEGER, description: "Ships sunk" }
+        },
+        required: ["killed", "wounded", "civilians", "aircraft_lost", "tanks_lost", "ships_lost"]
+      },
+      defender_casualties: {
+        type: Type.OBJECT,
+        properties: {
+          killed: { type: Type.INTEGER },
+          wounded: { type: Type.INTEGER },
+          civilians: { type: Type.INTEGER },
+          aircraft_lost: { type: Type.INTEGER },
+          tanks_lost: { type: Type.INTEGER },
+          ships_lost: { type: Type.INTEGER }
+        },
+        required: ["killed", "wounded", "civilians", "aircraft_lost", "tanks_lost", "ships_lost"]
+      },
       winner_advantage: { type: Type.STRING, description: "Which country got upper hand: 'attacker', 'defender', 'none'." },
       suggested_next_action: { type: Type.STRING, description: "Next recommended action: 'continue' or 'ceasefire'." }
     },
@@ -1604,6 +1634,7 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
       "narrative", "attacker_loss", "defender_loss", 
       "attacker_economy_damage", "defender_economy_damage",
       "attacker_resource_loss", "defender_resource_loss",
+      "attacker_casualties", "defender_casualties",
       "winner_advantage", "suggested_next_action"
     ]
   };
@@ -1620,6 +1651,8 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         defender_economy_damage: 4,
         attacker_resource_loss: { oil: 25, steel: 10, food: 15 },
         defender_resource_loss: { oil: 10, steel: 5, food: 5 },
+        attacker_casualties: { killed: 150, wounded: 400, civilians: 80, aircraft_lost: 3, tanks_lost: 8, ships_lost: 0 },
+        defender_casualties: { killed: 30, wounded: 80, civilians: 15, aircraft_lost: 0, tanks_lost: 2, ships_lost: 0 },
         winner_advantage: "defender",
         suggested_next_action: "ceasefire"
       };
@@ -1763,11 +1796,9 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         id: `warroom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId: "warroom_system",
         username: "اتاق_جنگ",
-        displayName: "🔴 اتاق جنگ | War Room",
-        avatar: "🔴",
         countryName: "system",
         flagUrl: "",
-        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🔴 مهاجم MP: ${attacker.country.assets.militaryPower} | 🛡️ مدافع MP: ${defender.country.assets.militaryPower}`,
+        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🪦 تلفات مهاجم:\nکشته: ${parsed.attacker_casualties?.killed || 0} | زخمی: ${parsed.attacker_casualties?.wounded || 0}\nغیرنظامی: ${parsed.attacker_casualties?.civilians || 0}\nجنگنده: ${parsed.attacker_casualties?.aircraft_lost || 0} | تانک: ${parsed.attacker_casualties?.tanks_lost || 0}\n\n🪦 تلفات مدافع:\nکشته: ${parsed.defender_casualties?.killed || 0} | زخمی: ${parsed.defender_casualties?.wounded || 0}\nغیرنظامی: ${parsed.defender_casualties?.civilians || 0}\nجنگنده: ${parsed.defender_casualties?.aircraft_lost || 0} | تانک: ${parsed.defender_casualties?.tanks_lost || 0}\n\n🔴 ${attacker.country.name} MP: ${attacker.country.assets.militaryPower} | 🛡️ ${defender.country.name} MP: ${defender.country.assets.militaryPower}`,
         timestamp: new Date().toISOString(),
         likes: [],
         comments: []
@@ -1785,6 +1816,112 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// War resolution: winner chooses what to do with loser
+app.post("/api/wars/:warId/resolve", checkRateLimit, async (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { warId } = req.params;
+  const { decision } = req.body; // "annex" | "colonize" | "tribute" | "spare"
+  const war = db.wars.find(w => w.id === warId);
+  if (!war) return res.status(404).json({ error: "جنگ یافت نشد" });
+  if (war.status !== "ended") return res.status(400).json({ error: "جنگ هنوز تمام نشده" });
+  if (war.winnerId !== user.id) return res.status(403).json({ error: "فقط پیروز می‌تواند تصمیم بگیرد" });
+
+  const winner = user;
+  const loserId = war.attackerId === user.id ? war.defenderId : war.attackerId;
+  const loser = db.users.find(u => u.id === loserId);
+  if (!loser) return res.status(404).json({ error: "کشور بازنده یافت نشد" });
+
+  let summary = "";
+  const loserGold = loser.country.assets.gold;
+  const loserOil = loser.country.assets.resources.oil;
+  const loserSteel = loser.country.assets.resources.steel;
+
+  switch (decision) {
+    case "colonize": {
+      // Full colonization: take everything
+      const goldTake = Math.floor(loserGold * 0.8);
+      const oilTake = Math.floor(loserOil * 0.8);
+      const steelTake = Math.floor(loserSteel * 0.8);
+      loser.country.assets.gold -= goldTake;
+      winner.country.assets.gold += goldTake;
+      loser.country.assets.resources.oil -= oilTake;
+      winner.country.assets.resources.oil += oilTake;
+      loser.country.assets.resources.steel -= steelTake;
+      winner.country.assets.resources.steel += steelTake;
+      loser.country.assets.militaryPower = Math.floor(loser.country.assets.militaryPower * 0.2);
+      loser.equipmentSlots = [];
+      loser.warehouse = {};
+      summary = `🔴 مستعمره کامل: ${winner.country.name} تمام منابع ${loser.country.name} را مصادره کرد. ${goldTake} طلا، ${oilTake} نفت، ${steelTake} فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.`;
+      break;
+    }
+    case "annex": {
+      // Annex: take half resources + cripple military
+      const goldTake = Math.floor(loserGold * 0.5);
+      const oilTake = Math.floor(loserOil * 0.5);
+      const steelTake = Math.floor(loserSteel * 0.5);
+      loser.country.assets.gold -= goldTake;
+      winner.country.assets.gold += goldTake;
+      loser.country.assets.resources.oil -= oilTake;
+      winner.country.assets.resources.oil += oilTake;
+      loser.country.assets.resources.steel -= steelTake;
+      winner.country.assets.resources.steel += steelTake;
+      loser.country.assets.militaryPower = Math.floor(loser.country.assets.militaryPower * 0.4);
+      summary = `🟡 الحاق سرزمینی: ${winner.country.name} نیمی از منابع ${loser.country.name} را ضمیمه کرد. ${goldTake} طلا، ${oilTake} نفت، ${steelTake} فولاد منتقل شد. ارتش بازنده تضعیف شد.`;
+      break;
+    }
+    case "tribute": {
+      // Heavy tribute: take 30% resources, keep military weak
+      const goldTake = Math.floor(loserGold * 0.3);
+      const oilTake = Math.floor(loserOil * 0.3);
+      const steelTake = Math.floor(loserSteel * 0.3);
+      loser.country.assets.gold -= goldTake;
+      winner.country.assets.gold += goldTake;
+      loser.country.assets.resources.oil -= oilTake;
+      winner.country.assets.resources.oil += oilTake;
+      loser.country.assets.resources.steel -= steelTake;
+      winner.country.assets.resources.steel += steelTake;
+      loser.country.assets.militaryPower = Math.floor(loser.country.assets.militaryPower * 0.6);
+      summary = `🟢 غرامت سنگین: ${winner.country.name} غرامت جنگی از ${loser.country.name} دریافت کرد. ${goldTake} طلا، ${oilTake} نفت، ${steelTake} فولاد به عنوان غرامت پرداخت شد.`;
+      break;
+    }
+    case "spare":
+    default: {
+      // Spare: minimal tribute, allow recovery
+      const goldTake = Math.min(100, Math.floor(loserGold * 0.1));
+      loser.country.assets.gold -= goldTake;
+      winner.country.assets.gold += goldTake;
+      summary = `⚪ عفو مشروط: ${winner.country.name} ${loser.country.name} را بخشید. غرامت ناچیز: ${goldTake} طلا. کشور بازنده فرصت بازیابی خواهد داشت.`;
+      break;
+    }
+  }
+
+  war.resolution = decision;
+  war.peaceTermsNarrative = summary;
+
+  // Add to War Room Twitter
+  try {
+    db.tweets.unshift({
+      id: `warroom_end_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      userId: "warroom_system",
+      username: "اتاق_جنگ",
+      countryName: "system",
+      flagUrl: "",
+      text: `🏁 پایان جنگ!\n\n${winner.country.name} 🏆 پیروز شد!\n\n${summary}\n\n📊 آمار نهایی:\n🔴 ${winner.country.name} MP: ${winner.country.assets.militaryPower}\n🛡️ ${loser.country.name} MP: ${loser.country.assets.militaryPower}`,
+      timestamp: new Date().toISOString(),
+      likes: [],
+      comments: []
+    });
+  } catch (e) { /* ignore */ }
+
+  updateAndLogUserAssets(winner);
+  updateAndLogUserAssets(loser);
+  saveDatabase();
+
+  res.json({ war, summary, decision });
 });
 
 // Helper for drafting custom AI laws

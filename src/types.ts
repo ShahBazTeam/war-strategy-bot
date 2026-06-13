@@ -79,6 +79,15 @@ export interface WarDeclarationResponse {
   tension_points: number;
 }
 
+export interface CasualtyReport {
+  killed: number;
+  wounded: number;
+  civilians: number;
+  aircraft_lost: number;
+  tanks_lost: number;
+  ships_lost: number;
+}
+
 export interface CombatRoundResponse {
   narrative: string;
   attacker_loss: number;
@@ -87,6 +96,8 @@ export interface CombatRoundResponse {
   defender_economy_damage: number;
   attacker_resource_loss: Resources;
   defender_resource_loss: Resources;
+  attacker_casualties: CasualtyReport;
+  defender_casualties: CasualtyReport;
   winner_advantage: 'attacker' | 'defender' | 'none';
   suggested_next_action: 'continue' | 'ceasefire';
 }
@@ -111,6 +122,8 @@ export interface WarReasonSubmission {
     timestamp: string;
   }[];
   winnerId?: string;
+  winnerChoice?: 'annex' | 'colonize' | 'tribute' | 'spare';
+  resolution?: 'annex' | 'colonize' | 'tribute' | 'spare';
   peaceTermsNarrative?: string;
   timestamp: string;
 }

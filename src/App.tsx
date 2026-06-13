@@ -466,6 +466,24 @@ export default function App() {
     } catch {}
   };
 
+  const resolveWarEnd = async (warId: string, decision: string) => {
+    try {
+      await apiCall(`/api/wars/${warId}/resolve`, {
+        method: "POST",
+        body: JSON.stringify({ decision })
+      });
+      const msgs: Record<string, string> = {
+        colonize: "🔴 مستعمره کامل اعمال شد!",
+        annex: "🟡 الحاق سرزمینی انجام شد!",
+        tribute: "🟢 غرامت سنگین دریافت شد!",
+        spare: "⚪ عفو مشروط اعمال شد!"
+      };
+      showTemporarySuccess(msgs[decision] || "تصمیم ثبت شد");
+      fetchGlobalData();
+      fetchCurrentUser();
+    } catch {}
+  };
+
   // UN ASSEMBLY ACTIONS
   const castBallotVote = async (proposalId: string, vote: "yes" | "no") => {
     try {
@@ -1056,6 +1074,7 @@ export default function App() {
                     onExecuteBattleRound={executeCombatTacticsRound}
                     onProposeCeasefire={proposeBattleCeasefire}
                     onRespondCeasefire={respondToCeasefireRequest}
+                    onResolveWar={resolveWarEnd}
                   />
                 )}
                 {activeTab === "un" && (

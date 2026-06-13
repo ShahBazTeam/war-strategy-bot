@@ -45,7 +45,11 @@ export default function Armory({ user, inventions, onBuyWeapon, onEquipChange, o
   const getWeaponDetails = (id: string) => {
     let baseMatch = id.split("_").slice(0, 2).join("_");
     let match = CATALOG.find(c => c.id === baseMatch || c.id === id.split("_")[0]);
-    if (!match) return { name: "تجهیزات ناشناس", type: 'ground_forces', icon: Swords };
+    if (!match) {
+      const inv = inventions.find(i => i.id === id);
+      if (inv) return { name: inv.name, type: inv.type || 'ground_forces', icon: iconMap[inv.type] || Swords, desc: "اختراع ملی", cost: inv.cost, mp: inv.militaryGained };
+      return { name: "تجهیزات ناشناس", type: 'ground_forces', icon: Swords };
+    }
     return { ...match, icon: iconMap[match.type] || Swords };
   };
 

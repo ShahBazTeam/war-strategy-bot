@@ -12,6 +12,7 @@ interface DiplomacyProps {
   onExecuteBattleRound: (warId: string, tactic: string) => void;
   onProposeCeasefire: (warId: string) => void;
   onRespondCeasefire: (warId: string, accept: boolean) => void;
+  onResolveWar: (warId: string, decision: string) => void;
 }
 
 export default function Diplomacy({
@@ -23,7 +24,8 @@ export default function Diplomacy({
   onSubmitDefense,
   onExecuteBattleRound,
   onProposeCeasefire,
-  onRespondCeasefire
+  onRespondCeasefire,
+  onResolveWar
 }: DiplomacyProps) {
   // Warfare declaration states
   const [declareTargetId, setDeclareTargetId] = useState("");
@@ -368,16 +370,56 @@ export default function Diplomacy({
                                   <p className="font-semibold text-rose-400">تلفات مهاجم:</p>
                                   <p>STRENGTH: -{r.resolution.attacker_loss} | ECONOMY: -{r.resolution.attacker_economy_damage}</p>
                                   <p className="text-[9px] opacity-80">OIL: -{r.resolution.attacker_resource_loss.oil} | STEEL: -{r.resolution.attacker_resource_loss.steel}</p>
+                                  {r.resolution.attacker_casualties && (
+                                    <div className="text-[9px] text-rose-300/80 mt-1 space-y-0.5">
+                                      <p>🪦 کشته: {r.resolution.attacker_casualties.killed} | زخمی: {r.resolution.attacker_casualties.wounded}</p>
+                                      <p>👥 غیرنظامی: {r.resolution.attacker_casualties.civilians}</p>
+                                      <p>✈️ جنگنده: {r.resolution.attacker_casualties.aircraft_lost} | 🛡️ تانک: {r.resolution.attacker_casualties.tanks_lost} | 🚢 کشتی: {r.resolution.attacker_casualties.ships_lost}</p>
+                                    </div>
+                                  )}
                                 </div>
                                 <div>
                                   <p className="font-semibold text-teal-400">تلفات مدافع:</p>
                                   <p>STRENGTH: -{r.resolution.defender_loss} | ECONOMY: -{r.resolution.defender_economy_damage}</p>
                                   <p className="text-[9px] opacity-80">OIL: -{r.resolution.defender_resource_loss.oil} | STEEL: -{r.resolution.defender_resource_loss.steel}</p>
+                                  {r.resolution.defender_casualties && (
+                                    <div className="text-[9px] text-teal-300/80 mt-1 space-y-0.5">
+                                      <p>🪦 کشته: {r.resolution.defender_casualties.killed} | زخمی: {r.resolution.defender_casualties.wounded}</p>
+                                      <p>👥 غیرنظامی: {r.resolution.defender_casualties.civilians}</p>
+                                      <p>✈️ جنگنده: {r.resolution.defender_casualties.aircraft_lost} | 🛡️ تانک: {r.resolution.defender_casualties.tanks_lost} | 🚢 کشتی: {r.resolution.defender_casualties.ships_lost}</p>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
                           ))}
                         </div>
+                      </div>
+                    )}
+
+                    {/* WINNER CHOICE: After war ends */}
+                    {war.status === "ended" && war.winnerId && !war.winnerChoice && war.winnerId === user.id && (
+                      <div className="mt-4 p-4 bg-gradient-to-r from-amber-950/30 to-orange-950/30 rounded-lg border border-amber-700/30">
+                        <p className="text-xs font-bold text-amber-400 mb-3">🏆 شما پیروز شدید! با کشور بازنده چه کنید؟</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={() => onResolveWar(war.id, "colonize")} className="px-3 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-300 rounded text-[10px] font-bold border border-red-700/30">
+                            🔴 مستعمره کامل (۸۰٪ منابع)
+                          </button>
+                          <button onClick={() => onResolveWar(war.id, "annex")} className="px-3 py-2 bg-orange-900/40 hover:bg-orange-900/60 text-orange-300 rounded text-[10px] font-bold border border-orange-700/30">
+                            🟡 الحاق سرزمینی (۵۰٪ منابع)
+                          </button>
+                          <button onClick={() => onResolveWar(war.id, "tribute")} className="px-3 py-2 bg-yellow-900/40 hover:bg-yellow-900/60 text-yellow-300 rounded text-[10px] font-bold border border-yellow-700/30">
+                            🟢 غرامت سنگین (۳۰٪ منابع)
+                          </button>
+                          <button onClick={() => onResolveWar(war.id, "spare")} className="px-3 py-2 bg-green-900/40 hover:bg-green-900/60 text-green-300 rounded text-[10px] font-bold border border-green-700/30">
+                            ⚪ عفو مشروط (۱۰٪ منابع)
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {war.status === "ended" && war.winnerChoice && (
+                      <div className="mt-3 p-3 bg-slate-900/30 rounded-lg border border-slate-700/30">
+                        <p className="text-[10px] text-slate-400">تصمیم پیروز: <span className="text-amber-400 font-bold">{war.peaceTermsNarrative?.substring(0, 100)}...</span></p>
                       </div>
                     )}
 
