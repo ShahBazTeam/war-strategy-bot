@@ -451,7 +451,11 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ warId, tacticalScenario: tactic })
       });
-      showTemporarySuccess(`راند با موفقیت توسط جمینی شبیه‌سازی شد! امتیازات ارتش کشور شما تغییر کرد.`);
+      if (res.waiting) {
+        showTemporarySuccess(res.message || "سناریوی شما ثبت شد. منتظر حریف...");
+      } else {
+        showTemporarySuccess("راند توسط هوش مصنوعی شبیه‌سازی شد!");
+      }
       fetchGlobalData();
       fetchCurrentUser();
     } catch {}

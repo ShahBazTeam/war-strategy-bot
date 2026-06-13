@@ -1503,37 +1503,83 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { warId, tacticalScenario } = req.body;
+  if (!tacticalScenario || tacticalScenario.trim().length < 10) {
+    return res.status(400).json({ error: "سناریوی تاکتیکی باید حداقل ۱۰ کاراکتر باشد" });
+  }
+
   const war = db.wars.find(w => w.id === warId && (w.attackerId === user.id || w.defenderId === user.id));
   if (!war) return res.status(404).json({ error: "سناریویی جنگی با این شناسه یافت نشد" });
-
-  if (war.status === "waiting_defender") {
-    // Auto-advance if requested by attacker anyway
-    war.status = "active";
-  }
+  if (war.status !== "active") return res.status(400).json({ error: "جنگ فعال نیست" });
 
   const attacker = db.users.find(u => u.id === war.attackerId);
   const defender = db.users.find(u => u.id === war.defenderId);
+  if (!attacker || !defender) return res.status(400).json({ error: "یکی از طرفین جنگ از دیتابیس حذف شده است" });
 
-  if (!attacker || !defender) {
-    return res.status(400).json({ error: "یکی از طرفین جنگ از دیتابیس حذف شده است" });
+  // Initialize pending scenarios if not exists
+  if (!war.pendingScenarios) {
+    war.pendingScenarios = {};
   }
 
-  const roundNum = war.rounds.length + 1;
+  const isAttacker = user.id === war.attackerId;
+  const role = isAttacker ? "attacker" : "defender";
 
-  // Security: prevent AI from applying/assuming usage of weapons beyond real inventory.
-  // If the tactical scenario contains big numeric claims, clamp by penalizing damages.
-  const scenarioClaimsTooLarge = () => {
-    const text = `${tacticalScenario || ""}`;
-    const nums = Array.from(text.matchAll(/\d{2,}/g)).map(m => Number(m[0]));
-    if (nums.length === 0) return false;
-
-    const attackerTotal = Object.values(attacker.warehouse || {}).reduce((a: number, b: any) => a + (Number(b) || 0), 0);
-    const defenderTotal = Object.values(defender.warehouse || {}).reduce((a: number, b: any) => a + (Number(b) || 0), 0);
-    const maxReal = Math.max(attackerTotal, defenderTotal);
-
-    // if any claim is more than 5x of maxReal (or exceeds a hard limit), treat as invalid
-    return nums.some(n => n > Math.max(50, maxReal * 5));
+  // Validate: user cannot claim more weapons than they actually have
+  const validateClaims = (scenario: string, u: User) => {
+    const claims = Array.from(scenario.matchAll(/(\d+)\s*(عدد|فروند|دستگاه|ناو|زیردریایی|تانک|جنگنده|موشک)/gi));
+    for (const match of claims) {
+      const claimedNum = parseInt(match[1]);
+      const weaponKeyword = match[2];
+      // Find matching warehouse items
+      let totalHave = 0;
+      for (const [wpnId, qty] of Object.entries(u.warehouse || {})) {
+        const catItem = CATALOG.find(c => c.id === wpnId);
+        const invItem = db.inventions.find(i => i.id === wpnId);
+        const name = (catItem?.name || invItem?.name || "").toLowerCase();
+        if (name.includes(weaponKeyword) || weaponKeyword.includes("جنگنده") && name.includes("fighter")) {
+          totalHave += Number(qty) || 0;
+        }
+      }
+      if (claimedNum > totalHave && totalHave > 0) {
+        return { valid: false, message: `ادعای ${claimedNum} ${weaponKeyword} در حالی که فقط ${totalHave} عدد در انبار دارید` };
+      }
+    }
+    return { valid: true };
   };
+
+  const validation = validateClaims(tacticalScenario, user);
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.message });
+  }
+
+  // Store this user's scenario
+  if (isAttacker) {
+    war.pendingScenarios.attackerId = user.id;
+    war.pendingScenarios.attackerScenario = tacticalScenario.trim();
+  } else {
+    war.pendingScenarios.defenderId = user.id;
+    war.pendingScenarios.defenderScenario = tacticalScenario.trim();
+  }
+
+  // Check if both users have submitted
+  const bothSubmitted = war.pendingScenarios.attackerScenario && war.pendingScenarios.defenderScenario;
+
+  if (!bothSubmitted) {
+    saveDatabase();
+    return res.json({ 
+      war, 
+      waiting: true, 
+      message: `سناریوی شما ثبت شد. منتظر ارسال سناریوی ${isAttacker ? "مدافع" : "مهاجم"}...`,
+      roundResolution: null 
+    });
+  }
+
+  // Both submitted - now evaluate with AI
+  const roundNum = war.rounds.length + 1;
+  const attackerScenario = war.pendingScenarios.attackerScenario!;
+  const defenderScenario = war.pendingScenarios.defenderScenario!;
+
+  // Clear pending scenarios for next round
+  war.pendingScenarios = {};
 
 
   // Compile active weapons detailed catalog to Gemini for evaluation
@@ -1559,7 +1605,8 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
 📜 علت جنگ: "${war.casusBelli}"
 🎯 سناریوی دفاع مدافع: "${war.defenderDefenseScenario || "استقرار پدافندی در خطوط مرزی"}"
 🎬 راند شماره: ${roundNum}
-⚡ دستورات تاکتیکی: "${tacticalScenario || "پیشروی متعارف زرهی"}"
+⚡ دستورات تاکتیکی مهاجم: "${attackerScenario}"
+⚡ دستورات تاکتیکی مدافع: "${defenderScenario}"
 
 🔫 تسلیحات مهاجم: ${attackerWeapons}
 🔫 تسلیحات مدافع: ${defenderWeapons}
@@ -1653,51 +1700,6 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   };
 
   try {
-    // If scenario claims are absurdly higher than real inventory, do not trust Gemini result.
-    // Apply a hard penalty by bypassing AI evaluation.
-    if (scenarioClaimsTooLarge()) {
-      const hardFailResult: CombatRoundResponse = {
-        narrative: "گزارش امنیتی: دستورات تاکتیکی حاوی ادعاهای غیرواقعی و خارج از ظرفیت موجودی تسلیحاتی ثبت شد. برآورد عملیاتی با خطای فاحش مواجه و تیم ستادی به دلیل فقدان انطباق با داده‌های رزمی، مشمول افت شدید توان و هزینه سنگین تدارکات گردید.",
-        attacker_loss: 25,
-        defender_loss: 6,
-        attacker_economy_damage: 10,
-        defender_economy_damage: 4,
-        attacker_resource_loss: { oil: 25, steel: 10, food: 15 },
-        defender_resource_loss: { oil: 10, steel: 5, food: 5 },
-        attacker_casualties: { killed: 150, wounded: 400, civilians: 80, aircraft_lost: 3, tanks_lost: 8, ships_lost: 0 },
-        defender_casualties: { killed: 30, wounded: 80, civilians: 15, aircraft_lost: 0, tanks_lost: 2, ships_lost: 0 },
-        winner_advantage: "defender",
-        suggested_next_action: "ceasefire"
-      };
-
-      attacker.country.assets.militaryPower -= hardFailResult.attacker_loss;
-      defender.country.assets.militaryPower -= hardFailResult.defender_loss;
-      attacker.country.assets.economicPower -= hardFailResult.attacker_economy_damage;
-      defender.country.assets.economicPower -= hardFailResult.defender_economy_damage;
-      attacker.country.assets.resources.oil -= hardFailResult.attacker_resource_loss.oil;
-      attacker.country.assets.resources.steel -= hardFailResult.attacker_resource_loss.steel;
-      attacker.country.assets.resources.food -= hardFailResult.attacker_resource_loss.food;
-      defender.country.assets.resources.oil -= hardFailResult.defender_resource_loss.oil;
-      defender.country.assets.resources.steel -= hardFailResult.defender_resource_loss.steel;
-      defender.country.assets.resources.food -= hardFailResult.defender_resource_loss.food;
-
-      const parsed: CombatRoundResponse = hardFailResult;
-
-      war.rounds.push({
-        roundNumber: roundNum,
-        attackerScenario: user.id === war.attackerId ? (tacticalScenario || "تهاجم کلی") : "تهاجم سنگین مداوم",
-        defenderScenario: user.id === war.defenderId ? (tacticalScenario || "استقرار زرهی دفاعی") : "کمین دفاعی در دشت",
-        resolution: parsed,
-        timestamp: new Date().toISOString()
-      });
-
-      updateAndLogUserAssets(attacker);
-      updateAndLogUserAssets(defender);
-
-      saveDatabase();
-      return res.json({ war, combatEnded: false, endNarrative: "", roundResolution: parsed });
-    }
-
     const text = await callGemini(
       prompt,
       "تو فیلمنامه‌نویس جنگی هالیوودی و گزارشگر نظامی CNN هستی. صحنه‌های نبرد را مانند فیلم اکشن سینمایی روایت کن. از اصطلاحات نظامی واقعی و نام تسلیحات استفاده کن. لحن گزارش باید دراماتیک و هیجان‌انگیز باشد.",
@@ -1794,8 +1796,8 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     // Add round history
     war.rounds.push({
       roundNumber: roundNum,
-      attackerScenario: user.id === war.attackerId ? (tacticalScenario || "تهاجم کلی") : "تهاجم سنگین مداوم",
-      defenderScenario: user.id === war.defenderId ? (tacticalScenario || "استقرار زرهی دفاعی") : "کمین دفاعی در دشت",
+      attackerScenario,
+      defenderScenario,
       resolution: parsed,
       timestamp: new Date().toISOString()
     });

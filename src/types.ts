@@ -117,6 +117,7 @@ export interface WarReasonSubmission {
   tensionPoints: number;
   status: 'waiting_defender' | 'active' | 'ended' | 'ceasefire';
   defenderDefenseScenario?: string;
+  pendingScenarios?: { attackerId?: string; defenderId?: string; attackerScenario?: string; defenderScenario?: string };
   rounds: {
     roundNumber: number;
     attackerScenario: string;

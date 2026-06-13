@@ -216,6 +216,7 @@ export default function Market({
               min="1"
               value={tradeAmount}
               onChange={(e) => setTradeAmount(parseInt(e.target.value) || 1)}
+              inputMode="numeric"
               className="w-full rounded bg-white/5 border border-white/10 p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
             />
           </div>
@@ -461,19 +462,19 @@ export default function Market({
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_GOLD</label>
-              <input type="number" min="0" value={aidGold} onChange={(e) => setAidGold(parseInt(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="number" min="0" value={aidGold} onChange={(e) => setAidGold(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_OIL</label>
-              <input type="number" min="0" value={aidOil} onChange={(e) => setAidOil(parseInt(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="number" min="0" value={aidOil} onChange={(e) => setAidOil(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_STEEL</label>
-              <input type="number" min="0" value={aidSteel} onChange={(e) => setAidSteel(parseInt(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="number" min="0" value={aidSteel} onChange={(e) => setAidSteel(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
             <div>
               <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5 block font-mono">AID_FOOD</label>
-              <input type="number" min="0" value={aidFood} onChange={(e) => setAidFood(parseInt(e.target.value) || 0)} className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
+              <input type="number" min="0" value={aidFood} onChange={(e) => setAidFood(parseInt(e.target.value) || 0)} inputMode="numeric" className="w-full bg-white/5 border border-white/10 p-1.5 rounded text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" />
             </div>
           </div>
           <button type="submit" className="mt-4 rounded border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold px-6 py-2 text-[10px] uppercase tracking-widest cursor-pointer transition">

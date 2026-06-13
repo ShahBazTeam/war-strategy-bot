@@ -291,42 +291,57 @@ export default function Diplomacy({
                       <div className="rounded-xl bg-slate-900/50 p-4 space-y-4 border border-dashed border-slate-800">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-indigo-400">فرماندهی عملیاتی راند {war.rounds.length + 1} مبارزه:</span>
-                          <span className="text-[10px] text-slate-500">(مشارکت همپیمان در ائتلاف اتوماتیک دفاع مشترک دارد)</span>
+                          <span className="text-[10px] text-slate-500">(هر دو طرف باید سناریو ارسال کنند)</span>
                         </div>
-                        <input
-                          type="text"
-                          placeholder="تاسیس بیانیه حمله پنهانی یا پدافندی (مثلا: پانتون‌ها مرزی را بمباران کرده و هواپیماها رادار دشمن را کور می‌کنند)"
-                          value={battleTactics[war.id] || ""}
-                          onChange={(e) => setBattleTactics(prev => ({ ...prev, [war.id]: e.target.value }))}
-                          className="w-full bg-slate-950 p-2.5 rounded border border-slate-800 text-xs focus:outline-none focus:border-cyan-500"
-                        />
 
-                        <div className="flex flex-wrap gap-2 justify-between">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => onProposeCeasefire(war.id)}
-                              className="px-3 py-1.5 text-xs bg-blue-950/30 border border-blue-900/30 text-blue-400 rounded-lg hover:bg-slate-900 transition cursor-pointer"
-                            >
-                              🏳️ پیشنهاد معاهده آتش‌بس توافقی
-                            </button>
+                        {/* Check if this user already submitted */}
+                        {war.pendingScenarios && ((isAttacker && war.pendingScenarios.attackerScenario) || (!isAttacker && war.pendingScenarios.defenderScenario)) ? (
+                          <div className="bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-3 text-center">
+                            <p className="text-xs text-cyan-400 font-bold">✅ سناریوی شما ثبت شد</p>
+                            <p className="text-[10px] text-slate-400 mt-1">منتظر ارسال سناریوی حریف...</p>
+                            <div className="flex items-center justify-center gap-2 mt-2">
+                              <RefreshCw className="h-3 w-3 animate-spin text-cyan-400" />
+                              <span className="text-[10px] text-cyan-300/60">در انتظار حریف</span>
+                            </div>
                           </div>
+                        ) : (
+                          <>
+                            <input
+                              type="text"
+                              placeholder="سناریوی تاکتیکی خود را بنویسید (مثلا: جنگنده‌های F-35 با بمباران دقیق پدافند دشمن را نابود می‌کنند)"
+                              value={battleTactics[war.id] || ""}
+                              onChange={(e) => setBattleTactics(prev => ({ ...prev, [war.id]: e.target.value }))}
+                              className="w-full bg-slate-950 p-2.5 rounded border border-slate-800 text-xs focus:outline-none focus:border-cyan-500"
+                            />
 
-                          <button
-                            onClick={() => runBattleRound(war.id)}
-                            disabled={isRoundProcessing[war.id]}
-                            className="bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer"
-                          >
-                            {isRoundProcessing[war.id] ? (
-                              <>
-                                <RefreshCw className="h-3.5 w-3.5 animate-spin" /> در حال گشودن آتش و پردازش راند نبرد...
-                              </>
-                            ) : (
-                              <>
-                                <Swords className="h-3.5 w-3.5" /> پرتاب آتش و حمله به دشمن
-                              </>
-                            )}
-                          </button>
-                        </div>
+                            <div className="flex flex-wrap gap-2 justify-between">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => onProposeCeasefire(war.id)}
+                                  className="px-3 py-1.5 text-xs bg-blue-950/30 border border-blue-900/30 text-blue-400 rounded-lg hover:bg-slate-900 transition cursor-pointer"
+                                >
+                                  🏳️ پیشنهاد معاهده آتش‌بس توافقی
+                                </button>
+                              </div>
+
+                              <button
+                                onClick={() => runBattleRound(war.id)}
+                                disabled={isRoundProcessing[war.id] || !(battleTactics[war.id] || "").trim()}
+                                className="bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer"
+                              >
+                                {isRoundProcessing[war.id] ? (
+                                  <>
+                                    <RefreshCw className="h-3.5 w-3.5 animate-spin" /> در حال گشودن آتش...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Swords className="h-3.5 w-3.5" /> ارسال سناریو و حمله
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
 
