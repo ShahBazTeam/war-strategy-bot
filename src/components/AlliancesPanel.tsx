@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { User, Alliance } from "../types";
-import { Users, Swords, ShieldCheck, PlusCircle, LogOut, Send, Globe } from "lucide-react";
+import { Users, Swords, ShieldCheck, PlusCircle, LogOut, Send, Globe, UserMinus, Coins, Crosshair } from "lucide-react";
 
 interface AlliancesPanelProps {
   user: User;
@@ -8,6 +8,9 @@ interface AlliancesPanelProps {
   onCreateAlliance: (name: string, charter: string, logoUrl: string) => void;
   onJoinAlliance: (allianceId: string) => void;
   onLeaveAlliance: () => void;
+  onKickMember: (targetUserId: string) => void;
+  onSendFinancialAid: (targetUserId: string, amount: number) => void;
+  onSendMilitaryAid: (targetUserId: string, amount: number) => void;
 }
 
 export default function AlliancesPanel({
@@ -15,15 +18,22 @@ export default function AlliancesPanel({
   alliances,
   onCreateAlliance,
   onJoinAlliance,
-  onLeaveAlliance
+  onLeaveAlliance,
+  onKickMember,
+  onSendFinancialAid,
+  onSendMilitaryAid
 }: AlliancesPanelProps) {
   const [name, setName] = useState("");
   const [charter, setCharter] = useState("");
   const [logoUrl, setLogoUrl] = useState("🎖️");
   const [isCreatingFormVisible, setIsCreatingFormVisible] = useState(false);
 
-  // Check if I play a part in any alliance
+  const [aidTarget, setAidTarget] = useState<string | null>(null);
+  const [aidType, setAidType] = useState<"financial" | "military" | null>(null);
+  const [aidAmount, setAidAmount] = useState("");
+
   const currentAlliance = alliances.find(a => a.members.some(m => m.userId === user.id));
+  const isLeader = currentAlliance?.leaderId === user.id;
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,9 +48,30 @@ export default function AlliancesPanel({
     setIsCreatingFormVisible(false);
   };
 
+  const handleAidSubmit = () => {
+    if (!aidTarget || !aidType || !aidAmount) return;
+    const amount = parseInt(aidAmount) || 0;
+    if (amount <= 0) return;
+
+    if (aidType === "financial") {
+      onSendFinancialAid(aidTarget, amount);
+    } else {
+      onSendMilitaryAid(aidTarget, amount);
+    }
+
+    setAidTarget(null);
+    setAidType(null);
+    setAidAmount("");
+  };
+
+  const openAidPanel = (targetUserId: string, type: "financial" | "military") => {
+    setAidTarget(targetUserId);
+    setAidType(type);
+    setAidAmount("");
+  };
+
   return (
     <div className="space-y-6 animate-fade-in text-slate-100">
-      {/* Intro details */}
       <div className="rounded-lg border border-white/10 bg-black/40 p-6">
         <div className="font-sans">
           <h2 className="text-base font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
@@ -71,22 +102,87 @@ export default function AlliancesPanel({
                 &ldquo; {currentAlliance.charter} &rdquo;
               </div>
 
-              {/* Members listing */}
+              {/* Members listing with actions */}
               <div className="space-y-2 pt-2 border-t border-white/5 font-sans">
                 <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">کشورهای متعهد ائتلاف:</span>
                 {currentAlliance.members.map((m) => {
-                  const isLeader = m.userId === currentAlliance.leaderId;
+                  const mIsLeader = m.userId === currentAlliance.leaderId;
+                  const isSelf = m.userId === user.id;
                   return (
-                    <div key={m.userId} className="flex items-center justify-between text-xs bg-black/20 border border-white/5 p-2 rounded">
-                      <span className="text-slate-200 flex items-center gap-1.5 font-medium">
-                        {m.countryName}
-                        {isLeader && <span className="text-[8px] font-black uppercase bg-amber-500/10 text-yellow-300 border border-amber-500/20 px-1 py-0.2 rounded-sm">FOUNDER</span>}
-                      </span>
-                      <span className="text-red-400 font-mono text-[10px] uppercase">⚔️ {m.militaryPower} MW</span>
+                    <div key={m.userId} className="bg-black/20 border border-white/5 p-2 rounded space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-200 flex items-center gap-1.5 font-medium">
+                          {m.countryName}
+                          {mIsLeader && <span className="text-[8px] font-black uppercase bg-amber-500/10 text-yellow-300 border border-amber-500/20 px-1 py-0.2 rounded-sm">FOUNDER</span>}
+                          {isSelf && <span className="text-[8px] font-black uppercase bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-1 py-0.2 rounded-sm">YOU</span>}
+                        </span>
+                        <span className="text-red-400 font-mono text-[10px] uppercase">⚔️ {m.militaryPower} MW</span>
+                      </div>
+                      
+                      {/* Action buttons for non-self members */}
+                      {!isSelf && (
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={() => openAidPanel(m.userId, "financial")}
+                            className="flex-1 flex items-center justify-center gap-1 bg-emerald-900/20 hover:bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 py-1 rounded text-[8px] uppercase tracking-wider font-bold cursor-pointer transition"
+                          >
+                            <Coins className="h-3 w-3" /> مالی
+                          </button>
+                          <button
+                            onClick={() => openAidPanel(m.userId, "military")}
+                            className="flex-1 flex items-center justify-center gap-1 bg-blue-900/20 hover:bg-blue-900/30 border border-blue-700/30 text-blue-400 py-1 rounded text-[8px] uppercase tracking-wider font-bold cursor-pointer transition"
+                          >
+                            <Crosshair className="h-3 w-3" /> نظامی
+                          </button>
+                          {isLeader && (
+                            <button
+                              onClick={() => {
+                                if (confirm(`آیا از اخراج ${m.countryName} از ائتلاف مطمئن هستید؟`)) {
+                                  onKickMember(m.userId);
+                                }
+                              }}
+                              className="flex items-center justify-center gap-1 bg-rose-900/20 hover:bg-rose-900/30 border border-rose-700/30 text-rose-400 py-1 px-2 rounded text-[8px] uppercase tracking-wider font-bold cursor-pointer transition"
+                            >
+                              <UserMinus className="h-3 w-3" />
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
+
+              {/* Aid input panel */}
+              {aidTarget && aidType && (
+                <div className="bg-black/30 border border-white/10 p-3 rounded space-y-2">
+                  <div className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                    {aidType === "financial" ? "💰 ارسال کمک مالی" : "⚔️ ارسال کمک نظامی"}
+                  </div>
+                  <input
+                    type="number"
+                    value={aidAmount}
+                    onChange={(e) => setAidAmount(e.target.value)}
+                    placeholder={aidType === "financial" ? "مبلغ طلا..." : "واحد قدرت نظامی..."}
+                    className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none focus:border-cyan-500"
+                    min="1"
+                  />
+                  <div className="flex gap-2 text-[9px] font-black uppercase tracking-widest">
+                    <button
+                      onClick={() => { setAidTarget(null); setAidType(null); setAidAmount(""); }}
+                      className="flex-1 border border-white/10 bg-white/5 hover:bg-white/10 rounded py-1.5 text-slate-400 cursor-pointer"
+                    >
+                      انصراف
+                    </button>
+                    <button
+                      onClick={handleAidSubmit}
+                      className="flex-1 border border-cyan-500/50 bg-cyan-500/10 hover:bg-cyan-500/20 rounded py-1.5 text-cyan-400 font-bold cursor-pointer"
+                    >
+                      ارسال
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <button
                 onClick={onLeaveAlliance}

@@ -1989,6 +1989,117 @@ app.post("/api/alliances/leave", (req, res) => {
   res.json({ message: "خروج با موفقیت ثبت گردید" });
 });
 
+// KICK MEMBER (LEADER ONLY)
+app.post("/api/alliances/kick", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { targetUserId } = req.body;
+  if (!targetUserId) return res.status(400).json({ error: "شناسه کشور مورد نظر الزامی است" });
+
+  const alliance = db.alliances.find(a => a.leaderId === user.id);
+  if (!alliance) return res.status(403).json({ error: "فقط رهبر ائتلاف امکان اخراج دارد" });
+
+  if (targetUserId === user.id) {
+    return res.status(400).json({ error: "رهبر نمی‌تواند خود را اخراج کند" });
+  }
+
+  const memberIndex = alliance.members.findIndex(m => m.userId === targetUserId);
+  if (memberIndex === -1) {
+    return res.status(404).json({ error: "این کشور عضو ائتلاف شما نیست" });
+  }
+
+  const removedMember = alliance.members[memberIndex];
+  alliance.members.splice(memberIndex, 1);
+
+  db.globalAnnouncements.unshift(`🚫 اخراج نظامی: کشور ${removedMember.countryName} توسط رهبری ائتلاف "${alliance.name}" از اتحاد اخراج گردید.`);
+
+  saveDatabase();
+  res.json({ alliance, message: `کشور ${removedMember.countryName} از ائتلاف اخراج شد.` });
+});
+
+// FINANCIAL AID (ALLIANCE MEMBERS)
+app.post("/api/alliances/aid/financial", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { targetUserId, amount } = req.body;
+  const goldAmount = parseInt(amount) || 0;
+  if (!targetUserId || goldAmount <= 0) {
+    return res.status(400).json({ error: "ورودی نامعتبر" });
+  }
+
+  const alliance = db.alliances.find(a => a.members.some(m => m.userId === user.id));
+  if (!alliance) return res.status(400).json({ error: "شما عضو ائتلافی نیستید" });
+
+  const targetMember = alliance.members.find(m => m.userId === targetUserId);
+  if (!targetMember) {
+    return res.status(400).json({ error: "کشور مقصد عضو ائتلاف شما نیست" });
+  }
+
+  if (user.country.assets.gold < goldAmount) {
+    return res.status(400).json({ error: "طلا کافی نیست" });
+  }
+
+  const targetUser = db.users.find(u => u.id === targetUserId);
+  if (!targetUser) return res.status(404).json({ error: "کشور مقصد یافت نشد" });
+
+  user.country.assets.gold -= goldAmount;
+  targetUser.country.assets.gold += goldAmount;
+
+  updateAndLogUserAssets(user);
+  updateAndLogUserAssets(targetUser);
+
+  db.globalAnnouncements.unshift(`💰 کمک مالی ائتلافی: کشور ${user.country.name} مبلغ ${goldAmount} طلا به کشور ${targetUser.country.name} در راستای همپیمانی اقتصادی اهدا کرد.`);
+
+  saveDatabase();
+  res.json({ user, message: `${goldAmount} طلا به ${targetUser.country.name} اهدا شد.` });
+});
+
+// MILITARY AID (ALLIANCE MEMBERS - transfer military power)
+app.post("/api/alliances/aid/military", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { targetUserId, amount } = req.body;
+  const mpAmount = parseInt(amount) || 0;
+  if (!targetUserId || mpAmount <= 0) {
+    return res.status(400).json({ error: "ورودی نامعتبر" });
+  }
+
+  const alliance = db.alliances.find(a => a.members.some(m => m.userId === user.id));
+  if (!alliance) return res.status(400).json({ error: "شما عضو ائتلافی نیستید" });
+
+  const targetMember = alliance.members.find(m => m.userId === targetUserId);
+  if (!targetMember) {
+    return res.status(400).json({ error: "کشور مقصد عضو ائتلاف شما نیست" });
+  }
+
+  if (user.country.assets.militaryPower < mpAmount) {
+    return res.status(400).json({ error: "قدرت نظامی کافی نیست" });
+  }
+
+  const targetUser = db.users.find(u => u.id === targetUserId);
+  if (!targetUser) return res.status(404).json({ error: "کشور مقصد یافت نشد" });
+
+  user.country.assets.militaryPower -= mpAmount;
+  targetUser.country.assets.militaryPower += mpAmount;
+
+  // Update alliance member records
+  const senderMember = alliance.members.find(m => m.userId === user.id);
+  if (senderMember) senderMember.militaryPower = user.country.assets.militaryPower;
+  const receiverMember = alliance.members.find(m => m.userId === targetUserId);
+  if (receiverMember) receiverMember.militaryPower = targetUser.country.assets.militaryPower;
+
+  updateAndLogUserAssets(user);
+  updateAndLogUserAssets(targetUser);
+
+  db.globalAnnouncements.unshift(`⚔️ کمک نظامی ائتلافی: کشور ${user.country.name} واحد ${mpAmount} قدرت نظامی را به کشور ${targetUser.country.name} در چارچوب پیمان دفاعی مشترک واگذار کرد.`);
+
+  saveDatabase();
+  res.json({ user, message: `${mpAmount} قدرت نظامی به ${targetUser.country.name} منتقل شد.` });
+});
+
 // --------------------------------------------------------
 // ADMIN INTERFACES & AUTOMATIC SCHEDULING & DEBUG VIEWS
 // --------------------------------------------------------

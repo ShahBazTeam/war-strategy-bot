@@ -505,6 +505,33 @@ export default function App() {
     } catch {}
   };
 
+  const kickAllianceMember = async (targetUserId: string) => {
+    try {
+      await apiCall("/api/alliances/kick", { method: "POST", body: JSON.stringify({ targetUserId }) });
+      showTemporarySuccess("کشور مورد نظر از ائتلاف اخراج شد.");
+      fetchGlobalData();
+      fetchCurrentUser();
+    } catch {}
+  };
+
+  const sendFinancialAid = async (targetUserId: string, amount: number) => {
+    try {
+      await apiCall("/api/alliances/aid/financial", { method: "POST", body: JSON.stringify({ targetUserId, amount }) });
+      showTemporarySuccess(`${amount} طلا با موفقیت اهدا شد.`);
+      fetchGlobalData();
+      fetchCurrentUser();
+    } catch {}
+  };
+
+  const sendMilitaryAid = async (targetUserId: string, amount: number) => {
+    try {
+      await apiCall("/api/alliances/aid/military", { method: "POST", body: JSON.stringify({ targetUserId, amount }) });
+      showTemporarySuccess(`${amount} قدرت نظامی با موفقیت منتقل شد.`);
+      fetchGlobalData();
+      fetchCurrentUser();
+    } catch {}
+  };
+
   // ADMIN ACTIONS
   const adminPublishBroadcast = async (text: string) => {
     try {
@@ -1003,6 +1030,9 @@ export default function App() {
                     onCreateAlliance={createModernAlliance}
                     onJoinAlliance={joinModernAlliance}
                     onLeaveAlliance={leaveModernAlliance}
+                    onKickMember={kickAllianceMember}
+                    onSendFinancialAid={sendFinancialAid}
+                    onSendMilitaryAid={sendMilitaryAid}
                   />
                 )}
                 {activeTab === "guide" && (
