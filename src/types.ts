@@ -134,6 +134,7 @@ export interface WarReasonSubmission {
   resolution?: 'annex' | 'colonize' | 'tribute' | 'spare';
   peaceTermsNarrative?: string;
   nuclearLaunched?: string[];
+  ceasefireProposedBy?: string;
   timestamp: string;
 }
 

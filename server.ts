@@ -141,6 +141,7 @@ const AI_MODELS = [
   "llama3-chat-70b",
 ];
 let currentModelIndex = 0;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "12345678@Amin123";
 
 async function callGemini(prompt: string, systemInstruction: string, jsonSchema?: any): Promise<string> {
   const logId = Math.random().toString(36).substring(2, 11);
@@ -370,7 +371,7 @@ async function loadDatabase() {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+      if (parsed && Array.isArray(parsed.users)) {
         db = parsed as GameDatabase;
         console.log(`[DB] Loaded local: ${db.users.length} users`);
         fs.writeFileSync(backupFile, raw, "utf-8");
@@ -383,7 +384,7 @@ async function loadDatabase() {
     if (fs.existsSync(backupFile)) {
       const raw = fs.readFileSync(backupFile, "utf-8");
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+      if (parsed && Array.isArray(parsed.users)) {
         db = parsed as GameDatabase;
         console.log(`[DB] Restored from local backup: ${db.users.length} users`);
         fs.writeFileSync(DB_FILE, raw, "utf-8");
@@ -574,10 +575,10 @@ function updatePassiveIncome(user: User) {
   
   if (elapsedMinutes > 0) {
     const factoryLvl = user.country.assets.factoryLevel || 1;
-    const ecoBonus = user.country.assets.economicPower / 100;
+    const ecoBonus = Math.max(0.1, user.country.assets.economicPower / 100); // minimum 10% income even with 0 EP
     
     // Gold income
-    const incomePerMinute = 6 * factoryLvl * ecoBonus;
+    const incomePerMinute = Math.max(0.5, 6 * factoryLvl * ecoBonus); // minimum 0.5 gold/min
     const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
 
@@ -742,9 +743,8 @@ app.post("/api/admin/create-user", checkRateLimit, (req, res) => {
   };
 
   db.users.push(newUser);
-  saveDatabase();
-
   db.globalAnnouncements.unshift(`🎮 کشور جدید: ${picked.name} (${username}) به نقشه جهان پیوست!`);
+  saveDatabase();
 
   res.json({ 
     success: true, 
@@ -766,12 +766,15 @@ app.get("/api/admin/generate-password", (req, res) => {
 
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body;
+  if (!username || typeof username !== "string") {
+    return res.status(400).json({ error: "نام کاربری الزامی است" });
+  }
   
   let found = db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
   
   if (!found) {
     if (username.toLowerCase() === "admin") {
-      if (password !== "12345678@Amin123") {
+      if (password !== ADMIN_PASSWORD) {
         return res.status(401).json({ error: "رمز عبور ادمین اشتباه است" });
       }
       // Auto create admin user
@@ -801,13 +804,14 @@ app.post("/api/auth/login", (req, res) => {
       };
       db.users.push(adminUser);
       saveDatabase();
-      return res.json({ user: adminUser });
+      const { password: _, ...safeAdmin } = adminUser as any;
+      return res.json({ user: safeAdmin });
     }
     return res.status(401).json({ error: "کاربری با چنین مشخصاتی یافت نشد" });
   }
 
   if (username.toLowerCase() === "admin") {
-    if (password !== "12345678@Amin123") {
+    if (password !== ADMIN_PASSWORD) {
       return res.status(401).json({ error: "رمز عبور ادمین اشتباه است" });
     }
     // Ensure admin always has isAdmin: true
@@ -816,7 +820,8 @@ app.post("/api/auth/login", (req, res) => {
   }
 
   // Simplified auth for our sandbox gameplay
-  res.json({ user: found });
+  const { password: _, ...safeUser } = found as any;
+  res.json({ user: safeUser });
 });
 
 app.post("/api/auth/restore", (req, res) => {
@@ -1841,20 +1846,20 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     );
     const parsed: CombatRoundResponse = JSON.parse(text);
 
-    // Apply casualties directly in DB
-    attacker.country.assets.militaryPower -= parsed.attacker_loss;
-    defender.country.assets.militaryPower -= parsed.defender_loss;
+    // Apply casualties directly in DB (clamp to 0 before winner check)
+    attacker.country.assets.militaryPower = Math.max(0, attacker.country.assets.militaryPower - parsed.attacker_loss);
+    defender.country.assets.militaryPower = Math.max(0, defender.country.assets.militaryPower - parsed.defender_loss);
 
-    attacker.country.assets.economicPower -= parsed.attacker_economy_damage;
-    defender.country.assets.economicPower -= parsed.defender_economy_damage;
+    attacker.country.assets.economicPower = Math.max(0, attacker.country.assets.economicPower - parsed.attacker_economy_damage);
+    defender.country.assets.economicPower = Math.max(0, defender.country.assets.economicPower - parsed.defender_economy_damage);
 
-    attacker.country.assets.resources.oil -= parsed.attacker_resource_loss.oil;
-    attacker.country.assets.resources.steel -= parsed.attacker_resource_loss.steel;
-    attacker.country.assets.resources.food -= parsed.attacker_resource_loss.food;
+    attacker.country.assets.resources.oil = Math.max(0, attacker.country.assets.resources.oil - parsed.attacker_resource_loss.oil);
+    attacker.country.assets.resources.steel = Math.max(0, attacker.country.assets.resources.steel - parsed.attacker_resource_loss.steel);
+    attacker.country.assets.resources.food = Math.max(0, attacker.country.assets.resources.food - parsed.attacker_resource_loss.food);
 
-    defender.country.assets.resources.oil -= parsed.defender_resource_loss.oil;
-    defender.country.assets.resources.steel -= parsed.defender_resource_loss.steel;
-    defender.country.assets.resources.food -= parsed.defender_resource_loss.food;
+    defender.country.assets.resources.oil = Math.max(0, defender.country.assets.resources.oil - parsed.defender_resource_loss.oil);
+    defender.country.assets.resources.steel = Math.max(0, defender.country.assets.resources.steel - parsed.defender_resource_loss.steel);
+    defender.country.assets.resources.food = Math.max(0, defender.country.assets.resources.food - parsed.defender_resource_loss.food);
 
     // Check military <= 0 to Trigger ultimate Peace Accord / Booty settlement via Gemini
     let combatEnded = false;
@@ -1864,7 +1869,10 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
       combatEnded = true;
       war.status = "ended";
 
-      const winner = attacker.country.assets.militaryPower > defender.country.assets.militaryPower ? attacker : defender;
+      // If both have 0 MP, the one with higher economy wins (or defender by default)
+      const winner = attacker.country.assets.militaryPower > defender.country.assets.militaryPower ? attacker :
+                     defender.country.assets.militaryPower > attacker.country.assets.militaryPower ? defender :
+                     defender; // default: defender wins tie
       const loser = winner.id === attacker.id ? defender : attacker;
       war.winnerId = winner.id;
 
@@ -1955,9 +1963,9 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
       db.tweets.unshift(warRoomTweet);
     } catch (e) { /* ignore */ }
 
-    // Create automatic UN proposals periodically or specifically after war rounds action
+    // Create automatic UN proposals periodically (fire-and-forget, don't block response)
     if (roundNum % 2 === 0) {
-      await autoDraftUNProposal(attacker, defender);
+      autoDraftUNProposal(attacker, defender).catch(e => console.error("[UN Auto] Error:", e));
     }
 
     saveDatabase();
@@ -2071,7 +2079,8 @@ app.post("/api/wars/:warId/resolve", checkRateLimit, async (req, res) => {
   saveDatabase();
 
   // CHECK VICTORY CONDITION
-  const remainingCountries = db.users.filter(u => u.id !== winner.id && u.country.assets.militaryPower > 10);
+  const MIN_MP_FOR_VICTORY_CHECK = 50; // minimum MP to be considered a "remaining" country
+  const remainingCountries = db.users.filter(u => u.id !== winner.id && u.country.assets.militaryPower > MIN_MP_FOR_VICTORY_CHECK);
   if (remainingCountries.length === 0) {
     // WINNER!
     db.globalAnnouncements.unshift(`🏆🏆🏆 پیروز نهایی: کشور ${winner.country.name} به رهبری ${winner.username} تمام کشورهای جهان را فتح کرد و برنده بازی شد! 🏆🏆🏆`);
@@ -2149,21 +2158,25 @@ app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
   user.country.assets.resources.oil -= 50;
   user.country.assets.resources.steel -= 30;
 
-  // Remove one nuke from warehouse
+  // Remove one nuke from warehouse (only ONE, not both catalog + invention)
+  let nukeConsumed = false;
   for (const wpnId of ["usa_nuke", "rus_nuke", "chn_nuke", "ind_nuke", "pak_nuke", "uk_nuke", "fra_nuke", "isr_nuke", "nk_nuke"]) {
     if (user.warehouse[wpnId] && user.warehouse[wpnId] > 0) {
       user.warehouse[wpnId] -= 1;
       if (user.warehouse[wpnId] <= 0) delete user.warehouse[wpnId];
+      nukeConsumed = true;
       break;
     }
   }
-  // Also check inventions
-  for (const [wpnId, qty] of Object.entries(user.warehouse)) {
-    const inv = db.inventions.find(i => i.id === wpnId && i.type === "nuclear");
-    if (inv && Number(qty) > 0) {
-      user.warehouse[wpnId] = Number(qty) - 1;
-      if (user.warehouse[wpnId] <= 0) delete user.warehouse[wpnId];
-      break;
+  // Also check inventions only if catalog nuke not found
+  if (!nukeConsumed) {
+    for (const [wpnId, qty] of Object.entries(user.warehouse)) {
+      const inv = db.inventions.find(i => i.id === wpnId && i.type === "nuclear");
+      if (inv && Number(qty) > 0) {
+        user.warehouse[wpnId] = Number(qty) - 1;
+        if (user.warehouse[wpnId] <= 0) delete user.warehouse[wpnId];
+        break;
+      }
     }
   }
 
@@ -2171,14 +2184,19 @@ app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
   if (!war.nuclearLaunched) war.nuclearLaunched = [];
   war.nuclearLaunched.push(user.id);
 
-  // Find target
-  const targetUserId = targetId || (war.attackerId === user.id ? war.defenderId : war.attackerId);
+  // Find target (must be war participant)
+  const targetUserId = (war.attackerId === user.id ? war.defenderId : war.attackerId);
   const target = db.users.find(u => u.id === targetUserId);
+  let actualMilitaryDamage = 0, actualEconomicDamage = 0, actualGoldDamage = 0;
+
   if (target) {
     // Nuclear damage: massive military + economic damage
     const militaryDamage = Math.floor(target.country.assets.militaryPower * 0.6);
     const economicDamage = Math.floor(target.country.assets.economicPower * 0.4);
     const goldDamage = Math.floor(target.country.assets.gold * 0.3);
+    actualMilitaryDamage = militaryDamage;
+    actualEconomicDamage = economicDamage;
+    actualGoldDamage = goldDamage;
     
     target.country.assets.militaryPower = Math.max(1, target.country.assets.militaryPower - militaryDamage);
     target.country.assets.economicPower = Math.max(1, target.country.assets.economicPower - economicDamage);
@@ -2213,9 +2231,9 @@ app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
     war, 
     message: `☢️ حمله هسته‌ای با موفقیت انجام شد! هزینه: ${LAUNCH_COST} طلا + ۵۰ نفت + ۳۰ فولاد. یک کلاهک هسته‌ای مصرف شد.`,
     damage: target ? {
-      military: Math.floor(target.country.assets.militaryPower * 0.6),
-      economic: Math.floor(target.country.assets.economicPower * 0.4),
-      gold: Math.floor(target.country.assets.gold * 0.3)
+      military: actualMilitaryDamage,
+      economic: actualEconomicDamage,
+      gold: actualGoldDamage
     } : null
   });
 });
@@ -2246,7 +2264,7 @@ async function autoDraftUNProposal(attacker: User, defender: User) {
   try {
     const text = await callGemini(
       prompt,
-      "تو فیلمنامه‌نویس جنگی هالیوودی و گزارشگر نظامی CNN هستی. صحنه‌های نبرد را مانند فیلم اکشن سینمایی روایت کن. از اصطلاحات نظامی واقعی و نام تسلیحات استفاده کن.",
+      "تو یک دیپلمات ارشد سازمان ملل متحد هستی که قطعنامه‌های شورای امنیت را تنظیم می‌کند. متن رسمی، حقوقی و دیپلماتیک بنویس.",
       schema
     );
     const parsed = JSON.parse(text);
@@ -2275,10 +2293,11 @@ app.post("/api/diplomacy/ceasefire-propose", (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { warId } = req.body;
-  const war = db.wars.find(w => w.id === warId && (w.attackerId === user.id || w.defenderId === user.id));
-  if (!war) return res.status(404).json({ error: "جنگ پیدا نشد" });
+  const war = db.wars.find(w => w.id === warId && w.status === "active" && (w.attackerId === user.id || w.defenderId === user.id));
+  if (!war) return res.status(404).json({ error: "جنگ پیدا نشد یا جنگ فعال نیست" });
 
-  war.status = "ceasefire"; // request status trigger
+  war.status = "ceasefire";
+  war.ceasefireProposedBy = user.id;
   db.globalAnnouncements.unshift(`🕊️ مذاکره صلح: کشور ${user.country.name} رسما خواستار معاهده آتش‌بس توافقی بین طرفین جنگ شد.`);
   
   saveDatabase();
@@ -2290,8 +2309,17 @@ app.post("/api/diplomacy/ceasefire-respond", (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { warId, accept } = req.body;
-  const war = db.wars.find(w => w.id === warId && (w.attackerId === user.id || w.defenderId === user.id));
-  if (!war) return res.status(404).json({ error: "جنگ پیدا نشد" });
+  if (accept === undefined || accept === null) {
+    return res.status(400).json({ error: "پاسخ آتش‌بس الزامی است (accept: true/false)" });
+  }
+
+  const war = db.wars.find(w => w.id === warId && w.status === "ceasefire" && (w.attackerId === user.id || w.defenderId === user.id));
+  if (!war) return res.status(404).json({ error: "جنگ پیدا نشد یا در وضعیت آتش‌بس نیست" });
+
+  // Only the OTHER party can respond (not the proposer)
+  if (war.ceasefireProposedBy === user.id) {
+    return res.status(400).json({ error: "شما خود آتش‌بس را پیشنهاد داده‌اید. فقط طرف مقابل می‌تواند پاسخ دهد." });
+  }
 
   if (accept) {
     war.status = "ended";
@@ -2299,6 +2327,7 @@ app.post("/api/diplomacy/ceasefire-respond", (req, res) => {
     db.globalAnnouncements.unshift(`☮️ تنش‌زدایی: آتش‌بس مابین کشورهای مبارز برقرار شد و صلح موقت حکمفرما گردید!`);
   } else {
     war.status = "active";
+    war.ceasefireProposedBy = undefined;
     db.globalAnnouncements.unshift(`⚔️ شکست صلح غیورانه: درخواست آتش‌بس رد شد و حملات پی‌درپی با شدت بیشتر ادامه دارد!`);
   }
 
@@ -2807,9 +2836,9 @@ app.post("/api/admin/update-prices", (req, res) => {
   if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
 
   const { oil, steel, food } = req.body;
-  if (oil) db.resourcePrices.oil = parseFloat(oil);
-  if (steel) db.resourcePrices.steel = parseFloat(steel);
-  if (food) db.resourcePrices.food = parseFloat(food);
+  if (oil !== undefined && oil !== null && oil !== "") db.resourcePrices.oil = parseFloat(oil);
+  if (steel !== undefined && steel !== null && steel !== "") db.resourcePrices.steel = parseFloat(steel);
+  if (food !== undefined && food !== null && food !== "") db.resourcePrices.food = parseFloat(food);
   db.resourcePrices.lastUpdated = new Date().toISOString();
 
   saveDatabase();
@@ -2840,7 +2869,7 @@ app.post("/api/admin/reset-user", (req, res) => {
   };
   target.equipmentSlots = [];
   target.warehouse = {};
-  target.assetLog = [{ timestamp: "ریست توسط ادمین", gold: 1000, military: 100, economy: 100 }];
+  target.assetLog = [{ timestamp: "ریست توسط ادمین", gold: 300, military: 100, economy: 100 }];
 
   saveDatabase();
   res.json({ message: `کشور ${countryName} ریست شد`, user: target });
@@ -2884,6 +2913,7 @@ app.post("/api/admin/delete-all-users", (req, res) => {
     const data = JSON.stringify(freshDb, null, 2);
     fs.writeFileSync(DB_FILE, data, "utf-8");
     db = freshDb;
+    saveToGitHub(db); // also save to GitHub
     console.log(`[DB] FULL RESET: ${count} users deleted, file written directly`);
   } catch (e) {
     console.error("[DB] Reset write error:", e);
@@ -2895,13 +2925,16 @@ app.post("/api/admin/delete-all-users", (req, res) => {
 
 app.get("/api/inventions", (req, res) => {
   // Auto-expire old sales
+  let changed = false;
   const now = new Date();
   for (const inv of db.inventions) {
     if (inv.isForSale && inv.forSaleUntil && new Date(inv.forSaleUntil) < now) {
       inv.isForSale = false;
       inv.forSaleUntil = undefined;
+      changed = true;
     }
   }
+  if (changed) saveDatabase();
   res.json({ inventions: db.inventions || [] });
 });
 
