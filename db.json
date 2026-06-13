@@ -566,6 +566,61 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376748311_ow26tzw",
+      "username": "aylin",
+      "password": "7vTicp98",
+      "isAdmin": false,
+      "country": {
+        "name": "فرانسه",
+        "originalName": "France",
+        "slogan": "آزادی، برابری، برادری",
+        "flagUrl": "🇫🇷",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 25976,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376748311
+        }
+      },
+      "equipmentSlots": [
+        "fra_leclerc",
+        "fra_vbci",
+        "fra_rafale",
+        "fra_charles",
+        "fra_horizon",
+        "fra_suffren",
+        "fra_samp",
+        "fra_m51",
+        "fra_nuke"
+      ],
+      "warehouse": {
+        "fra_leclerc": 2,
+        "fra_vbci": 6,
+        "fra_rafale": 10,
+        "fra_charles": 1,
+        "fra_horizon": 1,
+        "fra_suffren": 1,
+        "fra_samp": 1,
+        "fra_m51": 1,
+        "fra_nuke": 25
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 25976,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -595,6 +650,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: فرانسه (aylin) به نقشه جهان پیوست!",
     "🎮 کشور جدید: بریتانیا (arash) به نقشه جهان پیوست!",
     "🎮 کشور جدید: روسیه (sorena) به نقشه جهان پیوست!",
     "🎮 کشور جدید: اسرائیل (mahdi) به نقشه جهان پیوست!",
