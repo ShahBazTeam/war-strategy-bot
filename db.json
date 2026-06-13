@@ -1376,17 +1376,17 @@
         "slogan": "اتحاد و عدالت و آزادی",
         "flagUrl": "🇩🇪",
         "assets": {
-          "gold": 221.6,
+          "gold": 241.9,
           "militaryPower": 764,
           "economicPower": 127,
           "resources": {
             "oil": 20.1,
-            "steel": 30.3,
-            "food": 26.6
+            "steel": 31.3,
+            "food": 27.3
           },
           "techLevel": 2,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781379987697
+          "lastIncomeUpdate": 1781380047697
         }
       },
       "equipmentSlots": [
@@ -1475,6 +1475,12 @@
         {
           "timestamp": "۱۹:۴۶:۴۸",
           "gold": 221.6,
+          "military": 764,
+          "economy": 127
+        },
+        {
+          "timestamp": "۱۹:۴۷:۴۰",
+          "gold": 241.9,
           "military": 764,
           "economy": 127
         }
