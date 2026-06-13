@@ -224,6 +224,7 @@ const AVAILABLE_COUNTRIES = [
   { name: "لهستان", englishName: "Poland", slogan: "ایمان، افتخار و میهن‌پرستی", flagUrl: "🇵🇱" },
   { name: "سوئد", englishName: "Sweden", slogan: "برای سوئد با زمان همگام شویم", flagUrl: "🇸🇪" },
   { name: "ایتالیا", englishName: "Italy", slogan: "آزادی کشور تحت قانون برابری", flagUrl: "🇮🇹" },
+  { name: "کره شمالی", englishName: "North Korea", slogan: "کشورمان قدرتمند است، هرگز تسلیم نمی‌شویم", flagUrl: "🇰🇵" },
   { name: "اسپانیا", englishName: "Spain", slogan: "به سوی کشف عوالم و مرزهای بیشتر", flagUrl: "🇪🇸" }
 ];
 
@@ -333,97 +334,99 @@ function checkRateLimit(req: express.Request, res: express.Response, next: expre
 // --------------------------------------------------------
 const RESOURCE_PRODUCTION: { [country: string]: { oil: number; steel: number; food: number } } = {
   // Major Oil Producers
-  "usa": { oil: 5, steel: 4, food: 4 },
-  "آمریکا": { oil: 5, steel: 4, food: 4 },
-  "saudi arabia": { oil: 3, steel: 1, food: 1 },
-  "عربستان سعودی": { oil: 3, steel: 1, food: 1 },
-  "عربستان": { oil: 3, steel: 1, food: 1 },
-  "russia": { oil: 3, steel: 3, food: 3 },
-  "روسیه": { oil: 3, steel: 3, food: 3 },
-  "canada": { oil: 1.5, steel: 2, food: 3 },
-  "کانادا": { oil: 1.5, steel: 2, food: 3 },
-  "china": { oil: 1, steel: 5, food: 4 },
-  "چین": { oil: 1, steel: 5, food: 4 },
-  "iran": { oil: 1.2, steel: 1, food: 2 },
-  "ایران": { oil: 1.2, steel: 1, food: 2 },
-  "iraq": { oil: 1, steel: 0.5, food: 1 },
-  "عراق": { oil: 1, steel: 0.5, food: 1 },
-  "uae": { oil: 1, steel: 0.5, food: 0.5 },
-  "امارات": { oil: 1, steel: 0.5, food: 0.5 },
-  "brazil": { oil: 0.8, steel: 3, food: 4 },
-  "برزیل": { oil: 0.8, steel: 3, food: 4 },
-  "kuwait": { oil: 0.7, steel: 0.3, food: 0.3 },
-  "کویت": { oil: 0.7, steel: 0.3, food: 0.3 },
-  "mexico": { oil: 0.5, steel: 1.5, food: 2 },
-  "مکزیک": { oil: 0.5, steel: 1.5, food: 2 },
-  "nigeria": { oil: 0.4, steel: 0.5, food: 2 },
-  "نیجریه": { oil: 0.4, steel: 0.5, food: 2 },
-  "norway": { oil: 0.5, steel: 2, food: 1 },
-  "نروژ": { oil: 0.5, steel: 2, food: 1 },
-  "kazakhstan": { oil: 0.5, steel: 1, food: 1 },
-  "قزاقستان": { oil: 0.5, steel: 1, food: 1 },
-  "qatar": { oil: 0.5, steel: 0.3, food: 0.3 },
-  "قطر": { oil: 0.5, steel: 0.3, food: 0.3 },
-  "algeria": { oil: 0.3, steel: 0.5, food: 1 },
-  "الجزایر": { oil: 0.3, steel: 0.5, food: 1 },
-  "libya": { oil: 0.3, steel: 0.3, food: 0.5 },
-  "لیبی": { oil: 0.3, steel: 0.3, food: 0.5 },
-  "angola": { oil: 0.3, steel: 0.3, food: 1 },
-  "آنگولا": { oil: 0.3, steel: 0.3, food: 1 },
-  "oman": { oil: 0.3, steel: 0.3, food: 0.3 },
-  "عمان": { oil: 0.3, steel: 0.3, food: 0.3 },
-  "india": { oil: 0.2, steel: 3, food: 4 },
-  "هند": { oil: 0.2, steel: 3, food: 4 },
-  "venezuela": { oil: 0.2, steel: 0.5, food: 1 },
-  "ونزوئلا": { oil: 0.2, steel: 0.5, food: 1 },
-  "argentina": { oil: 0.2, steel: 1, food: 2 },
-  "آرژانتین": { oil: 0.2, steel: 1, food: 2 },
-  "indonesia": { oil: 0.2, steel: 1.5, food: 3 },
-  "اندونزی": { oil: 0.2, steel: 1.5, food: 3 },
-  "egypt": { oil: 0.15, steel: 1, food: 2 },
-  "مصر": { oil: 0.15, steel: 1, food: 2 },
-  "uk": { oil: 0.2, steel: 2, food: 1.5 },
-  "بریتانیا": { oil: 0.2, steel: 2, food: 1.5 },
-  "colombia": { oil: 0.2, steel: 0.5, food: 1.5 },
-  "کلمبیا": { oil: 0.2, steel: 0.5, food: 1.5 },
-  "azerbaijan": { oil: 0.15, steel: 0.3, food: 0.5 },
-  "آذربایجان": { oil: 0.15, steel: 0.3, food: 0.5 },
-  "malaysia": { oil: 0.15, steel: 1, food: 1.5 },
-  "مالزی": { oil: 0.15, steel: 1, food: 1.5 },
-  "australia": { oil: 0.1, steel: 1.5, food: 2 },
-  "استرالیا": { oil: 0.1, steel: 1.5, food: 2 },
-  "thailand": { oil: 0.1, steel: 1, food: 2 },
-  "تایلند": { oil: 0.1, steel: 1, food: 2 },
-  "vietnam": { oil: 0.05, steel: 1, food: 2 },
-  "ویتنام": { oil: 0.05, steel: 1, food: 2 },
-  "germany": { oil: 0.05, steel: 3, food: 2 },
-  "آلمان": { oil: 0.05, steel: 3, food: 2 },
-  "france": { oil: 0.03, steel: 2, food: 2 },
-  "فرانسه": { oil: 0.03, steel: 2, food: 2 },
-  "italy": { oil: 0.03, steel: 1.5, food: 1.5 },
-  "ایتالیا": { oil: 0.03, steel: 1.5, food: 1.5 },
-  "turkey": { oil: 0.03, steel: 1.5, food: 2 },
-  "ترکیه": { oil: 0.03, steel: 1.5, food: 2 },
-  "japan": { oil: 0.03, steel: 2.5, food: 1 },
-  "ژاپن": { oil: 0.03, steel: 2.5, food: 1 },
-  "south korea": { oil: 0.03, steel: 2.5, food: 1 },
-  "کره جنوبی": { oil: 0.03, steel: 2.5, food: 1 },
-  "pakistan": { oil: 0.02, steel: 0.5, food: 2 },
-  "پاکستان": { oil: 0.02, steel: 0.5, food: 2 },
-  "bangladesh": { oil: 0.01, steel: 0.3, food: 1.5 },
-  "بنگلادش": { oil: 0.01, steel: 0.3, food: 1.5 },
-  "poland": { oil: 0.015, steel: 1.5, food: 1.5 },
-  "لهستان": { oil: 0.015, steel: 1.5, food: 1.5 },
-  "sweden": { oil: 0.005, steel: 1, food: 1 },
-  "سوئد": { oil: 0.005, steel: 1, food: 1 },
-  "ukraine": { oil: 0.015, steel: 1, food: 2 },
-  "اوکراین": { oil: 0.015, steel: 1, food: 2 },
-  "south africa": { oil: 0.025, steel: 1, food: 1 },
-  "آفریقای جنوبی": { oil: 0.025, steel: 1, food: 1 },
-  "israel": { oil: 0.005, steel: 1, food: 0.5 },
-  "اسرائیل": { oil: 0.005, steel: 1, food: 0.5 },
-  "north korea": { oil: 0.001, steel: 0.5, food: 1 },
-  "کره شمالی": { oil: 0.001, steel: 0.5, food: 1 },
+  "usa": { oil: 0.5, steel: 0.4, food: 0.4 },
+  "آمریکا": { oil: 0.5, steel: 0.4, food: 0.4 },
+  "saudi arabia": { oil: 0.3, steel: 0.1, food: 0.1 },
+  "عربستان سعودی": { oil: 0.3, steel: 0.1, food: 0.1 },
+  "عربستان": { oil: 0.3, steel: 0.1, food: 0.1 },
+  "russia": { oil: 0.3, steel: 0.3, food: 0.3 },
+  "روسیه": { oil: 0.3, steel: 0.3, food: 0.3 },
+  "canada": { oil: 0.15, steel: 0.2, food: 0.3 },
+  "کانادا": { oil: 0.15, steel: 0.2, food: 0.3 },
+  "china": { oil: 0.1, steel: 0.5, food: 0.4 },
+  "چین": { oil: 0.1, steel: 0.5, food: 0.4 },
+  "iran": { oil: 0.12, steel: 0.1, food: 0.2 },
+  "ایران": { oil: 0.12, steel: 0.1, food: 0.2 },
+  "iraq": { oil: 0.1, steel: 0.05, food: 0.1 },
+  "عراق": { oil: 0.1, steel: 0.05, food: 0.1 },
+  "uae": { oil: 0.1, steel: 0.05, food: 0.05 },
+  "امارات": { oil: 0.1, steel: 0.05, food: 0.05 },
+  "brazil": { oil: 0.08, steel: 0.3, food: 0.4 },
+  "برزیل": { oil: 0.08, steel: 0.3, food: 0.4 },
+  "kuwait": { oil: 0.07, steel: 0.03, food: 0.03 },
+  "کویت": { oil: 0.07, steel: 0.03, food: 0.03 },
+  "mexico": { oil: 0.05, steel: 0.15, food: 0.2 },
+  "مکزیک": { oil: 0.05, steel: 0.15, food: 0.2 },
+  "nigeria": { oil: 0.04, steel: 0.05, food: 0.2 },
+  "نیجریه": { oil: 0.04, steel: 0.05, food: 0.2 },
+  "norway": { oil: 0.05, steel: 0.2, food: 0.1 },
+  "نروژ": { oil: 0.05, steel: 0.2, food: 0.1 },
+  "kazakhstan": { oil: 0.05, steel: 0.1, food: 0.1 },
+  "قزاقستان": { oil: 0.05, steel: 0.1, food: 0.1 },
+  "qatar": { oil: 0.05, steel: 0.03, food: 0.03 },
+  "قطر": { oil: 0.05, steel: 0.03, food: 0.03 },
+  "algeria": { oil: 0.03, steel: 0.05, food: 0.1 },
+  "الجزایر": { oil: 0.03, steel: 0.05, food: 0.1 },
+  "libya": { oil: 0.03, steel: 0.03, food: 0.05 },
+  "لیبی": { oil: 0.03, steel: 0.03, food: 0.05 },
+  "angola": { oil: 0.03, steel: 0.03, food: 0.1 },
+  "آنگولا": { oil: 0.03, steel: 0.03, food: 0.1 },
+  "oman": { oil: 0.03, steel: 0.03, food: 0.03 },
+  "عمان": { oil: 0.03, steel: 0.03, food: 0.03 },
+  "india": { oil: 0.02, steel: 0.3, food: 0.4 },
+  "هند": { oil: 0.02, steel: 0.3, food: 0.4 },
+  "venezuela": { oil: 0.02, steel: 0.05, food: 0.1 },
+  "ونزوئلا": { oil: 0.02, steel: 0.05, food: 0.1 },
+  "argentina": { oil: 0.02, steel: 0.1, food: 0.2 },
+  "آرژانتین": { oil: 0.02, steel: 0.1, food: 0.2 },
+  "indonesia": { oil: 0.02, steel: 0.15, food: 0.3 },
+  "اندونزی": { oil: 0.02, steel: 0.15, food: 0.3 },
+  "egypt": { oil: 0.015, steel: 0.1, food: 0.2 },
+  "مصر": { oil: 0.015, steel: 0.1, food: 0.2 },
+  "uk": { oil: 0.02, steel: 0.2, food: 0.15 },
+  "بریتانیا": { oil: 0.02, steel: 0.2, food: 0.15 },
+  "colombia": { oil: 0.02, steel: 0.05, food: 0.15 },
+  "کلمبیا": { oil: 0.02, steel: 0.05, food: 0.15 },
+  "azerbaijan": { oil: 0.015, steel: 0.03, food: 0.05 },
+  "آذربایجان": { oil: 0.015, steel: 0.03, food: 0.05 },
+  "malaysia": { oil: 0.015, steel: 0.1, food: 0.15 },
+  "مالزی": { oil: 0.015, steel: 0.1, food: 0.15 },
+  "australia": { oil: 0.01, steel: 0.15, food: 0.2 },
+  "استرالیا": { oil: 0.01, steel: 0.15, food: 0.2 },
+  "thailand": { oil: 0.01, steel: 0.1, food: 0.2 },
+  "تایلند": { oil: 0.01, steel: 0.1, food: 0.2 },
+  "vietnam": { oil: 0.005, steel: 0.1, food: 0.2 },
+  "ویتنام": { oil: 0.005, steel: 0.1, food: 0.2 },
+  "germany": { oil: 0.005, steel: 0.3, food: 0.2 },
+  "آلمان": { oil: 0.005, steel: 0.3, food: 0.2 },
+  "france": { oil: 0.003, steel: 0.2, food: 0.2 },
+  "فرانسه": { oil: 0.003, steel: 0.2, food: 0.2 },
+  "italy": { oil: 0.003, steel: 0.15, food: 0.15 },
+  "ایتالیا": { oil: 0.003, steel: 0.15, food: 0.15 },
+  "turkey": { oil: 0.003, steel: 0.15, food: 0.2 },
+  "ترکیه": { oil: 0.003, steel: 0.15, food: 0.2 },
+  "japan": { oil: 0.003, steel: 0.25, food: 0.1 },
+  "ژاپن": { oil: 0.003, steel: 0.25, food: 0.1 },
+  "south korea": { oil: 0.003, steel: 0.25, food: 0.1 },
+  "کره جنوبی": { oil: 0.003, steel: 0.25, food: 0.1 },
+  "pakistan": { oil: 0.002, steel: 0.05, food: 0.2 },
+  "پاکستان": { oil: 0.002, steel: 0.05, food: 0.2 },
+  "bangladesh": { oil: 0.001, steel: 0.03, food: 0.15 },
+  "بنگلادش": { oil: 0.001, steel: 0.03, food: 0.15 },
+  "poland": { oil: 0.0015, steel: 0.15, food: 0.15 },
+  "لهستان": { oil: 0.0015, steel: 0.15, food: 0.15 },
+  "sweden": { oil: 0.0005, steel: 0.1, food: 0.1 },
+  "سوئد": { oil: 0.0005, steel: 0.1, food: 0.1 },
+  "ukraine": { oil: 0.0015, steel: 0.1, food: 0.2 },
+  "اوکراین": { oil: 0.0015, steel: 0.1, food: 0.2 },
+  "south africa": { oil: 0.0025, steel: 0.1, food: 0.1 },
+  "آفریقای جنوبی": { oil: 0.0025, steel: 0.1, food: 0.1 },
+  "israel": { oil: 0.0005, steel: 0.1, food: 0.05 },
+  "اسرائیل": { oil: 0.0005, steel: 0.1, food: 0.05 },
+  "north korea": { oil: 0.001, steel: 0.05, food: 0.1 },
+  "کره شمالی": { oil: 0.001, steel: 0.05, food: 0.1 },
+  "spain": { oil: 0.003, steel: 0.15, food: 0.15 },
+  "اسپانیا": { oil: 0.003, steel: 0.15, food: 0.15 },
 };
 
 function updatePassiveIncome(user: User) {
@@ -441,7 +444,7 @@ function updatePassiveIncome(user: User) {
     const ecoBonus = user.country.assets.economicPower / 100;
     
     // Gold income
-    const incomePerMinute = 60 * factoryLvl * ecoBonus;
+    const incomePerMinute = 6 * factoryLvl * ecoBonus;
     const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
 
@@ -575,10 +578,10 @@ app.post("/api/admin/create-user", checkRateLimit, (req, res) => {
   }
 
   let initialAssets: NationalAssets = {
-    gold: 1000,
+    gold: 300,
     militaryPower: 100,
     economicPower: 100,
-    resources: { oil: 50, steel: 50, food: 50 },
+    resources: { oil: 20, steel: 20, food: 20 },
     techLevel: 1,
     factoryLevel: 1,
     lastIncomeUpdate: Date.now()
@@ -945,9 +948,9 @@ app.post("/api/factory/upgrade", checkRateLimit, (req, res) => {
     return res.status(400).json({ error: "کارخانه شما به بالاترین سطح ممکن رسیده است." });
   }
 
-  // Cost calculation: base 200 * current level
+  // Cost calculation: base 1000 + 800 per level
   const multipliers = getCatchUpMultipliers(user);
-  const cost = Math.round((200 * currentLevel) * multipliers.costMultiplier);
+  const cost = Math.round((1000 + 800 * currentLevel) * multipliers.costMultiplier);
 
   if (user.country.assets.gold < cost) {
     return res.status(400).json({ error: `ارتقای کارخانه به سطح ${currentLevel + 1} نیازمند ${cost} طلا است!` });
@@ -2459,10 +2462,10 @@ app.post("/api/admin/reset-user", (req, res) => {
   const countrySlogan = target.country.slogan;
 
   target.country.assets = {
-    gold: 1000,
+    gold: 300,
     militaryPower: 100,
     economicPower: 100,
-    resources: { oil: 50, steel: 50, food: 50 },
+    resources: { oil: 20, steel: 20, food: 20 },
     techLevel: 1,
     factoryLevel: 1,
     lastIncomeUpdate: Date.now()
@@ -2504,7 +2507,7 @@ app.post("/api/admin/delete-all-users", (req, res) => {
     tweets: [],
     inventions: [],
     geminiLogs: [],
-    resourcePrices: { oil: 12, steel: 18, food: 7, lastUpdated: new Date().toISOString() },
+  resourcePrices: { oil: 4, steel: 6, food: 2, lastUpdated: new Date().toISOString() },
     globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."]
   };
   
@@ -2897,17 +2900,17 @@ app.post("/api/user/reset", (req, res) => {
   if (!user) return res.status(401).json({ error: "کاربر نامعتبر" });
 
   user.country.assets = {
-    gold: 1000,
+    gold: 300,
     militaryPower: 100,
     economicPower: 100,
-    resources: { oil: 50, steel: 50, food: 50 },
+    resources: { oil: 20, steel: 20, food: 20 },
     techLevel: 1,
     factoryLevel: 1,
     lastIncomeUpdate: Date.now()
   };
   user.equipmentSlots = [];
   user.warehouse = {};
-  user.assetLog = [{ timestamp: "ریست", gold: 1000, military: 100, economy: 100 }];
+  user.assetLog = [{ timestamp: "ریست", gold: 300, military: 100, economy: 100 }];
 
   saveDatabase();
   res.json({ user, message: "تمامی تسلیحات و طلاهای دولتی شما با موفقیت ریست گردید." });
