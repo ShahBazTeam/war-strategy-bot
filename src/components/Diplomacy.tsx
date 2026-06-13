@@ -49,8 +49,8 @@ export default function Diplomacy({
       alert("لطفاً کشور متخاصم هدف را انتخاب کنید.");
       return;
     }
-    if (declareCasusBelli.length < 50) {
-      alert("بیانیه دلیل جنگ شما ضعیف یا کوتاه است (حداقل ۵۰ کاراکتر رسمی لازم است).");
+    if (declareCasusBelli.length < 30) {
+      alert("بیانیه دلیل جنگ باید حداقل ۳۰ کاراکتر باشد.");
       return;
     }
 
@@ -125,13 +125,13 @@ export default function Diplomacy({
 
             <div>
               <label className="block text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
-                بیانیه یا بیانیه توجیهی علت وقوع جنگ (حداقل ۵۰ کاراکتر)
+                بیانیه علت جنگ (حداقل ۳۰ کاراکتر)
               </label>
               <textarea
                 value={declareCasusBelli}
                 onChange={(e) => setDeclareCasusBelli(e.target.value)}
                 rows={4}
-                placeholder="مثال: کشور متخاصم بیش از سه ماه است نفت صادراتی ما را در دریا تحریم کرده، بنادر تجاری ما را تهدید نموده و به اشرار مرزی مسلح پناه‌ داده است..."
+                placeholder="مثال: کشور متخاصم نفت صادراتی ما را تحریم کرده و به اشرار مرزی پناه داده..."
                 className="w-full rounded bg-white/5 border border-white/10 p-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500"
               />
               <span className="text-[10px] text-slate-500 float-left mt-1 font-mono">LENGTH_METRIC: {declareCasusBelli.length} CHARS</span>

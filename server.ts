@@ -1375,8 +1375,8 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { defenderId, targetId, casusBelli } = req.body;
-  if (!casusBelli || casusBelli.length < 50) {
-    return res.status(400).json({ error: "علت وقوع جنگ (متن دلیل) باید حداقل ۵۰ کاراکتر حاوی جزئیات واقعه باشد." });
+  if (!casusBelli || casusBelli.length < 30) {
+    return res.status(400).json({ error: "علت وقوع جنگ باید حداقل ۳۰ کاراکتر باشد." });
   }
 
   const actualDefenderId = defenderId || targetId;
@@ -1404,20 +1404,22 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
 متن یا بیانیه توجیهی ارائه شده از مهاجم برای اعلام جنگ:
 "${casusBelli}"
 
-تو داور ارشد امنیت جهانی هستی. آیا این دلیل برای اعلام جنگ در یک بازی واقعگرایانه معتبر است؟
-پاسخ را با دقت در قالب JSON بازگردان:
+تو داور بازی هستی. این یک بازی شبیه‌سازی جنگی است و بازیکنان باید بتوانند جنگ را شروع کنند. 
+فقط در موارد بسیار نادر (مثل متن کاملاً بی‌معنی، فحاشی، یا خالی بودن) رد کن. 
+اگر حتی یک دلیل ساده مثل تنش مرزی، اختلاف اقتصادی، حمایت از شورشیان، تحریم، یا رقابت منطقه‌ای وجود دارد، تایید کن.
+پاسخ را در قالب JSON بازگردان:
 { 
-  "valid": boolean (اگر مضحک، تو خالی یا حاوی فیک تریالز تلگرامی یا بی‌ربط باشد false بزن، در صورت داشتن دلیل واقع‌گرایانه مثل تحریم، حملات مرزی، حمایت از اشرار true بزن), 
-  "reason": "استدلال شفاف شما در مورد معتبر بودن یا نبودن بیانیه به زبان فارسی", 
-  "tension_points": integer (عدد بین 0 تا 100 که نمایانگر شدت تنش بین دو کشور است)
+  "valid": boolean, 
+  "reason": "توضیح کوتاه به فارسی", 
+  "tension_points": integer (بین 20 تا 90)
 }`;
 
   const schema = {
     type: Type.OBJECT,
     properties: {
-      valid: { type: Type.BOOLEAN, description: "Whether the casus belli is realistically valid for war." },
-      reason: { type: Type.STRING, description: "Explanation of validity check in Persian." },
-      tension_points: { type: Type.INTEGER, description: "Tension rating from 0 to 100." }
+      valid: { type: Type.BOOLEAN },
+      reason: { type: Type.STRING },
+      tension_points: { type: Type.INTEGER }
     },
     required: ["valid", "reason", "tension_points"]
   };
@@ -1425,7 +1427,7 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
   try {
     const text = await callGemini(
       prompt,
-      "تو ناظر صلح سازمان ملل و تحلیلگر ارشد مسائل امنیتی و نظامی جهانی هستی. علت جنگ را نقد سختگیرانه و واقع‌گرایانه می‌کنی.",
+      "تو داور یک بازی شبیه‌سازی جنگی هستی. وظیفه تو تایید سریع اعلام جنگ‌هاست مگر اینکه واقعاً بی‌معنی باشند.",
       schema
     );
     const result: WarDeclarationResponse = JSON.parse(text);
@@ -1433,7 +1435,7 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
     if (!result.valid) {
       return res.json({ 
         valid: false, 
-        message: "بیانیه اعلام جنگ توسط ناظر صلح هوش مصنوعی به دلیل دور بودن از واقعیت یا عدم پختگی رد شد.",
+        message: "بیانیه اعلام جنگ رد شد. لطفاً دلیل محکم‌تری ارائه دهید.",
         reason: result.reason,
         tension_points: result.tension_points
       });
