@@ -1946,9 +1946,9 @@ async function autoDraftUNProposal(attacker: User, defender: User) {
       targetUserId: parsed.targetUserId,
       votesYes: [],
       votesNo: [],
-      status: "active",
+      status: "pending",
       createdAt: new Date().toISOString(),
-      durationMs: 3600000 // 1 hour simulation
+      durationMs: 3600000
     };
 
     db.unProposals.unshift(newProposal);
@@ -2107,7 +2107,90 @@ app.post("/api/un/evaluate", checkRateLimit, (req, res) => {
   res.json({ proposal, message: `پایان دور نظرسنجی و تصمیم‌گیری. وضعیت قطعنامه: ${proposal.status === 'approved' ? 'تصویب شده' : 'رد شده'}` });
 });
 
-// CUSTOM PROPOSAL SUBMITTED BY USERS (AUDITED LIVE BY GEMINI TO CONVERT TO A FORMAL POLL)
+// --------------------------------------------------------
+// ADMIN APPROVAL FOR UN PROPOSALS
+// --------------------------------------------------------
+app.get("/api/admin/un-proposals", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+  res.json({ proposals: db.unProposals });
+});
+
+app.post("/api/admin/un/approve", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "فقط ادمین می‌تواند لوایح را تایید کند" });
+
+  const { proposalId, adminNote } = req.body;
+  const proposal = db.unProposals.find(p => p.id === proposalId);
+  if (!proposal) return res.status(404).json({ error: "لایحه یافت نشد" });
+  if (proposal.status !== "pending") return res.status(400).json({ error: "این لایحه قبلاً بررسی شده" });
+
+  proposal.status = "approved";
+  proposal.adminNote = adminNote || "";
+
+  // Execute consequences
+  if (proposal.actionType === "sanctions" && proposal.targetUserId) {
+    const targetUser = db.users.find(u => u.id === proposal.targetUserId);
+    if (targetUser) {
+      const fines = Math.floor(targetUser.country.assets.gold * 0.20);
+      targetUser.country.assets.gold -= fines;
+      targetUser.country.assets.economicPower = Math.max(10, targetUser.country.assets.economicPower - 15);
+      updateAndLogUserAssets(targetUser);
+      db.globalAnnouncements.unshift(`🛡️ اجرای قطعنامه سازمان ملل: تحریم سنگین ۲۰٪ طلا (${fines} طلا) و کاهش ۱۵ واحد قدرت اقتصادی بر ضد ${targetUser.country.name} توسط ادمین تایید و اعمال شد!`);
+    }
+  } else if (proposal.actionType === "ceasefire" && proposal.targetUserId) {
+    const activeWars = db.wars.filter(w => 
+      (w.attackerId === proposal.targetUserId || w.defenderId === proposal.targetUserId) && w.status !== "ended"
+    );
+    for (const w of activeWars) {
+      w.status = "ended";
+      w.peaceTermsNarrative = "آتش‌بس اجباری به حکم شورای امنیت سازمان ملل و تایید نهایی ادمین اعمال شد.";
+    }
+    db.globalAnnouncements.unshift(`🕊️ قطعنامه آتش‌بس شورای امنیت: تمام جنگ‌های فعال کشور هدف با تایید ادمین متوقف شد!`);
+  } else if (proposal.actionType === "aid" && proposal.targetUserId) {
+    const targetUser = db.users.find(u => u.id === proposal.targetUserId);
+    if (targetUser) {
+      targetUser.country.assets.gold += 500;
+      targetUser.country.assets.resources.oil += 30;
+      targetUser.country.assets.resources.steel += 30;
+      targetUser.country.assets.resources.food += 30;
+      updateAndLogUserAssets(targetUser);
+      db.globalAnnouncements.unshift(`🎁 بسته کمکی سازمان ملل: ۵۰۰ طلا + ۳۰ واحد منابع به ${targetUser.country.name} با تایید ادمین اهدا شد.`);
+    }
+  } else if (proposal.actionType === "peacekeepers" && proposal.targetUserId) {
+    const targetUser = db.users.find(u => u.id === proposal.targetUserId);
+    if (targetUser) {
+      targetUser.country.assets.militaryPower = Math.max(10, targetUser.country.assets.militaryPower - 20);
+      updateAndLogUserAssets(targetUser);
+      db.globalAnnouncements.unshift(`🔵 حافظان صلح سازمان ملل: ۲۰ واحد قدرت نظامی ${targetUser.country.name} با تایید ادمین کاهش یافت.`);
+    }
+  } else {
+    db.globalAnnouncements.unshift(`📜 قطعنامه "${proposal.title}" توسط ادمین تایید و اجرا شد.`);
+  }
+
+  saveDatabase();
+  res.json({ proposal, message: `لایحه "${proposal.title}" تایید و اجرا شد.` });
+});
+
+app.post("/api/admin/un/reject", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "فقط ادمین می‌تواند لوایح را رد کند" });
+
+  const { proposalId, adminNote } = req.body;
+  const proposal = db.unProposals.find(p => p.id === proposalId);
+  if (!proposal) return res.status(404).json({ error: "لایحه یافت نشد" });
+  if (proposal.status !== "pending") return res.status(400).json({ error: "این لایحه قبلاً بررسی شده" });
+
+  proposal.status = "rejected";
+  proposal.adminNote = adminNote || "";
+
+  const sourceUser = proposal.sourceUserId ? db.users.find(u => u.id === proposal.sourceUserId) : null;
+  const countryName = sourceUser?.country.name || "ناشناس";
+  db.globalAnnouncements.unshift(`❌ لایحه "${proposal.title}" از ${countryName} توسط ادمین رد شد.`);
+
+  saveDatabase();
+  res.json({ proposal, message: `لایحه "${proposal.title}" رد شد.` });
+});
 app.post("/api/un/custom-bill", checkRateLimit, async (req, res) => {
   const user = getCurrentUser(req);
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
@@ -2163,16 +2246,16 @@ app.post("/api/un/custom-bill", checkRateLimit, async (req, res) => {
       sourceUserId: user.id,
       votesYes: [],
       votesNo: [],
-      status: "active",
+      status: "pending",
       createdAt: new Date().toISOString(),
       durationMs: 7200000
     };
 
     db.unProposals.unshift(newProposal);
-    db.globalAnnouncements.unshift(`📢 لایحه جدید: بیانیه فرستاده دیپلماتیک ${user.country.name} با تایید فنی جمینی به عنوان قطعنامه مجمع ثبت و آماده رای‌گیری شد!`);
+    db.globalAnnouncements.unshift(`📢 لایحه جدید: بیانیه فرستاده دیپلماتیک ${user.country.name} جهت تایید نهایی به دبیرخانه ادمین ارسال شد.`);
 
     saveDatabase();
-    res.json({ proposal: newProposal, message: "لایحه پیشنهادی شما پس از ویرایش و ممیزی صلح توسط هوش مصنوعی با موفقیت ثبت مجمع عمومی شد!" });
+    res.json({ proposal: newProposal, message: "لایحه شما پس از ممیزی هوش مصنوعی به ادمین ارسال شد. منتظر تایید نهایی باشید." });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

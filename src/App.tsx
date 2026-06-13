@@ -535,7 +535,29 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ description })
       });
-      showTemporarySuccess("لایحه شما پس از ممیزی به صندوق‌های رأی مجمع عمومی ملل برده شد.");
+      showTemporarySuccess("لایحه شما پس از ممیزی به دبیرخانه ادمین ارسال شد.");
+      fetchGlobalData();
+    } catch {}
+  };
+
+  const adminApproveUN = async (proposalId: string, note: string) => {
+    try {
+      const res = await apiCall("/api/admin/un/approve", {
+        method: "POST",
+        body: JSON.stringify({ proposalId, adminNote: note })
+      });
+      showTemporarySuccess(res.message);
+      fetchGlobalData();
+    } catch {}
+  };
+
+  const adminRejectUN = async (proposalId: string, note: string) => {
+    try {
+      const res = await apiCall("/api/admin/un/reject", {
+        method: "POST",
+        body: JSON.stringify({ proposalId, adminNote: note })
+      });
+      showTemporarySuccess(res.message);
       fetchGlobalData();
     } catch {}
   };
@@ -1119,11 +1141,12 @@ export default function App() {
                   <GuideBook onSelectTab={(t) => setActiveTab(t)} />
                 )}
                 {activeTab === "admin" && currentUser.isAdmin && (
-                  <AdminPanel 
+                   <AdminPanel 
                     user={currentUser}
                     wars={wars}
                     prices={prices}
                     allUsers={allUsers}
+                    proposals={proposals}
                     onAdminUpdatePrices={adminChangePricesDirect}
                     onAdminOverrideWar={adminOverrideConflictState}
                     onAdminBroadcast={adminPublishBroadcast}
@@ -1131,6 +1154,8 @@ export default function App() {
                     onAdminResetUser={adminResetUser}
                     onAdminDeleteUser={adminDeleteUser}
                     onAdminDeleteAllUsers={adminDeleteAllUsers}
+                    onAdminApproveUN={adminApproveUN}
+                    onAdminRejectUN={adminRejectUN}
                   />
                 )}
               </motion.div>

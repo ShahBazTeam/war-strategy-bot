@@ -138,13 +138,14 @@ export interface UNProposal {
   title: string;
   description: string;
   actionType: 'ceasefire' | 'sanctions' | 'peacekeepers' | 'aid' | 'custom';
-  targetUserId?: string; // Target country for sanction/aid
-  sourceUserId?: string; // Proposed by this user, empty if AI system proposed
-  votesYes: string[]; // Array of userIds
-  votesNo: string[]; // Array of userIds
-  status: 'active' | 'approved' | 'rejected';
+  targetUserId?: string;
+  sourceUserId?: string;
+  votesYes: string[];
+  votesNo: string[];
+  status: 'pending' | 'active' | 'approved' | 'rejected';
   createdAt: string;
-  durationMs: number; // e.g. 24 hours in real life, but in game we can evaluate instantly or allow immediate action
+  durationMs: number;
+  adminNote?: string;
 }
 
 export interface Alliance {

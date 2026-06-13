@@ -48,7 +48,7 @@ export default function UNAssembly({
           </div>
           <div>
             <h2 className="text-base font-black uppercase tracking-wider text-white">شورای امنیت و مجمع عمومی سازمان ملل متحد</h2>
-            <p className="text-slate-400 text-sm mt-1 leading-relaxed">تریبون قانون‌گذاری و ایجاد ثبات مابین ملل بازی. لایحه‌های پیشنهادی در صورت دریافت رأی اکثریت مثبت، خودکار در سیستم بازی به اجرا درمی‌آیند!</p>
+            <p className="text-slate-400 text-sm mt-1 leading-relaxed">تریبون قانون‌گذاری و ایجاد ثبات مابین ملل بازی. لوایح پیشنهادی ابتدا توسط دبیرخانه ادمین بررسی و تایید شده، سپس اجرا می‌شوند!</p>
           </div>
         </div>
       </div>
@@ -85,11 +85,13 @@ export default function UNAssembly({
                       </div>
                       
                       <span className={`rounded-md border px-2.5 py-0.5 text-[9px] font-mono uppercase tracking-wider select-none ${
+                        proposal.status === "pending" ? "bg-amber-500/10 text-amber-400 border-amber-500/30" :
                         proposal.status === "active" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30" :
                         proposal.status === "approved" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
                         "bg-red-500/10 text-red-500 border-red-500/30"
                       }`}>
-                        {proposal.status === "active" ? "UNDER_VOTE" :
+                        {proposal.status === "pending" ? "⏳ در انتظار تایید ادمین" :
+                         proposal.status === "active" ? "UNDER_VOTE" :
                          proposal.status === "approved" ? "PASSED_AND_ENFORCED" : "DEFEATED"}
                       </span>
                     </div>
@@ -133,6 +135,14 @@ export default function UNAssembly({
                       </div>
                     )}
 
+                    {proposal.status === "pending" && (
+                      <div className="pt-3 border-t border-white/5">
+                        <p className="text-amber-400 text-[10px] font-bold flex items-center gap-1.5">
+                          <RefreshCw className="h-3 w-3 animate-spin" /> این لایحه توسط ادمین در حال بررسی است. رأی‌گیری پس از تایید ادمین آغاز می‌شود.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Stats details bar */}
                     <div className="font-mono text-[9px] text-slate-500 flex justify-between pt-1 uppercase tracking-wider select-none">
                       <span>موافقان: <span className="text-emerald-405 font-bold">{yesVotes}</span></span>
@@ -152,7 +162,7 @@ export default function UNAssembly({
             <Sparkles className="h-4 w-4 text-cyan-400" /> لایحه جدید شورای امنیت
           </h2>
           <p className="text-slate-400 text-xs leading-relaxed font-serif text-slate-300">
-            میتوانید کشور دلخواهی را تحریم متوالی کنید، تقاضای واریز طلا برای صلح صادر کنید و یا آتش‌بس فراگیر بخواهید. هوش مصنوعی حرف‌های شما را بازنگری و ویرایش ادبی کرده و به لایحه مجمع تبدیل می‌کند.
+            لایحه خود را بنویسید. هوش مصنوعی آن را ویرایش کرده و سپس برای تایید نهایی به ادمین ارسال می‌شود. پس از تایید ادمین، قطعنامه اجرا خواهد شد.
           </p>
 
           <form onSubmit={handleBillSubmit} className="space-y-3.5">

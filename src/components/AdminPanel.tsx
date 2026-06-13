@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { User, WarReasonSubmission, GeminiLog } from "../types";
-import { Settings, ShieldCheck, HelpCircle, Save, Megaphone, Terminal, FileCode, CheckCircle, RefreshCw, Trash2, RotateCcw, Users, AlertTriangle } from "lucide-react";
+import { User, WarReasonSubmission, GeminiLog, UNProposal } from "../types";
+import { Settings, ShieldCheck, HelpCircle, Save, Megaphone, Terminal, FileCode, CheckCircle, RefreshCw, Trash2, RotateCcw, Users, AlertTriangle, Check, X, Vote } from "lucide-react";
 
 interface AdminPanelProps {
   user: User;
   wars: WarReasonSubmission[];
   prices: { oil: number; steel: number; food: number };
   allUsers: { id: string; username: string; country: { name: string; flagUrl: string } }[];
+  proposals: UNProposal[];
   onAdminUpdatePrices: (oil: number, steel: number, food: number) => void;
   onAdminOverrideWar: (warId: string, status: string) => void;
   onAdminBroadcast: (text: string) => void;
@@ -14,6 +15,8 @@ interface AdminPanelProps {
   onAdminResetUser: (targetUserId: string) => Promise<void>;
   onAdminDeleteUser: (targetUserId: string) => Promise<void>;
   onAdminDeleteAllUsers: () => Promise<void>;
+  onAdminApproveUN: (proposalId: string, note: string) => Promise<void>;
+  onAdminRejectUN: (proposalId: string, note: string) => Promise<void>;
 }
 
 export default function AdminPanel({
@@ -21,13 +24,16 @@ export default function AdminPanel({
   wars,
   prices,
   allUsers,
+  proposals,
   onAdminUpdatePrices,
   onAdminOverrideWar,
   onAdminBroadcast,
   onFetchLogs,
   onAdminResetUser,
   onAdminDeleteUser,
-  onAdminDeleteAllUsers
+  onAdminDeleteAllUsers,
+  onAdminApproveUN,
+  onAdminRejectUN
 }: AdminPanelProps) {
   const [broadcastText, setBroadcastText] = useState("");
   const [oilPrice, setOilPrice] = useState(prices.oil.toString());
@@ -395,6 +401,69 @@ export default function AdminPanel({
             >
               📋 کپی اطلاعات
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* UN PROPOSALS ADMIN SECTION */}
+      <div className="rounded-lg border border-white/10 bg-black/40 p-5 space-y-4">
+        <h2 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+          <Vote className="h-4 w-4" /> لوایح سازمان ملل (در انتظار تایید)
+        </h2>
+        <p className="text-[10px] text-slate-400">لوایح ارسالی کاربران و سیستم خودکار فقط با تایید شما اجرا می‌شوند.</p>
+        
+        {proposals.filter(p => p.status === "pending").length === 0 ? (
+          <p className="text-[10px] text-slate-500 py-4 text-center">هیچ لایحه در انتظاری وجود ندارد.</p>
+        ) : (
+          <div className="space-y-3">
+            {proposals.filter(p => p.status === "pending").map((proposal) => {
+              const sourceUser = proposal.sourceUserId ? allUsers.find(u => u.id === proposal.sourceUserId) : null;
+              const targetUser = proposal.targetUserId ? allUsers.find(u => u.id === proposal.targetUserId) : null;
+              return (
+                <div key={proposal.id} className="rounded border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-amber-400 font-mono text-[9px]">UN_COUNCIL:</span>
+                      <h3 className="font-bold text-white text-xs mt-1">{proposal.title}</h3>
+                      <p className="text-[9px] text-slate-400 mt-1">
+                        ارسال کننده: {sourceUser?.country?.flagUrl} {sourceUser?.country?.name || "سیستم خودکار"}
+                        {targetUser && <> → هدف: {targetUser.country?.flagUrl} {targetUser.country?.name}</>}
+                      </p>
+                      <p className="text-[9px] text-slate-400 mt-1">نوع: {proposal.actionType}</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-300 leading-relaxed">{proposal.description}</p>
+                  
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <input
+                        id={`note-${proposal.id}`}
+                        placeholder="یادداشت ادمین (اختیاری)"
+                        className="w-full text-[10px] bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white placeholder-slate-500"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const note = (document.getElementById(`note-${proposal.id}`) as HTMLInputElement)?.value || "";
+                        onAdminApproveUN(proposal.id, note);
+                      }}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Check className="h-3 w-3" /> تایید
+                    </button>
+                    <button
+                      onClick={() => {
+                        const note = (document.getElementById(`note-${proposal.id}`) as HTMLInputElement)?.value || "";
+                        onAdminRejectUN(proposal.id, note);
+                      }}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <X className="h-3 w-3" /> رد
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
