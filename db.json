@@ -272,17 +272,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 56157.1,
-          "militaryPower": 4176,
+          "gold": 51942.7,
+          "militaryPower": 4996,
           "economicPower": 316,
           "resources": {
-            "oil": 15.3,
-            "steel": 26.3,
-            "food": 499.6
+            "oil": 15.5,
+            "steel": 46.8,
+            "food": 507.8
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781386598012
+          "lastIncomeUpdate": 1781386658012
         }
       },
       "equipmentSlots": [
@@ -296,24 +296,12 @@
       "warehouse": {
         "jp_type10": 5,
         "jp_f35": 53,
-        "jp_maya": 2,
+        "jp_maya": 22,
         "jp_soryu": 2,
         "jp_patriot": 2,
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۳۱:۳۹",
-          "gold": 47739.1,
-          "military": 1276,
-          "economy": 316
-        },
-        {
-          "timestamp": "۲۱:۳۲:۴۳",
-          "gold": 48244.7,
-          "military": 1276,
-          "economy": 316
-        },
         {
           "timestamp": "۲۱:۳۳:۱۶",
           "gold": 26144.7,
@@ -391,6 +379,18 @@
           "gold": 56157.1,
           "military": 4176,
           "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۳۷:۳۹",
+          "gold": 56662.7,
+          "military": 4176,
+          "economy": 316
+        },
+        {
+          "timestamp": "۲۱:۳۷:۳۹",
+          "gold": 51942.7,
+          "military": 4996,
+          "economy": 316
         }
       ]
     },
@@ -405,11 +405,11 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 9559.5,
+          "gold": 8179.5,
           "militaryPower": 37932,
           "economicPower": 140,
           "resources": {
-            "oil": 1303.9,
+            "oil": 1403.9,
             "steel": 433.4,
             "food": 518.4
           },
@@ -441,12 +441,6 @@
         "chn_nuke": 35
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۳۳:۱۸",
-          "gold": 22911.5,
-          "military": 37932,
-          "economy": 140
-        },
         {
           "timestamp": "۲۱:۳۴:۲۱",
           "gold": 23023.5,
@@ -528,6 +522,12 @@
         {
           "timestamp": "۲۱:۳۷:۲۴",
           "gold": 9559.5,
+          "military": 37932,
+          "economy": 140
+        },
+        {
+          "timestamp": "۲۱:۳۷:۳۷",
+          "gold": 8179.5,
           "military": 37932,
           "economy": 140
         }
