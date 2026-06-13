@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 43681.7,
+          "gold": 109848.6,
           "militaryPower": 18421,
           "economicPower": 186,
           "resources": {
             "oil": 210,
-            "steel": 8142,
+            "steel": 6143,
             "food": 348.5
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۰۲:۲۵",
-          "gold": 145537.5,
-          "military": 18421,
-          "economy": 186
-        },
         {
           "timestamp": "۲۱:۰۲:۲۶",
           "gold": 97961.3,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۲۱:۰۴:۵۵",
           "gold": 43681.7,
+          "military": 18421,
+          "economy": 186
+        },
+        {
+          "timestamp": "۲۱:۰۵:۰۵",
+          "gold": 109848.6,
           "military": 18421,
           "economy": 186
         }
@@ -405,11 +405,11 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 7443.5,
+          "gold": 8563.5,
           "militaryPower": 37932,
           "economicPower": 140,
           "resources": {
-            "oil": 194.5,
+            "oil": 144.5,
             "steel": 133.1,
             "food": 277.5
           },
@@ -441,12 +441,6 @@
         "chn_nuke": 35
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۵۸:۱۸",
-          "gold": 6965.5,
-          "military": 37932,
-          "economy": 110
-        },
         {
           "timestamp": "۲۰:۵۹:۱۰",
           "gold": 9335.5,
@@ -528,6 +522,12 @@
         {
           "timestamp": "۲۱:۰۴:۴۳",
           "gold": 7443.5,
+          "military": 37932,
+          "economy": 140
+        },
+        {
+          "timestamp": "۲۱:۰۵:۰۵",
+          "gold": 8563.5,
           "military": 37932,
           "economy": 140
         }
