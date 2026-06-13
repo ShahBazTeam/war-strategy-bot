@@ -272,17 +272,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 3262.9,
+          "gold": 3538.5,
           "militaryPower": 650,
           "economicPower": 158,
           "resources": {
-            "oil": 60.1,
-            "steel": 10.1,
-            "food": 27
+            "oil": 50.1,
+            "steel": 12.2,
+            "food": 27.8
           },
           "techLevel": 3,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781380538012
+          "lastIncomeUpdate": 1781380598012
         }
       },
       "equipmentSlots": [
@@ -302,18 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۵۳:۴۴",
-          "gold": 736.7,
-          "military": 650,
-          "economy": 158
-        },
-        {
-          "timestamp": "۱۹:۵۳:۴۵",
-          "gold": 489.7,
-          "military": 650,
-          "economy": 158
-        },
         {
           "timestamp": "۱۹:۵۳:۴۵",
           "gold": 242.7,
@@ -389,6 +377,18 @@
         {
           "timestamp": "۱۹:۵۵:۳۹",
           "gold": 3262.9,
+          "military": 650,
+          "economy": 158
+        },
+        {
+          "timestamp": "۱۹:۵۶:۳۸",
+          "gold": 3313.5,
+          "military": 650,
+          "economy": 158
+        },
+        {
+          "timestamp": "۱۹:۵۶:۳۸",
+          "gold": 3538.5,
           "military": 650,
           "economy": 158
         }
@@ -1100,17 +1100,17 @@
         "slogan": "آزادی، برابری، برادری",
         "flagUrl": "🇫🇷",
         "assets": {
-          "gold": 391,
+          "gold": 426.2,
           "militaryPower": 25976,
           "economicPower": 110,
           "resources": {
             "oil": 20.1,
-            "steel": 13.9,
-            "food": 48.9
+            "steel": 15,
+            "food": 50
           },
           "techLevel": 1,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781380528311
+          "lastIncomeUpdate": 1781380588311
         }
       },
       "equipmentSlots": [
@@ -1136,12 +1136,6 @@
         "fra_nuke": 25
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۳:۰۶",
-          "gold": 1791,
-          "military": 25976,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۴۳:۳۰",
           "gold": 1807,
@@ -1223,6 +1217,12 @@
         {
           "timestamp": "۱۹:۵۵:۳۰",
           "gold": 391,
+          "military": 25976,
+          "economy": 110
+        },
+        {
+          "timestamp": "۱۹:۵۶:۳۳",
+          "gold": 426.2,
           "military": 25976,
           "economy": 110
         }
