@@ -822,17 +822,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 1120.8,
-          "militaryPower": 47985,
+          "gold": 1162.4,
+          "militaryPower": 47983,
           "economicPower": 130,
           "resources": {
-            "oil": 6.8,
-            "steel": 3.8,
-            "food": 46.8
+            "oil": 8.8,
+            "steel": 5.8,
+            "food": 48.8
           },
           "techLevel": 2,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781379718616
+          "lastIncomeUpdate": 1781379778616
         }
       },
       "equipmentSlots": [
@@ -858,12 +858,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۳۳:۰۰",
-          "gold": 1617.8,
-          "military": 47995,
-          "economy": 120
-        },
         {
           "timestamp": "۱۹:۳۴:۳۷",
           "gold": 1637,
@@ -947,6 +941,12 @@
           "gold": 1120.8,
           "military": 47985,
           "economy": 130
+        },
+        {
+          "timestamp": "۱۹:۴۳:۰۱",
+          "gold": 1162.4,
+          "military": 47983,
+          "economy": 130
         }
       ]
     },
@@ -961,17 +961,17 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 849,
+          "gold": 865,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
-            "oil": 12.2,
-            "steel": 42.4,
-            "food": 51.8
+            "oil": 12.3,
+            "steel": 42.9,
+            "food": 52.2
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781379711736
+          "lastIncomeUpdate": 1781379771736
         }
       },
       "equipmentSlots": [
@@ -1048,6 +1048,12 @@
         {
           "timestamp": "۱۹:۴۲:۵۱",
           "gold": 849,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۴۲:۵۸",
+          "gold": 865,
           "military": 22847,
           "economy": 100
         }
