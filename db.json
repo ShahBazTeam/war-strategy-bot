@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 18934.6,
+          "gold": 20369.6,
           "militaryPower": 1276,
           "economicPower": 277,
           "resources": {
             "oil": 10.1,
-            "steel": 437.5,
+            "steel": 387.5,
             "food": 312
           },
           "techLevel": 5,
@@ -302,36 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۰۸:۵۰",
-          "gold": 14703.2,
-          "military": 1278,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۰۸:۵۰",
-          "gold": 15030.2,
-          "military": 1278,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۰۹:۴۳",
-          "gold": 15340.4,
-          "military": 1276,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۰۹:۵۱",
-          "gold": 15627.4,
-          "military": 1276,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۰۹:۵۲",
-          "gold": 15929.4,
-          "military": 1276,
-          "economy": 277
-        },
         {
           "timestamp": "۲۱:۰۹:۵۴",
           "gold": 16230.4,
@@ -389,6 +359,36 @@
         {
           "timestamp": "۲۱:۱۱:۰۵",
           "gold": 18934.6,
+          "military": 1276,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۱۱:۰۶",
+          "gold": 19221.6,
+          "military": 1276,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۱۱:۰۶",
+          "gold": 19508.6,
+          "military": 1276,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۱۱:۰۶",
+          "gold": 19795.6,
+          "military": 1276,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۱۱:۰۷",
+          "gold": 20082.6,
+          "military": 1276,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۱۱:۰۷",
+          "gold": 20369.6,
           "military": 1276,
           "economy": 277
         }
