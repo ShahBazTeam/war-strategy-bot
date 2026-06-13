@@ -412,7 +412,7 @@ app.post("/api/auth/register", (req, res) => {
   const assignedCountries = db.users.map(u => u.country.originalName.toLowerCase());
   const remainingCountries = AVAILABLE_COUNTRIES.filter(c => !assignedCountries.includes(c.englishName.toLowerCase()));
   const pool = remainingCountries.length > 0 ? remainingCountries : AVAILABLE_COUNTRIES;
-  const picked = pool[Math.floor(Math.random() * pool.length)];
+  let picked = pool[Math.floor(Math.random() * pool.length)];
 
   // If user chose a specific country, validate it's not taken
   if (countryName) {
@@ -424,6 +424,14 @@ app.post("/api/auth/register", (req, res) => {
     });
     if (isTaken) {
       return res.status(400).json({ error: "این کشور قبلاً توسط کشور دیگری انتخاب شده است. لطفاً کشور دیگری برگزینید." });
+    }
+    // Find the matching country from AVAILABLE_COUNTRIES
+    const matchedCountry = AVAILABLE_COUNTRIES.find(c => 
+      c.englishName.toLowerCase() === requestedLower || 
+      c.name.toLowerCase() === requestedLower
+    );
+    if (matchedCountry) {
+      picked = matchedCountry;
     }
   }
 
@@ -498,7 +506,7 @@ app.post("/api/auth/register", (req, res) => {
     };
   }
 
-  const inventoryData = getInitialInventoryAndMP(countryName || picked.name, picked.englishName);
+  const inventoryData = getInitialInventoryAndMP(picked.name, picked.englishName);
   initialAssets.militaryPower = inventoryData.mp > 0 ? inventoryData.mp : initialAssets.militaryPower;
 
   const newUser: User = {
