@@ -74,7 +74,7 @@ export default function App() {
   const [proposals, setProposals] = useState<UNProposal[]>([]);
   const [alliances, setAlliances] = useState<Alliance[]>([]);
   const [announcements, setAnnouncements] = useState<string[]>([]);
-  const [announcementText, setAnnouncementText] = useState("");
+  const [currentAnnIdx, setCurrentAnnIdx] = useState(0);
   const [inventions, setInventions] = useState<EquipmentItem[]>([]);
   const [warehouseNames, setWarehouseNames] = useState<Record<string, string>>({});
 
@@ -96,6 +96,15 @@ export default function App() {
       return () => clearInterval(interval);
     }
   }, [userId]);
+
+  // Cycle through announcements every 5 seconds
+  useEffect(() => {
+    if (announcements.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentAnnIdx(prev => (prev + 1) % announcements.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [announcements.length]);
 
   // Handle prevention during active battle
   useEffect(() => {
@@ -214,7 +223,7 @@ export default function App() {
         setWarehouseNames(whNames);
       }
       if (annData.announcements && annData.announcements.length > 0) {
-        setAnnouncementText(annData.announcements.join(" | "));
+        setAnnouncements(annData.announcements);
       }
     } catch (err) {
       console.error("Failed to load generic game assets: ", err);
@@ -890,24 +899,15 @@ export default function App() {
         /* GAME HUB MAIN AREA */
         <div className="flex flex-col min-h-screen">
           
-          {/* NEWS TICKER - like TV subtitles */}
+          {/* NEWS TICKER - one announcement at a time */}
           <div className="bg-black border-b border-white/10 py-2.5 text-[10px] relative z-20 shadow-sm">
-            <div className="ticker-wrap">
-              <div className="ticker-content">
-                <span className="font-bold text-cyan-400 uppercase tracking-widest mx-4">
-                  📡 پیجر راداری زنده ملل:
-                </span>
-                <span className="text-slate-400 font-mono tracking-wider mx-2">
-                  {announcementText || "صلح در تمام قاره‌ها برقرار گردیده است. مجمع عمومی سازمان ملل فعال و ناظر بر امور است."}
-                </span>
-                <span className="text-slate-600 mx-6">|</span>
-                <span className="font-bold text-cyan-400 uppercase tracking-widest mx-4">
-                  📡 RADAR LIVE:
-                </span>
-                <span className="text-slate-400 font-mono tracking-wider mx-2">
-                  {announcementText || "Peace across all continents. UN General Assembly active and monitoring."}
-                </span>
-              </div>
+            <div className="flex items-center justify-center gap-2 px-4">
+              <span className="font-bold text-cyan-400 uppercase tracking-widest shrink-0">
+                📡 رادار:
+              </span>
+              <span className="text-slate-400 font-mono tracking-wider text-center ticker-item" key={currentAnnIdx}>
+                {announcements.length > 0 ? announcements[currentAnnIdx] : "صلح در تمام قاره‌ها برقرار گردیده است."}
+              </span>
             </div>
           </div>
 
