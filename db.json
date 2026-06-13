@@ -1239,11 +1239,11 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 1377.5,
+          "gold": 1559.5,
           "militaryPower": 23093,
           "economicPower": 120,
           "resources": {
-            "oil": 13.7,
+            "oil": 3.7,
             "steel": 61.8,
             "food": 75.6
           },
@@ -1273,12 +1273,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۵:۲۶",
-          "gold": 528.1,
-          "military": 23093,
-          "economy": 120
-        },
         {
           "timestamp": "۲۰:۰۵:۳۵",
           "gold": 743.1,
@@ -1360,6 +1354,12 @@
         {
           "timestamp": "۲۰:۰۷:۱۶",
           "gold": 1377.5,
+          "military": 23093,
+          "economy": 120
+        },
+        {
+          "timestamp": "۲۰:۰۷:۲۹",
+          "gold": 1559.5,
           "military": 23093,
           "economy": 120
         }
@@ -1564,6 +1564,17 @@
     }
   ],
   "tweets": [
+    {
+      "id": "9z9abfq",
+      "userId": "user_1781376748311_ow26tzw",
+      "username": "aylin",
+      "countryName": "فرانسه",
+      "flagUrl": "🇫🇷",
+      "text": "🇫🇷 La France croit en un monde où le dialogue l’emporte sur les armes, où l’amitié entre les peuples dépasse les différences.\nEnsemble, bâtissons la paix, chaque jour, par le respect, la coopération et la solidarité.\n🤝🕊️ #Paix #Amitié #France\n\nترجمه فارسی :\nفرانسه به جهانی باور دارد که در آن گفتوگو بر اسلحه پیروز است و دوستی میان ملتها بر تفاوتها غلبه میکند. بیایید هر روز صلح را با احترام، همکاری و همبستگی بسازیم.",
+      "timestamp": "2026-06-13T20:07:27.167Z",
+      "likes": [],
+      "comments": []
+    },
     {
       "id": "t4xes3o",
       "userId": "user_1781376553710_mgz8a2x",
