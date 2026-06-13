@@ -405,11 +405,11 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 16480.7,
+          "gold": 18300.7,
           "militaryPower": 37932,
           "economicPower": 110,
           "resources": {
-            "oil": 240.4,
+            "oil": 140.4,
             "steel": 112.5,
             "food": 261
           },
@@ -441,12 +441,6 @@
         "chn_nuke": 35
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۵۵:۰۵",
-          "gold": 8004.7,
-          "military": 37932,
-          "economy": 110
-        },
         {
           "timestamp": "۲۰:۵۵:۰۷",
           "gold": 6554.7,
@@ -528,6 +522,12 @@
         {
           "timestamp": "۲۰:۵۹:۲۷",
           "gold": 16480.7,
+          "military": 37932,
+          "economy": 110
+        },
+        {
+          "timestamp": "۲۰:۵۹:۳۱",
+          "gold": 18300.7,
           "military": 37932,
           "economy": 110
         }
@@ -1099,17 +1099,17 @@
         "slogan": "آزادی، برابری، برادری",
         "flagUrl": "🇫🇷",
         "assets": {
-          "gold": 1584.2,
+          "gold": 1619.4,
           "militaryPower": 25976,
           "economicPower": 110,
           "resources": {
             "oil": 180.7,
-            "steel": 12.5,
-            "food": 119.5
+            "steel": 13.6,
+            "food": 120.6
           },
           "techLevel": 1,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781384308311
+          "lastIncomeUpdate": 1781384368311
         }
       },
       "equipmentSlots": [
@@ -1135,12 +1135,6 @@
         "fra_nuke": 25
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۴۷:۲۹",
-          "gold": 979.4,
-          "military": 25976,
-          "economy": 110
-        },
         {
           "timestamp": "۲۰:۴۸:۳۲",
           "gold": 1014.6,
@@ -1224,6 +1218,12 @@
           "gold": 1584.2,
           "military": 25976,
           "economy": 110
+        },
+        {
+          "timestamp": "۲۰:۵۹:۳۱",
+          "gold": 1619.4,
+          "military": 25976,
+          "economy": 110
         }
       ]
     },
@@ -1238,12 +1238,12 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 20719.7,
+          "gold": 26499.7,
           "militaryPower": 23041,
           "economicPower": 160,
           "resources": {
             "oil": 17.6,
-            "steel": 292.6,
+            "steel": 92.6,
             "food": 344.1
           },
           "techLevel": 2,
@@ -1272,18 +1272,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۵۷:۵۹",
-          "gold": 16963.7,
-          "military": 23041,
-          "economy": 160
-        },
-        {
-          "timestamp": "۲۰:۵۸:۰۸",
-          "gold": 17091.7,
-          "military": 23041,
-          "economy": 160
-        },
         {
           "timestamp": "۲۰:۵۸:۰۸",
           "gold": 14741.7,
@@ -1359,6 +1347,18 @@
         {
           "timestamp": "۲۰:۵۹:۲۶",
           "gold": 20719.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۰:۵۹:۳۱",
+          "gold": 23609.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۰:۵۹:۳۶",
+          "gold": 26499.7,
           "military": 23041,
           "economy": 160
         }
