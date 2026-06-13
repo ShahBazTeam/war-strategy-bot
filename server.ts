@@ -255,21 +255,52 @@ let db: GameDatabase = {
 
 // Synchronized read write database functions
 function loadDatabase() {
+  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
   try {
     if (fs.existsSync(DB_FILE)) {
-      const parsed = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+      const raw = fs.readFileSync(DB_FILE, "utf-8");
+      const parsed = JSON.parse(raw);
+      // Validate parsed has essential fields
+      if (parsed && parsed.users && Array.isArray(parsed.users)) {
+        db = { ...db, ...parsed };
+        // Also save backup
+        fs.writeFileSync(BACKUP_FILE, raw, "utf-8");
+        console.log(`[DB] Loaded ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
+      } else {
+        throw new Error("Invalid DB structure");
+      }
+    } else if (fs.existsSync(BACKUP_FILE)) {
+      // Restore from backup
+      const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
       db = { ...db, ...parsed };
+      saveDatabase();
+      console.log(`[DB] Restored from backup: ${db.users.length} users`);
     } else {
       saveDatabase();
+      console.log("[DB] Created fresh database");
     }
   } catch (e) {
-    console.error("Failed to load JSON database:", e);
+    console.error("[DB] Failed to load main DB, trying backup:", e);
+    try {
+      if (fs.existsSync(BACKUP_FILE)) {
+        const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
+        db = { ...db, ...parsed };
+        saveDatabase();
+        console.log(`[DB] Recovered from backup: ${db.users.length} users`);
+      }
+    } catch (e2) {
+      console.error("[DB] Backup also failed:", e2);
+    }
   }
 }
 
 function saveDatabase() {
+  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), "utf-8");
+    const data = JSON.stringify(db, null, 2);
+    fs.writeFileSync(DB_FILE, data, "utf-8");
+    // Also save backup every time
+    fs.writeFileSync(BACKUP_FILE, data, "utf-8");
   } catch (e) {
     console.error("Failed to save JSON database:", e);
   }
@@ -2783,42 +2814,61 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { description, category } = req.body;
-  if (!description || description.length < 30) return res.status(400).json({ error: "شرح اختراع باید حداقل ۳۰ کاراکتر باشد. توضیحات کوتاه و غیرمنطقی رد می‌شود." });
+  if (!description || description.length < 50) return res.status(400).json({ error: "شرح اختراع باید حداقل ۵۰ کاراکتر باشد. توضیحات دقیق‌تر = قدرت بیشتر!" });
 
   const validTypes = ["ground_forces", "air_force", "navy", "air_defense", "missile", "nuclear", "drone", "artillery", "special_forces"];
   const selectedType = validTypes.includes(category) ? category : "ground_forces";
 
-  // Invent cost: 500-2000 gold based on description quality and complexity
-  const INVENT_BASE_COST = 500;
-  const INVENT_MAX_COST = 2000;
+  // Reference values for the AI to compare against
+  const REFERENCE_WEAPONS: Record<string, { name: string; mp: number }[]> = {
+    ground_forces: [{ name: "M1 Abrams", mp: 8 }, { name: "T-90", mp: 7 }, { name: "Leopard 2", mp: 8 }],
+    air_force: [{ name: "F-35", mp: 12 }, { name: "Su-57", mp: 11 }, { name: "F-22", mp: 13 }],
+    navy: [{ name: "Nimitz Carrier", mp: 15 }, { name: "Type 055 Destroyer", mp: 10 }],
+    missile: [{ name: "Tomahawk", mp: 9 }, { name: "Iskander", mp: 10 }, { name: "Hypersonic DF-17", mp: 14 }],
+    nuclear: [{ name: "W88 Warhead", mp: 20 }, { name: "Thermonuclear", mp: 25 }],
+    drone: [{ name: "MQ-9 Reaper", mp: 6 }, { name: "Bayraktar TB2", mp: 5 }],
+    air_defense: [{ name: "S-400", mp: 11 }, { name: "Patriot PAC-3", mp: 10 }],
+    artillery: [{ name: "M777 Howitzer", mp: 5 }, { name: "PzH 2000", mp: 6 }],
+    special_forces: [{ name: "Navy SEALs Team", mp: 4 }, { name: "SAS Squadron", mp: 4 }]
+  };
 
-  const prompt = `تو یک کمیته داوری اختراعات نظامی پنتاگون هستی. اختراع زیر را بسیار سختگیرانه بررسی کن:
+  const refs = REFERENCE_WEAPONS[selectedType] || [];
+  const refText = refs.map(r => `${r.name} (MP: ${r.mp})`).join("، ");
 
-کشور پیشنهاد دهنده: ${user.country.name}
+  const prompt = `تو کمیته داوری سختگیر اختراعات نظامی پنتاگون هستی.
+
+کشور: ${user.country.name}
 دسته‌بندی: ${selectedType}
 شرح اختراع: "${description}"
 
-قوانین سختگیرانه:
-1. اختراع باید کاملاً واقع‌بینانه و علمی باشد (مثل: تانک نسل ۵ با زره کامپوزیتی، جنگنده خاموش با موتور رامجت)
-2. اختراعات تخیلی، جادویی، غیرواقعی یا بیش از حد پیشرفته باید رد شوند
-3. توضیحات کوتاه، مبهم یا غیرمنطقی باید رد شوند
-4. هرچه توضیحات دقی‌تر، فنی‌تر و واقع‌بینانه‌تر باشد، قدرت (MP) بیشتری می‌گیرد
+ارزش‌های مرجع تسلیحات موجود در بازار:
+${refText}
 
-سیستم امتیازدهی:
-- توضیحات عالی (مشخصات فنی دقیق، ابعاد، سرعت، برد): MP بالا (30-50)
-- توضیحات خوب (ویژگی‌های منطقی اما کلی): MP متوسط (15-29)
-- توضیحات ضعیف (کوتاه، مبهم، غیرمنطقی): MP پایین (5-14) یا رد شدن
+قوانین بسیار سختگیرانه:
+1. اختراع باید کاملاً واقع‌بینانه و علمی باشد
+2. اختراعات تخیلی، جادویی، یا غیرواقعی باید رد شوند
+3. توضیحات کوتاه، مبهم یا غیرمنطقی باید رد شوند
+4. MP باید بر اساس کیفیت توضیحات و مقایسه با تسلیحات موجود تعیین شود
+5. اگر اختراع واقعاً پیشرفته‌تر از تسلیحات موجود باشد، MP بالاتری بگیرد
+6. اگر اختراع در حد تسلیحات موجود باشد، MP مشابه بگیرد
+
+سیستم امتیازدهی دقیق:
+- توضیحات عالی (مشخصات فنی دقیق: ابعاد، سرعت، برد، سیستم هدفگیری): MP بین ۸ تا ۲۰
+- توضیحات خوب (ویژگی‌های منطقی اما کلی): MP بین ۴ تا ۷
+- توضیحات ضعیف یا غیرواقعی: رد شدن
+
+مهم: MP باید با قدرت واقعی تسلیحات تناسب داشته باشد. یک موشک بالستیک قوی‌تر از یک تانک است.
 
 پاسخ JSON:
 {
   "valid": boolean,
   "reason": "دلیل تایید یا رد به فارسی",
-  "name": "نام اختراع به فارسی (اگر تایید شد)",
+  "name": "نام اختراع به فارسی",
   "type": "${selectedType}",
-  "cost": number (قیمت خرید برای کاربران: 50-200 طلا - ارزان چون تولید ملی است),
-  "mp": number (قدرت رزمی: 5-50 بسته به کیفیت توضیحات),
+  "cost": number (قیمت خرید: ۳۰-۱۵۰ طلا),
+  "mp": number (قدرت: ۴-۲۰ بسته به کیفیت و مقایسه با مرجع),
   "description": "توضیح کوتاه فنی",
-  "minTech": number (1-5)
+  "minTech": number (۱-۵)
 }`;
 
   const schema = {
@@ -2837,32 +2887,35 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   };
   
   try {
-    const raw = await callGemini(prompt, "تو داور سختگیر اختراعات نظامی پنتاگون هستی. فقط اختراعات واقع‌بینانه و علمی را تایید کن.", schema);
+    const raw = await callGemini(prompt, "تو داور سختگیر اختراعات نظامی پنتاگون هستی. فقط اختراعات واقع‌بینانه و علمی را تایید کن. MP باید با مقایسه تسلیحات موجود تعیین شود.", schema);
     const result = JSON.parse(raw);
 
     if (!result.valid) {
       return res.status(400).json({ error: `اختراع رد شد: ${result.reason}` });
     }
 
-    // Invent cost is HIGH (500-2000 gold) - this is the R&D cost
-    const inventCost = Math.min(INVENT_MAX_COST, Math.max(INVENT_BASE_COST, Math.round((result.mp || 10) * 40)));
+    // Clamp MP to reasonable range
+    const finalMP = Math.max(4, Math.min(20, result.mp || 5));
+
+    // Invent cost is HIGH (500-2000 gold) - scales with MP
+    const inventCost = Math.min(2000, Math.max(500, finalMP * 80));
 
     if (user.country.assets.gold < inventCost) {
-      return res.status(400).json({ error: `هزینه اختراع: ${inventCost} طلا. شما طلا کافی ندارید.` });
+      return res.status(400).json({ error: `هزینه R&D: ${inventCost} طلا. شما طلا کافی ندارید.` });
     }
 
     // Deduct invention cost
     user.country.assets.gold -= inventCost;
 
     // Production cost is CHEAP (country makes it domestically)
-    const productionCost = Math.round((result.cost || 100) * 0.3); // 70% discount - domestic production
+    const productionCost = Math.round((result.cost || 50) * 0.3);
 
     const newEquipment: EquipmentItem = {
       id: "inv_" + Math.random().toString(36).substring(2, 9),
       name: result.name,
       type: result.type,
-      cost: productionCost, // CHEAP production cost
-      militaryGained: result.mp,
+      cost: productionCost,
+      militaryGained: finalMP,
       minTech: result.minTech,
       isInvention: true,
       inventorUsername: user.username,
@@ -2877,7 +2930,7 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
       success: true, 
       equipment: newEquipment, 
       inventCost,
-      message: `اختراع "${result.name}" تایید شد! هزینه R&D: ${inventCost} طلا | قیمت تولید: ${productionCost} طلا (تخفیف تولید ملی)` 
+      message: `اختراع "${result.name}" تایید شد! | MP: ${finalMP} | هزینه R&D: ${inventCost} طلا | قیمت تولید: ${productionCost} طلا` 
     });
   } catch (err) {
     res.status(500).json({ error: "خطا در پردازش توسط هوش مصنوعی" });
