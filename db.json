@@ -529,11 +529,11 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 312,
+          "gold": 352,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
-            "oil": 20,
+            "oil": 10,
             "steel": 20.4,
             "food": 20.3
           },
@@ -580,6 +580,12 @@
         {
           "timestamp": "۱۸:۵۲:۵۴",
           "gold": 312,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۸:۵۳:۱۳",
+          "gold": 352,
           "military": 22847,
           "economy": 100
         }
