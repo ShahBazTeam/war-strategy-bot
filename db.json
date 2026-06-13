@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 8176.2,
+          "gold": 3260.9,
           "militaryPower": 1421,
           "economicPower": 95,
           "resources": {
             "oil": 35.9,
-            "steel": 205.1,
+            "steel": 404.1,
             "food": 56.7
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۵:۳۹",
-          "gold": 6568.8,
-          "military": 1421,
-          "economy": 95
-        },
         {
           "timestamp": "۱۹:۴۶:۰۱",
           "gold": 4358.8,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۲۰:۰۵:۴۰",
           "gold": 8176.2,
+          "military": 1421,
+          "economy": 95
+        },
+        {
+          "timestamp": "۲۰:۰۶:۲۲",
+          "gold": 3260.9,
           "military": 1421,
           "economy": 95
         }
@@ -544,11 +544,11 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 190.2,
+          "gold": 799.2,
           "militaryPower": 54860,
           "economicPower": 150,
           "resources": {
-            "oil": 61.6,
+            "oil": 31.6,
             "steel": 25.3,
             "food": 147.3
           },
@@ -580,12 +580,6 @@
         "usa_nuke": 50
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۱:۴۲",
-          "gold": 1776.6,
-          "military": 54862,
-          "economy": 130
-        },
         {
           "timestamp": "۲۰:۰۰:۳۸",
           "gold": 2567,
@@ -667,6 +661,12 @@
         {
           "timestamp": "۲۰:۰۶:۰۳",
           "gold": 190.2,
+          "military": 54860,
+          "economy": 150
+        },
+        {
+          "timestamp": "۲۰:۰۶:۲۶",
+          "gold": 799.2,
           "military": 54860,
           "economy": 150
         }
