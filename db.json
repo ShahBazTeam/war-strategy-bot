@@ -822,8 +822,8 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 796.4,
-          "militaryPower": 47975,
+          "gold": 76.4,
+          "militaryPower": 48047,
           "economicPower": 167,
           "resources": {
             "oil": 65.7,
@@ -847,7 +847,7 @@
       ],
       "warehouse": {
         "rus_t14": 58,
-        "rus_bmp3": 40,
+        "rus_bmp3": 49,
         "rus_su57": 5,
         "rus_ka52": 3,
         "rus_kuznetsov": 1,
@@ -857,12 +857,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۶:۳۳",
-          "gold": 4463.1,
-          "military": 47977,
-          "economy": 138
-        },
         {
           "timestamp": "۲۰:۰۶:۳۳",
           "gold": 4568.1,
@@ -945,6 +939,12 @@
           "timestamp": "۲۰:۱۸:۰۲",
           "gold": 796.4,
           "military": 47975,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۱۸:۴۳",
+          "gold": 76.4,
+          "military": 48047,
           "economy": 167
         }
       ]
@@ -1634,6 +1634,15 @@
           "flagUrl": "🇷🇺",
           "text": "اسراییل صهیونستی نابودت میکنم",
           "timestamp": "2026-06-13T20:17:25.468Z"
+        },
+        {
+          "id": "comment_dz2ou8z",
+          "userId": "user_1781376553710_mgz8a2x",
+          "username": "mahdi",
+          "countryName": "اسرائیل",
+          "flagUrl": "🇮🇱",
+          "text": "این نوع صحبت نادرست هست و با این لحن متوجه میشیم که من کسی نیستم که دنبال اتم هستم شما دنبال کشتار هستی",
+          "timestamp": "2026-06-13T20:18:50.365Z"
         }
       ]
     },
