@@ -2313,6 +2313,63 @@ app.post("/api/admin/update-prices", (req, res) => {
   res.json({ prices: db.resourcePrices });
 });
 
+app.post("/api/admin/reset-user", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  const { targetUserId } = req.body;
+  const target = db.users.find(u => u.id === targetUserId);
+  if (!target) return res.status(404).json({ error: "کاربر یافت نشد" });
+
+  const countryName = target.country.name;
+  const countryOriginal = target.country.originalName;
+  const countryFlag = target.country.flagUrl;
+  const countrySlogan = target.country.slogan;
+
+  target.country.assets = {
+    gold: 1000,
+    militaryPower: 100,
+    economicPower: 100,
+    resources: { oil: 50, steel: 50, food: 50 },
+    techLevel: 1,
+    factoryLevel: 1,
+    lastIncomeUpdate: Date.now()
+  };
+  target.equipmentSlots = [];
+  target.warehouse = {};
+  target.assetLog = [{ timestamp: "ریست توسط ادمین", gold: 1000, military: 100, economy: 100 }];
+
+  saveDatabase();
+  res.json({ message: `کشور ${countryName} ریست شد`, user: target });
+});
+
+app.post("/api/admin/delete-user", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  const { targetUserId } = req.body;
+  const idx = db.users.findIndex(u => u.id === targetUserId);
+  if (idx === -1) return res.status(404).json({ error: "کاربر یافت نشد" });
+
+  const deleted = db.users.splice(idx, 1)[0];
+  saveDatabase();
+  res.json({ message: `کاربر ${deleted.username} حذف شد` });
+});
+
+app.post("/api/admin/delete-all-users", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  const count = db.users.length;
+  db.users = [];
+  db.wars = [];
+  db.alliances = [];
+  db.tradeOffers = [];
+  db.unProposals = [];
+  saveDatabase();
+  res.json({ message: `${count} کاربر حذف شدند. تمام داده‌ها ریست شد.` });
+});
+
 // CRON-LIKE FORCE UPDATE OF PRICES USING GEMINI VALUE FORECASTING
 app.post("/api/market/update-prices-ai", checkRateLimit, async (req, res) => {
   const prompt = `نرخ ارزش معاملاتی روز گذشته منابع حیاتی و استراتژیک در کلان بازار ملل:

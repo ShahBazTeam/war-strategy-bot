@@ -592,6 +592,30 @@ export default function App() {
     return res.logs || [];
   };
 
+  const adminResetUser = async (targetUserId: string) => {
+    await apiCall("/api/admin/reset-user", {
+      method: "POST",
+      body: JSON.stringify({ targetUserId })
+    });
+    fetchGlobalData();
+    showTemporarySuccess("کشور با موفقیت ریست شد!");
+  };
+
+  const adminDeleteUser = async (targetUserId: string) => {
+    await apiCall("/api/admin/delete-user", {
+      method: "POST",
+      body: JSON.stringify({ targetUserId })
+    });
+    fetchGlobalData();
+    showTemporarySuccess("کاربر حذف شد!");
+  };
+
+  const adminDeleteAllUsers = async () => {
+    await apiCall("/api/admin/delete-all-users", { method: "POST" });
+    fetchGlobalData();
+    showTemporarySuccess("تمام کاربران حذف شدند!");
+  };
+
   // Check ongoing wars
   const activeUserWar = wars.find(
     (w) => w.status === "active" && (w.attackerId === userId || w.defenderId === userId)
@@ -1067,10 +1091,14 @@ export default function App() {
                     user={currentUser}
                     wars={wars}
                     prices={prices}
+                    allUsers={allUsers}
                     onAdminUpdatePrices={adminChangePricesDirect}
                     onAdminOverrideWar={adminOverrideConflictState}
                     onAdminBroadcast={adminPublishBroadcast}
                     onFetchLogs={adminFetchGeminiQueryLogs}
+                    onAdminResetUser={adminResetUser}
+                    onAdminDeleteUser={adminDeleteUser}
+                    onAdminDeleteAllUsers={adminDeleteAllUsers}
                   />
                 )}
               </motion.div>

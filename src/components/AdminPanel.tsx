@@ -1,25 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { User, WarReasonSubmission, GeminiLog } from "../types";
-import { Settings, ShieldCheck, HelpCircle, Save, Megaphone, Terminal, FileCode, CheckCircle, RefreshCw } from "lucide-react";
+import { Settings, ShieldCheck, HelpCircle, Save, Megaphone, Terminal, FileCode, CheckCircle, RefreshCw, Trash2, RotateCcw, Users, AlertTriangle } from "lucide-react";
 
 interface AdminPanelProps {
   user: User;
   wars: WarReasonSubmission[];
   prices: { oil: number; steel: number; food: number };
+  allUsers: { id: string; username: string; country: { name: string; flagUrl: string } }[];
   onAdminUpdatePrices: (oil: number, steel: number, food: number) => void;
   onAdminOverrideWar: (warId: string, status: string) => void;
   onAdminBroadcast: (text: string) => void;
   onFetchLogs: () => Promise<GeminiLog[]>;
+  onAdminResetUser: (targetUserId: string) => Promise<void>;
+  onAdminDeleteUser: (targetUserId: string) => Promise<void>;
+  onAdminDeleteAllUsers: () => Promise<void>;
 }
 
 export default function AdminPanel({
   user,
   wars,
   prices,
+  allUsers,
   onAdminUpdatePrices,
   onAdminOverrideWar,
   onAdminBroadcast,
-  onFetchLogs
+  onFetchLogs,
+  onAdminResetUser,
+  onAdminDeleteUser,
+  onAdminDeleteAllUsers
 }: AdminPanelProps) {
   const [broadcastText, setBroadcastText] = useState("");
   const [oilPrice, setOilPrice] = useState(prices.oil.toString());
@@ -28,6 +36,7 @@ export default function AdminPanel({
 
   const [aiLogs, setAiLogs] = useState<GeminiLog[]>([]);
   const [isLogsLoading, setIsLogsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const loadLogs = async () => {
     setIsLogsLoading(true);
@@ -117,6 +126,74 @@ export default function AdminPanel({
           </form>
         </div>
 
+      </div>
+
+      {/* USER MANAGEMENT */}
+      <div className="rounded-2xl border border-amber-500/20 bg-amber-950/5 p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h2 className="text-sm font-bold text-amber-300 flex items-center gap-1.5">
+            <Users className="h-5 w-5" /> مدیریت کاربران و کشورها
+          </h2>
+          <button
+            onClick={async () => {
+              if (!confirm("آیا مطمئنید؟ تمام کشورها، جنگ‌ها، اتحادها و معاملات پاک می‌شوند!")) return;
+              setIsProcessing("delete_all");
+              await onAdminDeleteAllUsers();
+              setIsProcessing(null);
+            }}
+            disabled={isProcessing === "delete_all"}
+            className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
+          >
+            <AlertTriangle className="h-3.5 w-3.5" />
+            {isProcessing === "delete_all" ? "در حال حذف..." : "حذف تمام کاربران و ریست کامل"}
+          </button>
+        </div>
+
+        {allUsers.length === 0 ? (
+          <p className="text-slate-500 text-xs text-center py-6">هیچ کاربری ثبت‌نام نکرده است.</p>
+        ) : (
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {allUsers.filter(u => u.username !== "admin").map((u) => (
+              <div key={u.id} className="rounded-lg bg-slate-950/50 p-3 border border-slate-900 text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{u.country.flagUrl}</span>
+                  <div>
+                    <p className="font-bold text-slate-200">{u.country.name}</p>
+                    <p className="text-slate-500 text-[10px] font-mono">@{u.username} | ID: {u.id}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`آیا کشور ${u.country.name} ریست شود؟ تجهیزات و منابع پاک می‌شوند.`)) return;
+                      setIsProcessing(u.id + "_reset");
+                      await onAdminResetUser(u.id);
+                      setIsProcessing(null);
+                    }}
+                    disabled={isProcessing === u.id + "_reset"}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-600/30 text-amber-400 text-[10px] font-bold rounded transition cursor-pointer disabled:opacity-50"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    {isProcessing === u.id + "_reset" ? "..." : "ریست"}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`آیا کاربر @${u.username} حذف شود؟ این عمل غیرقابل بازگشت است!`)) return;
+                      setIsProcessing(u.id + "_delete");
+                      await onAdminDeleteUser(u.id);
+                      setIsProcessing(null);
+                    }}
+                    disabled={isProcessing === u.id + "_delete"}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-600/30 text-red-400 text-[10px] font-bold rounded transition cursor-pointer disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    {isProcessing === u.id + "_delete" ? "..." : "حذف"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* WAR CONTROL AND OVERRIDES */}
