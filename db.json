@@ -129,17 +129,17 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 315.7,
-          "militaryPower": 1437,
-          "economicPower": 86,
+          "gold": 627.5,
+          "militaryPower": 1435,
+          "economicPower": 85,
           "resources": {
-            "oil": 6.9,
-            "steel": 74,
-            "food": 8.3
+            "oil": 7.2,
+            "steel": 64.2,
+            "food": 8.7
           },
           "techLevel": 1,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781378735409
+          "lastIncomeUpdate": 1781378795409
         }
       },
       "equipmentSlots": [
@@ -169,18 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۲۲:۵۶",
-          "gold": 1207.5,
-          "military": 1443,
-          "economy": 89
-        },
-        {
-          "timestamp": "۱۹:۲۳:۰۱",
-          "gold": 1519.5,
-          "military": 1443,
-          "economy": 89
-        },
         {
           "timestamp": "۱۹:۲۳:۱۴",
           "gold": 1831.5,
@@ -258,6 +246,18 @@
           "gold": 315.7,
           "military": 1437,
           "economy": 86
+        },
+        {
+          "timestamp": "۱۹:۲۶:۳۶",
+          "gold": 329.5,
+          "military": 1435,
+          "economy": 85
+        },
+        {
+          "timestamp": "۱۹:۲۶:۳۶",
+          "gold": 627.5,
+          "military": 1435,
+          "economy": 85
         }
       ]
     },
@@ -1198,6 +1198,15 @@
           "flagUrl": "🇷🇺",
           "text": "در نظر میگیرخ ولی پاسخ نمیده",
           "timestamp": "2026-06-13T19:24:09.638Z"
+        },
+        {
+          "id": "comment_mht15kl",
+          "userId": "user_1781376553710_mgz8a2x",
+          "username": "mahdi",
+          "countryName": "اسرائیل",
+          "flagUrl": "🇮🇱",
+          "text": "اها همین خوبه",
+          "timestamp": "2026-06-13T19:26:34.254Z"
         }
       ]
     },
