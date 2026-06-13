@@ -683,17 +683,17 @@
         "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 947370,
-          "militaryPower": 40311,
+          "gold": 917142,
+          "militaryPower": 55294,
           "economicPower": 239,
           "resources": {
             "oil": 0,
-            "steel": 62.2,
-            "food": 12518.6
+            "steel": 68.4,
+            "food": 12521.7
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781387953710
+          "lastIncomeUpdate": 1781388013710
         }
       },
       "equipmentSlots": [
@@ -718,21 +718,9 @@
         "isr_iron_dome": 1,
         "isr_jericho": 1,
         "isr_nuke": 24,
-        "inv_0sq19px": 999
+        "inv_0sq19px": 1998
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۴۹:۵۱",
-          "gold": 4845.6,
-          "military": 25346,
-          "economy": 239
-        },
-        {
-          "timestamp": "۲۱:۵۰:۰۹",
-          "gold": 960415.6,
-          "military": 25346,
-          "economy": 239
-        },
         {
           "timestamp": "۲۱:۵۰:۱۹",
           "gold": 960798,
@@ -810,6 +798,18 @@
           "gold": 947370,
           "military": 40311,
           "economy": 239
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۷",
+          "gold": 953106,
+          "military": 40309,
+          "economy": 239
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۷",
+          "gold": 917142,
+          "military": 55294,
+          "economy": 239
         }
       ]
     },
@@ -824,11 +824,11 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 452276.1,
+          "gold": 508376.1,
           "militaryPower": 48047,
           "economicPower": 287,
           "resources": {
-            "oil": 3404.5,
+            "oil": 404.5,
             "steel": 451.5,
             "food": 22964.5
           },
@@ -860,24 +860,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۲:۰۰:۰۹",
-          "gold": 190476.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۹",
-          "gold": 209176.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۹",
-          "gold": 227876.1,
-          "military": 48047,
-          "economy": 287
-        },
         {
           "timestamp": "۲۲:۰۰:۰۹",
           "gold": 246576.1,
@@ -947,6 +929,24 @@
         {
           "timestamp": "۲۲:۰۰:۱۱",
           "gold": 452276.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 470976.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 489676.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 508376.1,
           "military": 48047,
           "economy": 287
         }
