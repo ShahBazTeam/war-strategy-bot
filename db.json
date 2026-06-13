@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 55460,
+          "gold": 55620,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 589.3,
-            "steel": 1393,
-            "food": 1393
+            "oil": 591.9,
+            "steel": 1419,
+            "food": 1419
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781379808567
+          "lastIncomeUpdate": 1781379868567
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۱۹:۳۰:۲۷",
-          "gold": 53300,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۳۱:۲۷",
           "gold": 53380,
@@ -115,6 +109,12 @@
           "gold": 55460,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۴۴:۳۲",
+          "gold": 55620,
+          "military": 100,
+          "economy": 100
         }
       ]
     },
@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 901.8,
+          "gold": 525.6,
           "militaryPower": 1421,
           "economicPower": 95,
           "resources": {
             "oil": 16.3,
-            "steel": 250.2,
+            "steel": 269.2,
             "food": 23.9
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۳۹:۰۹",
-          "gold": 315.4,
-          "military": 1421,
-          "economy": 82
-        },
         {
           "timestamp": "۱۹:۳۹:۱۳",
           "gold": 94.4,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۱۹:۴۴:۲۷",
           "gold": 901.8,
+          "military": 1421,
+          "economy": 95
+        },
+        {
+          "timestamp": "۱۹:۴۴:۳۱",
+          "gold": 525.6,
           "military": 1421,
           "economy": 95
         }
