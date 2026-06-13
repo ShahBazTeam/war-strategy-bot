@@ -900,7 +900,8 @@ app.post("/api/factory/scrap", (req, res) => {
 
   // Deduct military power proportionally
   const config = CATALOG.find(c => c.id === itemType);
-  const mpVal = config ? config.mp : 5;
+  const invItem = db.inventions.find(i => i.id === itemType);
+  const mpVal = config ? config.mp : (invItem ? invItem.militaryGained : 5);
   user.country.assets.militaryPower = Math.max(10, user.country.assets.militaryPower - (mpVal * deductQty));
 
   updateAndLogUserAssets(user);
@@ -2814,13 +2815,17 @@ app.post("/api/inventions/:id/buy", checkRateLimit, (req, res) => {
     user.equipmentSlots.push(id);
   }
 
+  // Add military power to buyer
+  const mpGain = (inv.militaryGained || 0) * q;
+  user.country.assets.militaryPower += mpGain;
+
   updateAndLogUserAssets(user);
   updateAndLogUserAssets(inventor);
   saveDatabase();
 
   res.json({ 
     user, 
-    message: `${q} عدد ${inv.name} از ${inventor.username} خریداری شد. هزینه: ${totalCost} طلا` 
+    message: `${q} عدد ${inv.name} از ${inventor.username} خریداری شد. +${mpGain} قدرت نظامی. هزینه: ${totalCost} طلا` 
   });
 });
 
