@@ -51,9 +51,11 @@ export interface EquipmentItem {
   isInvention?: boolean;
   inventorUsername?: string;
   inventorCountryName?: string;
-  sellPrice?: number; // Price inventor sets for selling to others
-  isForSale?: boolean; // Is inventor selling this?
-  forSaleUntil?: string; // ISO timestamp - when sale ends
+  tags?: string[];
+  sellPrice?: number;
+  isForSale?: boolean;
+  forSaleUntil?: string;
+  description?: string;
 }
 
 export interface TradeOffer {

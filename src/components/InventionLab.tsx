@@ -10,7 +10,7 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("ground_forces");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{message: string; equipment?: EquipmentItem; error?: string} | null>(null);
+  const [result, setResult] = useState<{message: string; equipment?: EquipmentItem; comparison?: string; error?: string} | null>(null);
 
   const categories = [
     { value: "ground_forces", label: "نیروی زمینی (تانک/نفربر)" },
@@ -37,7 +37,7 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
       });
       const data = await res.json();
       if (res.ok) {
-        setResult({ message: data.message, equipment: data.equipment });
+        setResult({ message: data.message, equipment: data.equipment, comparison: data.comparison });
         setDescription("");
       } else {
         setResult({ error: data.error || "خطای نامشخص" });
@@ -57,7 +57,7 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
           <FlaskConical className="h-6 w-6 text-emerald-400" />
           آزمایشگاه پژوهش و فناوری (R&D Lab)
         </h2>
-        <p className="text-slate-400 text-sm mt-2">اختراعات نظامی خود را تعریف کنید. هوش مصنوعی جمینی آن‌ها را از نظر علمی بررسی کرده و در صورت تایید، به تجهیزات ملی شما افزوده می‌شود.</p>
+        <p className="text-slate-400 text-sm mt-2">اختراعات نظامی خود را با مشخصات فنی دقیق تعریف کنید. حداقل ۱۰۰ کاراکتر با اطلاعات: ابعاد، سرعت، برد، سیستم هدفگیری و مقایسه با تسلیحات موجود. هوش مصنوعی بسیار سختگیرانه بررسی می‌کند.</p>
       </div>
 
       {/* Invention Form */}
@@ -78,13 +78,13 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="شرح دقیق اختراع خود را وارد کنید (مثلا: تانک سبک با بدنه کامپوزیت برای سرعت بالا در صحرا)..."
+            placeholder="مثال: موشک بالستیک میان‌برد با برد ۱۵۰۰ کیلومتر، سرعت ۱۰۰۰۰ کیلومتر بر ساعت، سیستم هدفگیری INS/GPS، ارتفاع پرواز ۳۰۰ کیلومتر، کلاهک ۵۰۰ کیلوتنی. مقایسه با DF-17: برد کمتر اما دقت بالاتر..."
             rows={4}
             className="w-full bg-white/5 border border-white/10 p-3 rounded text-sm text-white focus:outline-none focus:border-emerald-500"
           />
           <button
             type="submit"
-            disabled={loading || description.length < 10}
+            disabled={loading || description.length < 100}
             className="w-full py-3 rounded bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 text-white font-bold transition flex items-center justify-center gap-2"
           >
             {loading ? <RefreshCw className="animate-spin h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
@@ -106,6 +106,7 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
                   <p><strong>نام:</strong> {result.equipment.name}</p>
                   <p><strong>نوع:</strong> {result.equipment.type}</p>
                   <p><strong>قدرت نظامی:</strong> +{result.equipment.militaryGained}</p>
+                  {result.comparison && <p><strong>مقایسه:</strong> {result.comparison}</p>}
                 </div>
               )}
             </div>

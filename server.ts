@@ -2826,61 +2826,95 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { description, category } = req.body;
-  if (!description || description.length < 50) return res.status(400).json({ error: "شرح اختراع باید حداقل ۵۰ کاراکتر باشد. توضیحات دقیق‌تر = قدرت بیشتر!" });
+  if (!description || description.length < 100) return res.status(400).json({ error: "شرح اختراع باید حداقل ۱۰۰ کاراکتر باشد. مشخصات فنی دقیق وارد کنید: ابعاد، سرعت، برد، سیستم هدفگیری، مواد استفاده شده." });
 
   const validTypes = ["ground_forces", "air_force", "navy", "air_defense", "missile", "nuclear", "drone", "artillery", "special_forces"];
   const selectedType = validTypes.includes(category) ? category : "ground_forces";
 
   // Reference values for the AI to compare against
-  const REFERENCE_WEAPONS: Record<string, { name: string; mp: number }[]> = {
-    ground_forces: [{ name: "M1 Abrams", mp: 8 }, { name: "T-90", mp: 7 }, { name: "Leopard 2", mp: 8 }],
-    air_force: [{ name: "F-35", mp: 12 }, { name: "Su-57", mp: 11 }, { name: "F-22", mp: 13 }],
-    navy: [{ name: "Nimitz Carrier", mp: 15 }, { name: "Type 055 Destroyer", mp: 10 }],
-    missile: [{ name: "Tomahawk", mp: 9 }, { name: "Iskander", mp: 10 }, { name: "Hypersonic DF-17", mp: 14 }],
-    nuclear: [{ name: "W88 Warhead", mp: 20 }, { name: "Thermonuclear", mp: 25 }],
-    drone: [{ name: "MQ-9 Reaper", mp: 6 }, { name: "Bayraktar TB2", mp: 5 }],
-    air_defense: [{ name: "S-400", mp: 11 }, { name: "Patriot PAC-3", mp: 10 }],
-    artillery: [{ name: "M777 Howitzer", mp: 5 }, { name: "PzH 2000", mp: 6 }],
-    special_forces: [{ name: "Navy SEALs Team", mp: 4 }, { name: "SAS Squadron", mp: 4 }]
+  const REFERENCE_WEAPONS: Record<string, { name: string; mp: number; specs: string }[]> = {
+    ground_forces: [
+      { name: "M1A2 Abrams", mp: 8, specs: "تانک اصلی میدان نبرد، زره کامپوزیتی Chobham، توپ ۱۲۰mm، سرعت ۶۷km/h" },
+      { name: "T-90M", mp: 7, specs: "تانک روسی، زره реакتیوی ERA، توپ ۱۲۵mm، سیستم هدفگیری خودکار" },
+      { name: "Leopard 2A7", mp: 8, specs: "تانک آلمانی، زره کامپوزیتی، توپ ۱۲۰mm L/55، سرعت ۶۸km/h" }
+    ],
+    air_force: [
+      { name: "F-35A Lightning II", mp: 12, specs: "جنگنده نسل پنجم، رادارگریز، سرعت ۱.۶ ماخ، برد ۲۲۰۰km، حمل ۸ تیر بمب" },
+      { name: "Su-57 Felon", mp: 11, specs: "جنگنده روسی نسل پنجم، رادارگریز، سرعت ۲ ماخ، برد ۱۵۰۰km" },
+      { name: "F-22 Raptor", mp: 13, specs: "جنگنده برتری هوایی، رادارگریز، سرعت ۲.۲۵ ماخ، برد ۲۹۶۰km" }
+    ],
+    navy: [
+      { name: "USS Nimitz Carrier", mp: 15, specs: "ناو هواپیمابر هسته‌ای، ۹۰ هواپیما، سرعت ۳۰+ گره، خدمه ۵۰۰۰ نفر" },
+      { name: "Type 055 Destroyer", mp: 10, specs: "ناوشکن چینی، ۱۱۲ سلول VLS، رادار AESA، سرعت ۳۰ گره" }
+    ],
+    missile: [
+      { name: "BGM-109 Tomahawk", mp: 9, specs: "موشک کروز، برد ۱۶۰۰km، سرعت ۸۸۰km/h، هدفگیری GPS/TERCOM" },
+      { name: "Iskander-M", mp: 10, specs: "موشک بالستیک کوتاه‌برد، برد ۵۰۰km، سرعت ۷۲۰۰km/h، ارتفاع پرواز ۵۰km" },
+      { name: "DF-17 Hypersonic", mp: 14, specs: "موشک هایپرسونیک، برد ۲۵۰۰km، سرعت ۱۲۲۰۰km/h، اوج ۳۰۰km" }
+    ],
+    nuclear: [
+      { name: "W88 Warhead", mp: 20, specs: "کلاهک هسته‌ای ۴۷۵ کیلوتن، چاشنی.implosion، قابل حمل بر ICBM" },
+      { name: "Thermonuclear B83", mp: 25, specs: "بمب هسته‌ای حرارتی ۱.۲ مگاتن، قوی‌ترین بمب آمریکایی" }
+    ],
+    drone: [
+      { name: "MQ-9 Reaper", mp: 6, specs: "پهپاد مسلح، برد ۱۹۰۰km، پرواز ۲۷ ساعت، حمل ۴ موشک Hellfire" },
+      { name: "Bayraktar TB2", mp: 5, specs: "پهپاد ترکی، برد ۱۵۰km، پرواز ۲۷ ساعت، حمل ۴ بمب MAM" }
+    ],
+    air_defense: [
+      { name: "S-400 Triumf", mp: 11, specs: "سیستم پدافند، برد ۴۰۰km، ردیابی ۳۰۰ هدف، رهگیری ۷۲ هدف همزمان" },
+      { name: "Patriot PAC-3", mp: 10, specs: "سیستم پدافند، برد ۱۸۰km، رهگیری بالستیکی، رادار AN/MPQ-65" }
+    ],
+    artillery: [
+      { name: "M777 Howitzer", mp: 5, specs: "توپ ۱۵۵mm، برد ۲۴km، وزن ۴.۲ تن، نیروی هوایی" },
+      { name: "PzH 2000", mp: 6, specs: "توپ خودکشی، برد ۵۶km، نرخ شلیک ۱۰ گلوله/دقیقه، زره سبک" }
+    ],
+    special_forces: [
+      { name: "Navy SEALs Team", mp: 4, specs: "تیم ۱۲ نفره، تسلیحات پیشرفته، عملیات ویژه دریایی" },
+      { name: "SAS Squadron", mp: 4, specs: "تیم ۱۶ نفره، تخصص جنگ شهری و ضد تروریسم" }
+    ]
   };
 
   const refs = REFERENCE_WEAPONS[selectedType] || [];
-  const refText = refs.map(r => `${r.name} (MP: ${r.mp})`).join("، ");
+  const refText = refs.map(r => `- ${r.name} (MP: ${r.mp}): ${r.specs}`).join("\n");
 
-  const prompt = `تو کمیته داوری سختگیر اختراعات نظامی پنتاگون هستی.
+  const prompt = `تو کمیته داوری بسیار سختگیر اختراعات نظامی هستی. وظیفه شما جلوگیری از اختراعات غیرواقعی، ضعیف، یا کپی از تسلیحات موجود است.
 
-کشور: ${user.country.name}
+کشور مخترع: ${user.country.name}
 دسته‌بندی: ${selectedType}
-شرح اختراع: "${description}"
+شرح اختراع کاربر:
+"${description}"
 
-ارزش‌های مرجع تسلیحات موجود در بازار:
+=== تسلیحات موجود در همین دسته‌بندی (برای مقایسه اجباری) ===
 ${refText}
 
-قوانین بسیار سختگیرانه:
-1. اختراع باید کاملاً واقع‌بینانه و علمی باشد
-2. اختراعات تخیلی، جادویی، یا غیرواقعی باید رد شوند
-3. توضیحات کوتاه، مبهم یا غیرمنطقی باید رد شوند
-4. MP باید بر اساس کیفیت توضیحات و مقایسه با تسلیحات موجود تعیین شود
-5. اگر اختراع واقعاً پیشرفته‌تر از تسلیحات موجود باشد، MP بالاتری بگیرد
-6. اگر اختراع در حد تسلیحات موجود باشد، MP مشابه بگیرد
+=== قوانین بسیار سختگیرانه ===
+1. اختراع باید کاملاً واقع‌بینانه، علمی و فنی باشد
+2. اختراعات تخیلی، جادویی، غیرواقعی یا کپی از تسلیحات موجود (مثل B2، F-22 و...) رد شوند
+3. توضیحات کوتاه، مبهم، غیرمنطقی یا بدون مشخصات فنی باید رد شوند
+4. باید حداقل این مشخصات را داشته باشد: ابعاد/وزن، سرعت/برد، سیستم هدفگیری/هدایت، مواد/تکنولوژی ساخت
+5. اگر اختراع کپی یا نسخه بهبودیافته تسلیحات موجود است، باید تفاوت‌های اساسی و واقع‌بینانه ذکر شود
+6. اختراع باید با یکی از تسلیحات موجود مقایسه شود و مشخص شود چرا قوی‌تر یا متفاوت است
 
-سیستم امتیازدهی دقیق:
-- توضیحات عالی (مشخصات فنی دقیق: ابعاد، سرعت، برد، سیستم هدفگیری): MP بین ۸ تا ۲۰
-- توضیحات خوب (ویژگی‌های منطقی اما کلی): MP بین ۴ تا ۷
-- توضیحات ضعیف یا غیرواقعی: رد شدن
+=== سیستم امتیازدهی بسیار سخت ===
+- MP = ۴ تا ۷: تسلیحات متوسط، مشابه تسلیحات موجود
+- MP = ۸ تا ۱۲: تسلیحات پیشرفته، بهتر از اکثر تسلیحات موجود
+- MP = ۱۳ تا ۱۶: تسلیحات نسل بعدی، بسیار پیشرفته‌تر از موجود
+- MP = ۱۷ تا ۲۰: تسلیحات انقلابی، تغییردهنده بازی
+- MP > ۲۰: تقریباً غیرممکن - فقط برای اختراعات فوق‌العاده
 
-مهم: MP باید با قدرت واقعی تسلیحات تناسب داشته باشد. یک موشک بالستیک قوی‌تر از یک تانک است.
+مهم: اگر توضیحات کافی نیست، رد کن. اگر اختراع واقعاً عالی است، MP بالا بده اما با دلیل.
 
 پاسخ JSON:
 {
   "valid": boolean,
-  "reason": "دلیل تایید یا رد به فارسی",
-  "name": "نام اختراع به فارسی",
+  "reason": "دلیل دقیق تایید یا رد به فارسی (حداقل ۲۰ کلمه)",
+  "name": "نام اختراع به فارسی (اگر تایید شد)",
   "type": "${selectedType}",
   "cost": number (قیمت خرید: ۳۰-۱۵۰ طلا),
-  "mp": number (قدرت: ۴-۲۰ بسته به کیفیت و مقایسه با مرجع),
-  "description": "توضیح کوتاه فنی",
-  "minTech": number (۱-۵)
+  "mp": number (قدرت: ۴-۲۰ بسته به مقایسه),
+  "description": "توضیح فنی کوتاه اختراع",
+  "minTech": number (۱-۵),
+  "comparison": "نام تسلیحاتی که با آن مقایسه شد + چرا قوی‌تر/متفاوت است"
 }`;
 
   const schema = {
@@ -2893,17 +2927,26 @@ ${refText}
       cost: { type: Type.NUMBER },
       mp: { type: Type.NUMBER },
       description: { type: Type.STRING },
-      minTech: { type: Type.NUMBER }
+      minTech: { type: Type.NUMBER },
+      comparison: { type: Type.STRING }
     },
     required: ["valid", "reason"]
   };
   
   try {
-    const raw = await callGemini(prompt, "تو داور سختگیر اختراعات نظامی پنتاگون هستی. فقط اختراعات واقع‌بینانه و علمی را تایید کن. MP باید با مقایسه تسلیحات موجود تعیین شود.", schema);
+    const raw = await callGemini(prompt, "تو داور سختگیر اختراعات نظامی هستی. فقط اختراعات واقع‌بینانه، علمی و متفاوت از تسلیحات موجود را تایید کن. MP باید با مقایسه دقیق تسلیحات موجود تعیین شود.", schema);
     const result = JSON.parse(raw);
 
     if (!result.valid) {
       return res.status(400).json({ error: `اختراع رد شد: ${result.reason}` });
+    }
+
+    // Double-check: ensure no duplicate names with existing CATALOG or inventions
+    const nameLower = (result.name || "").toLowerCase();
+    const isDuplicate = CATALOG.some(c => c.name.toLowerCase() === nameLower) || 
+                        db.inventions.some(i => i.name.toLowerCase() === nameLower);
+    if (isDuplicate) {
+      return res.status(400).json({ error: `اختراع رد شد: نام "${result.name}" مشابه تسلیحات موجود است. نام منحصربه‌فرد انتخاب کنید.` });
     }
 
     // Clamp MP to reasonable range
@@ -2928,10 +2971,12 @@ ${refText}
       type: result.type,
       cost: productionCost,
       militaryGained: finalMP,
-      minTech: result.minTech,
+      minTech: result.minTech || 1,
       isInvention: true,
       inventorUsername: user.username,
-      inventorCountryName: user.country.name
+      inventorCountryName: user.country.name,
+      tags: [user.country.originalName?.toLowerCase() || "", user.country.name.toLowerCase()],
+      description: result.description || `${result.name} - اختراع ${user.country.name}`
     };
 
     db.inventions.push(newEquipment);
@@ -2942,7 +2987,8 @@ ${refText}
       success: true, 
       equipment: newEquipment, 
       inventCost,
-      message: `اختراع "${result.name}" تایید شد! | MP: ${finalMP} | هزینه R&D: ${inventCost} طلا | قیمت تولید: ${productionCost} طلا` 
+      comparison: result.comparison || "",
+      message: `اختراع "${result.name}" تایید شد! | MP: ${finalMP} | مقایسه: ${result.comparison || "نامشخص"} | هزینه R&D: ${inventCost} طلا | قیمت تولید: ${productionCost} طلا` 
     });
   } catch (err) {
     res.status(500).json({ error: "خطا در پردازش توسط هوش مصنوعی" });
