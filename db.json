@@ -33,53 +33,6 @@
           "economy": 100
         }
       ]
-    },
-    {
-      "id": "user_1781376248387_m5o1dtu",
-      "username": "mohsen",
-      "password": "eAb4FMyqPLKde9NeiAdp",
-      "isAdmin": false,
-      "country": {
-        "name": "ایتالیا",
-        "originalName": "Italy",
-        "slogan": "آزادی کشور تحت قانون برابری",
-        "flagUrl": "🇮🇹",
-        "assets": {
-          "gold": 300,
-          "militaryPower": 645,
-          "economicPower": 100,
-          "resources": {
-            "oil": 20,
-            "steel": 20,
-            "food": 20
-          },
-          "techLevel": 1,
-          "factoryLevel": 1,
-          "lastIncomeUpdate": 1781376248387
-        }
-      },
-      "equipmentSlots": [
-        "ita_ariete",
-        "ita_freccia",
-        "ita_typhoon",
-        "ita_cavour",
-        "ita_orizzonte"
-      ],
-      "warehouse": {
-        "ita_ariete": 2,
-        "ita_freccia": 5,
-        "ita_typhoon": 7,
-        "ita_cavour": 1,
-        "ita_orizzonte": 1
-      },
-      "assetLog": [
-        {
-          "timestamp": "ثبت‌نام توسط ادمین",
-          "gold": 300,
-          "military": 645,
-          "economy": 100
-        }
-      ]
     }
   ],
   "tradeOffers": [],
