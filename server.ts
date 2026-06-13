@@ -255,63 +255,33 @@ let db: GameDatabase = {
 
 // Synchronized read write database functions
 function loadDatabase() {
-  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
   try {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(raw);
-      // Validate parsed has essential fields
-      if (parsed && parsed.users && Array.isArray(parsed.users)) {
-        db = { ...db, ...parsed };
-        // Only save backup if there are actual users (prevents overwriting good backup with empty db)
-        if (db.users.length > 0) {
-          fs.writeFileSync(BACKUP_FILE, raw, "utf-8");
-        }
-        console.log(`[DB] Loaded ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
+      if (parsed && Array.isArray(parsed.users)) {
+        db = parsed as GameDatabase;
+        console.log(`[DB] Loaded: ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
       } else {
-        throw new Error("Invalid DB structure");
-      }
-    } else if (fs.existsSync(BACKUP_FILE)) {
-      // Only restore from backup if main file is MISSING (not if it was intentionally cleared)
-      const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
-      if (parsed && parsed.users && parsed.users.length > 0) {
-        db = { ...db, ...parsed };
+        console.log("[DB] Invalid DB file, starting fresh");
         saveDatabase();
-        console.log(`[DB] Restored from backup: ${db.users.length} users`);
-      } else {
-        saveDatabase();
-        console.log("[DB] Created fresh database (backup was empty)");
       }
     } else {
+      console.log("[DB] No DB file found, starting fresh");
       saveDatabase();
-      console.log("[DB] Created fresh database");
     }
   } catch (e) {
-    console.error("[DB] Failed to load main DB, trying backup:", e);
-    try {
-      if (fs.existsSync(BACKUP_FILE)) {
-        const parsed = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
-        if (parsed && parsed.users && parsed.users.length > 0) {
-          db = { ...db, ...parsed };
-          saveDatabase();
-          console.log(`[DB] Recovered from backup: ${db.users.length} users`);
-        }
-      }
-    } catch (e2) {
-      console.error("[DB] Backup also failed:", e2);
-    }
+    console.error("[DB] Load error:", e);
+    saveDatabase();
   }
 }
 
 function saveDatabase() {
-  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
   try {
     const data = JSON.stringify(db, null, 2);
     fs.writeFileSync(DB_FILE, data, "utf-8");
-    // Also save backup every time
-    fs.writeFileSync(BACKUP_FILE, data, "utf-8");
   } catch (e) {
-    console.error("Failed to save JSON database:", e);
+    console.error("[DB] Save error:", e);
   }
 }
 
@@ -2534,7 +2504,7 @@ app.post("/api/admin/delete-all-users", (req, res) => {
   const count = db.users.length;
   
   // FULLY RESET DATABASE TO FRESH STATE
-  db = {
+  const freshDb: GameDatabase = {
     users: [],
     tradeOffers: [],
     wars: [],
@@ -2547,13 +2517,18 @@ app.post("/api/admin/delete-all-users", (req, res) => {
     globalAnnouncements: ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."]
   };
   
-  saveDatabase();
+  // Write directly to file - bypass any in-memory issues
+  try {
+    const data = JSON.stringify(freshDb, null, 2);
+    fs.writeFileSync(DB_FILE, data, "utf-8");
+    db = freshDb;
+    console.log(`[DB] FULL RESET: ${count} users deleted, file written directly`);
+  } catch (e) {
+    console.error("[DB] Reset write error:", e);
+    return res.status(500).json({ error: "خطا در ریست دیتابیس" });
+  }
   
-  // Also delete backup file to prevent restore
-  const BACKUP_FILE = path.join(process.cwd(), "db.backup.json");
-  try { fs.unlinkSync(BACKUP_FILE); } catch {}
-  
-  res.json({ message: `ریست کامل انجام شد. ${count} کاربر حذف شد. تمام داده‌ها از اول شروع می‌شود.` });
+  res.json({ message: `ریست کامل انجام شد. ${count} کاربر حذف شد.` });
 });
 
 app.get("/api/inventions", (req, res) => {
