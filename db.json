@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": "admin_ogbc4sp",
+      "id": "admin_7o4e547",
       "username": "admin",
       "isAdmin": true,
       "country": {
@@ -10,89 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 53200,
+          "gold": 50000,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 528.6,
-            "steel": 786,
-            "food": 786
+            "oil": 500,
+            "steel": 500,
+            "food": 500
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781389577086
+          "lastIncomeUpdate": 1781389584579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
-      "assetLog": [
-        {
-          "timestamp": "۲۲:۱۶:۲۱",
-          "gold": 52400,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۱۷:۴۸",
-          "gold": 52480,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۱۸:۴۸",
-          "gold": 52560,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۱۹:۴۸",
-          "gold": 52640,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۰:۴۸",
-          "gold": 52720,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۱:۴۸",
-          "gold": 52800,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۲:۴۸",
-          "gold": 52880,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۳:۴۸",
-          "gold": 52960,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۴:۴۸",
-          "gold": 53040,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۵:۴۸",
-          "gold": 53120,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۲۲:۲۶:۱۹",
-          "gold": 53200,
-          "military": 100,
-          "economy": 100
-        }
-      ]
+      "assetLog": []
     }
   ],
   "tradeOffers": [],
@@ -106,7 +39,7 @@
     "oil": 120,
     "steel": 180,
     "food": 60,
-    "lastUpdated": "2026-06-13T22:14:51.374Z"
+    "lastUpdated": "2026-06-13T22:26:19.264Z"
   },
   "globalAnnouncements": [
     "پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."
