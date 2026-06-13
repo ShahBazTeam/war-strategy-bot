@@ -871,7 +871,15 @@ const buyWeaponHandler = (req, res) => {
   updateAndLogUserAssets(user);
   saveDatabase();
 
-  res.json({ user, message: `خریداری شد: ${q} عدد ${item.name}. تجهیزات به زرادخانه ملل افزوده شد!` });
+  // Include warehouse name mappings for frontend resolution
+  const warehouseNames: Record<string, string> = {};
+  for (const wpnId of Object.keys(user.warehouse)) {
+    const catItem = CATALOG.find(c => c.id === wpnId);
+    const invItem = db.inventions.find(i => i.id === wpnId);
+    warehouseNames[wpnId] = catItem?.name || invItem?.name || "تجهیزات";
+  }
+
+  res.json({ user, warehouseNames, message: `خریداری شد: ${q} عدد ${item.name}. تجهیزات به زرادخانه ملل افزوده شد!` });
 };
 
 app.post("/api/factory/buy", checkRateLimit, buyWeaponHandler);
@@ -884,8 +892,8 @@ app.post("/api/factory/equip", (req, res) => {
   const { activeSlots, active } = req.body;
   const listActive = activeSlots || active;
 
-  if (!Array.isArray(listActive) || listActive.length > 6) {
-    return res.status(400).json({ error: "فرمت اسلات‌های فعال معتبر نیست" });
+  if (!Array.isArray(listActive) || listActive.length > 15) {
+    return res.status(400).json({ error: "فرمت اسلات‌های فعال معتبر نیست (حداکثر ۱۵)" });
   }
 
   // Ensure active weapons are in the warehouse
@@ -2675,30 +2683,41 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { description, category } = req.body;
-  if (!description || description.length < 10) return res.status(400).json({ error: "شرح اختراع کوتاه است" });
+  if (!description || description.length < 30) return res.status(400).json({ error: "شرح اختراع باید حداقل ۳۰ کاراکتر باشد. توضیحات کوتاه و غیرمنطقی رد می‌شود." });
 
   const validTypes = ["ground_forces", "air_force", "navy", "air_defense", "missile", "nuclear", "drone", "artillery", "special_forces"];
   const selectedType = validTypes.includes(category) ? category : "ground_forces";
 
-  // Use AI to validate and define stats
-  const prompt = `یک اختراع نظامی جدید برای بازی شبیه‌ساز جنگی پیشنهاد شده است:
-"${description}"
+  // Invent cost: 500-2000 gold based on description quality and complexity
+  const INVENT_BASE_COST = 500;
+  const INVENT_MAX_COST = 2000;
+
+  const prompt = `تو یک کمیته داوری اختراعات نظامی پنتاگون هستی. اختراع زیر را بسیار سختگیرانه بررسی کن:
+
 کشور پیشنهاد دهنده: ${user.country.name}
-دسته‌بندی انتخاب شده: ${selectedType}
+دسته‌بندی: ${selectedType}
+شرح اختراع: "${description}"
 
-این اختراع را بررسی کن. اگر "منطقی" است (مثلا تانک، موشک، هواپیما، پهپاد با ویژگی‌های علمی و واقع‌بینانه)، آن را تایید کن و stats زیر را برایش تولید کن. اگر غیرمنطقی است (مثلا اژدها، اسلحه جادویی، سلاح‌های تخیلی غول‌آسا)، آن را رد کن.
+قوانین سختگیرانه:
+1. اختراع باید کاملاً واقع‌بینانه و علمی باشد (مثل: تانک نسل ۵ با زره کامپوزیتی، جنگنده خاموش با موتور رامجت)
+2. اختراعات تخیلی، جادویی، غیرواقعی یا بیش از حد پیشرفته باید رد شوند
+3. توضیحات کوتاه، مبهم یا غیرمنطقی باید رد شوند
+4. هرچه توضیحات دقی‌تر، فنی‌تر و واقع‌بینانه‌تر باشد، قدرت (MP) بیشتری می‌گیرد
 
-نوع اختراع باید حتماً یکی از اینها باشد: ${selectedType}
+سیستم امتیازدهی:
+- توضیحات عالی (مشخصات فنی دقیق، ابعاد، سرعت، برد): MP بالا (30-50)
+- توضیحات خوب (ویژگی‌های منطقی اما کلی): MP متوسط (15-29)
+- توضیحات ضعیف (کوتاه، مبهم، غیرمنطقی): MP پایین (5-14) یا رد شدن
 
-پاسخ را در فرمت JSON بده:
+پاسخ JSON:
 {
   "valid": boolean,
-  "reason": string,
-  "name": string,
+  "reason": "دلیل تایید یا رد به فارسی",
+  "name": "نام اختراع به فارسی (اگر تایید شد)",
   "type": "${selectedType}",
-  "cost": number (100-1000),
-  "mp": number (5-50),
-  "description": string (short),
+  "cost": number (قیمت خرید برای کاربران: 50-200 طلا - ارزان چون تولید ملی است),
+  "mp": number (قدرت رزمی: 5-50 بسته به کیفیت توضیحات),
+  "description": "توضیح کوتاه فنی",
   "minTech": number (1-5)
 }`;
 
@@ -2718,18 +2737,31 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   };
   
   try {
-    const raw = await callGemini(prompt, "تو یک دستیار تحلیلگر تکنولوژی نظامی در یک بازی شبیه‌سازی هستی.", schema);
+    const raw = await callGemini(prompt, "تو داور سختگیر اختراعات نظامی پنتاگون هستی. فقط اختراعات واقع‌بینانه و علمی را تایید کن.", schema);
     const result = JSON.parse(raw);
 
     if (!result.valid) {
-      return res.status(400).json({ error: result.reason });
+      return res.status(400).json({ error: `اختراع رد شد: ${result.reason}` });
     }
+
+    // Invent cost is HIGH (500-2000 gold) - this is the R&D cost
+    const inventCost = Math.min(INVENT_MAX_COST, Math.max(INVENT_BASE_COST, Math.round((result.mp || 10) * 40)));
+
+    if (user.country.assets.gold < inventCost) {
+      return res.status(400).json({ error: `هزینه اختراع: ${inventCost} طلا. شما طلا کافی ندارید.` });
+    }
+
+    // Deduct invention cost
+    user.country.assets.gold -= inventCost;
+
+    // Production cost is CHEAP (country makes it domestically)
+    const productionCost = Math.round((result.cost || 100) * 0.3); // 70% discount - domestic production
 
     const newEquipment: EquipmentItem = {
       id: "inv_" + Math.random().toString(36).substring(2, 9),
       name: result.name,
       type: result.type,
-      cost: result.cost,
+      cost: productionCost, // CHEAP production cost
       militaryGained: result.mp,
       minTech: result.minTech,
       isInvention: true,
@@ -2738,9 +2770,15 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
     };
 
     db.inventions.push(newEquipment);
+    updateAndLogUserAssets(user);
     saveDatabase();
 
-    res.json({ success: true, equipment: newEquipment, message: `اختراع شما توسط بازرسان فنی تایید شد: ${result.name}` });
+    res.json({ 
+      success: true, 
+      equipment: newEquipment, 
+      inventCost,
+      message: `اختراع "${result.name}" تایید شد! هزینه R&D: ${inventCost} طلا | قیمت تولید: ${productionCost} طلا (تخفیف تولید ملی)` 
+    });
   } catch (err) {
     res.status(500).json({ error: "خطا در پردازش توسط هوش مصنوعی" });
   }

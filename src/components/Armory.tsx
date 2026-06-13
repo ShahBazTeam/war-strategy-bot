@@ -6,6 +6,7 @@ import { CATALOG } from "../catalogData";
 interface ArmoryProps {
   user: User;
   inventions: EquipmentItem[];
+  warehouseNames: Record<string, string>;
   onBuyWeapon: (itemType: string, quantity: number) => void;
   onEquipChange: (active: string[], warehouse: string[]) => void;
   onUpgradeTech: () => void;
@@ -37,15 +38,25 @@ const categoryNames: Record<string, string> = {
   artillery: "توپخانه سنگین"
 };
 
-export default function Armory({ user, inventions, onBuyWeapon, onEquipChange, onUpgradeTech, onUpgradeFactory, onScrapWeapon }: ArmoryProps) {
+export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, onEquipChange, onUpgradeTech, onUpgradeFactory, onScrapWeapon }: ArmoryProps) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [scrapModal, setScrapModal] = useState<{ id: string; name: string; maxQty: number } | null>(null);
   const [scrapQty, setScrapQty] = useState(1);
   
   const getWeaponDetails = (id: string) => {
+    // First check warehouseNames (from server buy response)
+    if (warehouseNames[id]) {
+      const inv = inventions.find(i => i.id === id);
+      if (inv) return { name: warehouseNames[id], type: inv.type || 'ground_forces', icon: iconMap[inv.type] || Swords, desc: "اختراع ملی", cost: inv.cost, mp: inv.militaryGained };
+      const cat = CATALOG.find(c => c.id === id);
+      if (cat) return { ...cat, icon: iconMap[cat.type] || Swords };
+      return { name: warehouseNames[id], type: 'ground_forces', icon: Swords, desc: "تجهیزات", cost: 0, mp: 0 };
+    }
+    // Fallback to CATALOG
     let baseMatch = id.split("_").slice(0, 2).join("_");
     let match = CATALOG.find(c => c.id === baseMatch || c.id === id.split("_")[0]);
     if (!match) {
+      // Fallback to inventions
       const inv = inventions.find(i => i.id === id);
       if (inv) return { name: inv.name, type: inv.type || 'ground_forces', icon: iconMap[inv.type] || Swords, desc: "اختراع ملی", cost: inv.cost, mp: inv.militaryGained };
       return { name: "تجهیزات ناشناس", type: 'ground_forces', icon: Swords };
@@ -353,7 +364,7 @@ export default function Armory({ user, inventions, onBuyWeapon, onEquipChange, o
         <div className="rounded-lg border border-white/10 bg-black/40 p-6">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2 font-sans">
-              🎖️ تجهیزات فعال خط مقدم ({user.equipmentSlots.length}/۶)
+              🎖️ تجهیزات فعال خط مقدم ({user.equipmentSlots.length}/۱۵)
             </h2>
           </div>
           <p className="text-slate-400 text-xs font-serif text-slate-300 mb-4">آرایه فعال سلاح‌هایی که ارتش برای حملات در راندهای جنگ استفاده می‌کند.</p>

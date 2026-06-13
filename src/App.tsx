@@ -76,6 +76,7 @@ export default function App() {
   const [announcements, setAnnouncements] = useState<string[]>([]);
   const [announcementText, setAnnouncementText] = useState("");
   const [inventions, setInventions] = useState<EquipmentItem[]>([]);
+  const [warehouseNames, setWarehouseNames] = useState<Record<string, string>>({});
 
   // UI state
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -200,6 +201,15 @@ export default function App() {
       setAlliances(alliancesData.alliances || []);
       setAnnouncements(annData.announcements || []);
       setInventions(inventionsData.inventions || []);
+      // Build warehouse names for invented items
+      if (currentUser) {
+        const whNames: Record<string, string> = {};
+        for (const wpnId of Object.keys(currentUser.warehouse || {})) {
+          const invItem = (inventionsData.inventions || []).find((i: any) => i.id === wpnId);
+          if (invItem) whNames[wpnId] = invItem.name;
+        }
+        setWarehouseNames(whNames);
+      }
       if (annData.announcements && annData.announcements.length > 0) {
         setAnnouncementText(annData.announcements.join(" | "));
       }
@@ -295,6 +305,10 @@ export default function App() {
         body: JSON.stringify({ itemType, quantity })
       });
       updateUser(data.user);
+      // Merge warehouse names for invented items
+      if (data.warehouseNames) {
+        setWarehouseNames(prev => ({ ...prev, ...data.warehouseNames }));
+      }
       showTemporarySuccess(data.message);
     } catch (err: any) {
       showTemporaryError(err?.message || "خطا در خرید تجهیزات");
@@ -1041,6 +1055,7 @@ export default function App() {
                   <Armory 
                     user={currentUser} 
                     inventions={inventions}
+                    warehouseNames={warehouseNames}
                     onBuyWeapon={buyArmoryWeapon} 
                     onEquipChange={changeSlotsEquip}
                     onUpgradeTech={levelUpTechnology}
