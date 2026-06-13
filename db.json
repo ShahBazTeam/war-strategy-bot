@@ -1,0 +1,19 @@
+{
+  "users": [],
+  "tradeOffers": [],
+  "wars": [],
+  "alliances": [],
+  "unProposals": [],
+  "tweets": [],
+  "inventions": [],
+  "geminiLogs": [],
+  "resourcePrices": {
+    "oil": 12,
+    "steel": 18,
+    "food": 7,
+    "lastUpdated": "2026-06-13T17:13:33.624Z"
+  },
+  "globalAnnouncements": [
+    "پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"
+  ]
+}
