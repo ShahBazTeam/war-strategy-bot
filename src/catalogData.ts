@@ -266,8 +266,8 @@ export const CATALOG: WeaponConfig[] = [
 
 // Map of english/farsi name to inventory
 export const INITIAL_QUANTITIES: { [countryTag: string]: { [id: string]: number } } = {
-  "usa": { "usa_abrams": 4657, "usa_bradley": 4500, "usa_f35": 1000, "usa_apache": 800, "usa_nimitz": 11, "usa_arleigh": 73, "usa_patriot": 480, "usa_minuteman": 400, "usa_nuke": 5042 },
-  "آمریکا": { "usa_abrams": 4657, "usa_bradley": 4500, "usa_f35": 1000, "usa_apache": 800, "usa_nimitz": 11, "usa_arleigh": 73, "usa_patriot": 480, "usa_minuteman": 400, "usa_nuke": 5042 },
+  "usa": { "usa_abrams": 5800, "usa_bradley": 6700, "usa_f35": 2500, "usa_apache": 800, "usa_nimitz": 11, "usa_arleigh": 73, "usa_patriot": 480, "usa_minuteman": 400, "usa_nuke": 5042 },
+  "آمریکا": { "usa_abrams": 5800, "usa_bradley": 6700, "usa_f35": 2500, "usa_apache": 800, "usa_nimitz": 11, "usa_arleigh": 73, "usa_patriot": 480, "usa_minuteman": 400, "usa_nuke": 5042 },
   "russia": { "rus_t14": 5750, "rus_bmp3": 4000, "rus_su57": 30, "rus_ka52": 150, "rus_kuznetsov": 1, "rus_kilo": 66, "rus_s400": 800, "rus_sarmat": 400, "rus_nuke": 5580 },
   "روسیه": { "rus_t14": 5750, "rus_bmp3": 4000, "rus_su57": 30, "rus_ka52": 150, "rus_kuznetsov": 1, "rus_kilo": 66, "rus_s400": 800, "rus_sarmat": 400, "rus_nuke": 5580 },
   "china": { "chn_type99": 6800, "chn_zbd04": 3000, "chn_j20": 250, "chn_z10": 300, "chn_liaoning": 3, "chn_type055": 50, "chn_hq9": 500, "chn_df41": 300, "chn_nuke": 620 },
@@ -276,8 +276,8 @@ export const INITIAL_QUANTITIES: { [countryTag: string]: { [id: string]: number 
   "هند": { "ind_arjun": 4201, "ind_su30": 2229, "ind_vikrant": 2, "ind_kolkata": 10, "ind_arihant": 17, "ind_akash": 300, "ind_agni": 150, "ind_nuke": 190 },
   "south korea": { "sk_k2": 2236, "sk_k21": 3000, "sk_kf21": 1592, "sk_surion": 500, "sk_sejong": 3, "sk_dosan": 9, "sk_l_sam": 150, "sk_hyunmoo": 200 },
   "کره جنوبی": { "sk_k2": 2236, "sk_k21": 3000, "sk_kf21": 1592, "sk_surion": 500, "sk_sejong": 3, "sk_dosan": 9, "sk_l_sam": 150, "sk_hyunmoo": 200 },
-  "japan": { "jp_type10": 521, "jp_f35": 1443, "jp_maya": 38, "jp_soryu": 22, "jp_patriot": 150, "jp_type12": 300 },
-  "ژاپن": { "jp_type10": 521, "jp_f35": 1443, "jp_maya": 38, "jp_soryu": 22, "jp_patriot": 150, "jp_type12": 300 },
+  "japan": { "jp_type10": 521, "jp_f35": 147, "jp_maya": 38, "jp_soryu": 22, "jp_patriot": 150, "jp_type12": 300 },
+  "ژاپن": { "jp_type10": 521, "jp_f35": 147, "jp_maya": 38, "jp_soryu": 22, "jp_patriot": 150, "jp_type12": 300 },
   "turkey": { "tur_altay": 2238, "tur_kirpi": 4000, "tur_f16": 1083, "tur_tb2": 200, "tur_gabya": 16, "tur_reis": 12, "tur_hisar": 100, "tur_bora": 150 },
   "ترکیه": { "tur_altay": 2238, "tur_kirpi": 4000, "tur_f16": 1083, "tur_tb2": 200, "tur_gabya": 16, "tur_reis": 12, "tur_hisar": 100, "tur_bora": 150 },
   "uk": { "uk_challenger": 227, "uk_warrior": 800, "uk_typhoon": 631, "uk_queen": 2, "uk_daring": 6, "uk_astute": 10, "uk_skysabre": 50, "uk_trident": 50, "uk_nuke": 225 },
