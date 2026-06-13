@@ -1,33 +1,5 @@
 {
-  "users": [
-    {
-      "id": "admin_4yujexj",
-      "username": "admin",
-      "isAdmin": true,
-      "country": {
-        "name": "سازمان ملل",
-        "originalName": "UN",
-        "slogan": "صلح جهانی",
-        "flagUrl": "🇺🇳",
-        "assets": {
-          "gold": 50000,
-          "militaryPower": 100,
-          "economicPower": 100,
-          "resources": {
-            "oil": 500,
-            "steel": 500,
-            "food": 500
-          },
-          "techLevel": 5,
-          "factoryLevel": 10,
-          "lastIncomeUpdate": 1781376124686
-        }
-      },
-      "equipmentSlots": [],
-      "warehouse": {},
-      "assetLog": []
-    }
-  ],
+  "users": [],
   "tradeOffers": [],
   "wars": [],
   "alliances": [],
@@ -39,7 +11,7 @@
     "oil": 4,
     "steel": 6,
     "food": 2,
-    "lastUpdated": "2026-06-13T17:42:51.220Z"
+    "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
     "پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد."
