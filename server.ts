@@ -709,6 +709,29 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ user: found });
 });
 
+app.post("/api/auth/restore", (req, res) => {
+  const { userData } = req.body;
+  if (!userData || !userData.username || !userData.id) {
+    return res.status(400).json({ error: "داده‌های کاربر معتبر نیست" });
+  }
+  const existing = db.users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
+  if (existing) {
+    return res.json({ user: existing });
+  }
+  const restoredUser: User = {
+    id: userData.id,
+    username: userData.username,
+    isAdmin: userData.isAdmin || false,
+    country: userData.country,
+    equipmentSlots: userData.equipmentSlots || [],
+    warehouse: userData.warehouse || {},
+    assetLog: userData.assetLog || []
+  };
+  db.users.push(restoredUser);
+  saveDatabase();
+  res.json({ user: restoredUser });
+});
+
 app.get("/api/user/me", (req, res) => {
   const currentUser = getCurrentUser(req);
   if (!currentUser) return res.status(401).json({ error: "لطفاً ابتدا وارد شوید" });

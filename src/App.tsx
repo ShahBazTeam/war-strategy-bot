@@ -146,13 +146,34 @@ export default function App() {
     setTimeout(() => setUiSuccess(null), 4000);
   };
 
+  const updateUser = (user: User | null) => {
+    setCurrentUser(user);
+    if (user) {
+      localStorage.setItem("modern_world_user_backup", JSON.stringify(user));
+    }
+  };
+
   const fetchCurrentUser = async () => {
     if (!userId) return;
     try {
       const data = await apiCall("/api/user/me");
-      setCurrentUser(data.user);
+      updateUser(data.user);
     } catch {
-      // Clear invalid id
+      const backup = localStorage.getItem("modern_world_user_backup");
+      if (backup) {
+        try {
+          const userData = JSON.parse(backup);
+          const data = await apiCall("/api/auth/restore", {
+            method: "POST",
+            body: JSON.stringify({ userData })
+          });
+          localStorage.setItem("modern_world_user_id", data.user.id);
+          setUserId(data.user.id);
+          updateUser(data.user);
+          showTemporarySuccess("داده‌های شما بازیابی شد!");
+          return;
+        } catch {}
+      }
       handleLogout();
     }
   };
@@ -194,8 +215,9 @@ export default function App() {
         body: JSON.stringify({ username, password })
       });
       localStorage.setItem("modern_world_user_id", data.user.id);
+      localStorage.setItem("modern_world_user_backup", JSON.stringify(data.user));
       setUserId(data.user.id);
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(`خوش آمدید فرمانده @${username}!`);
     } catch {
       // Handled by apiCall
@@ -223,8 +245,9 @@ export default function App() {
         })
       });
       localStorage.setItem("modern_world_user_id", data.user.id);
+      localStorage.setItem("modern_world_user_backup", JSON.stringify(data.user));
       setUserId(data.user.id);
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(`کشور نوین شما با نام ${data.user.country.name} با سهمیه طلا با موفقیت تأسیس شد!`);
     } catch {
       // Handled
@@ -235,8 +258,9 @@ export default function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("modern_world_user_id");
+    localStorage.removeItem("modern_world_user_backup");
     setUserId(null);
-    setCurrentUser(null);
+    updateUser(null);
     setActiveTab("dashboard");
   };
 
@@ -247,7 +271,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify(fields)
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess("شناسنامه کشور با موفقیت اصلاح گردید.");
     } catch {}
   };
@@ -255,7 +279,7 @@ export default function App() {
   const resetUserCountry = async () => {
     try {
       const data = await apiCall("/api/user/reset", { method: "POST" });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess("گنجینه ملی و مخازن شما با موفقیت ریست گردید.");
     } catch {}
   };
@@ -267,7 +291,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ itemType, quantity })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(data.message);
     } catch (err: any) {
       showTemporaryError(err?.message || "خطا در خرید تجهیزات");
@@ -280,7 +304,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ itemType, quantity })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(data.message);
     } catch (err: any) {
       showTemporaryError(err?.message || "خطا در اسقاط تجهیزات");
@@ -293,7 +317,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ active, warehouse })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess("آرایه خط مقدم تسلیحات ویرایش گردید.");
     } catch {}
   };
@@ -301,7 +325,7 @@ export default function App() {
   const levelUpTechnology = async () => {
     try {
       const data = await apiCall("/api/factory/upgrade-tech", { method: "POST" });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess("جهش تکنولوژی کشور شما به سطح بالاتر انجام شد!");
     } catch {}
   };
@@ -309,7 +333,7 @@ export default function App() {
   const upgradeFactory = async () => {
     try {
       const data = await apiCall("/api/factory/upgrade", { method: "POST" });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(data.message);
     } catch (err: any) {
       showTemporaryError(err?.message || "خطا در ارتقای کارخانه");
@@ -323,7 +347,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ action, resource, amount })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(action === "buy" ? "خرید از بورس موفقیت‌آمیز بود." : "فروش کالا ثبت گردید.");
     } catch {}
   };
@@ -357,7 +381,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ targetId, gold, resources })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess("کمک اقتصادی دوستانه ارسال شد و دیپلماسی ارتقا یافت.");
     } catch {}
   };
@@ -380,7 +404,7 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ proposal })
       });
-      setCurrentUser(data.user);
+      updateUser(data.user);
       showTemporarySuccess(`تسهیلات وام صندوق پول به حجم ${proposal.loanAmount} طلا واریز شد.`);
     } catch {}
   };
