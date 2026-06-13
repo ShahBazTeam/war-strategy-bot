@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 1845.7,
+          "gold": 1624.7,
           "militaryPower": 1441,
           "economicPower": 88,
           "resources": {
             "oil": 6.3,
-            "steel": 3.6,
+            "steel": 13.6,
             "food": 7.3
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۲۱:۱۵",
-          "gold": 1270.5,
-          "military": 1447,
-          "economy": 91
-        },
         {
           "timestamp": "۱۹:۲۱:۲۰",
           "gold": 1582.5,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۱۹:۲۳:۳۶",
           "gold": 1845.7,
+          "military": 1441,
+          "economy": 88
+        },
+        {
+          "timestamp": "۱۹:۲۳:۵۸",
+          "gold": 1624.7,
           "military": 1441,
           "economy": 88
         }
@@ -533,16 +533,16 @@
         "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 1824.1,
+          "gold": 222.1,
           "militaryPower": 15803,
-          "economicPower": 100,
+          "economicPower": 111,
           "resources": {
             "oil": 0,
             "steel": 0.4,
             "food": 0.2
           },
           "techLevel": 1,
-          "factoryLevel": 1,
+          "factoryLevel": 2,
           "lastIncomeUpdate": 1781378593710
         }
       },
@@ -569,12 +569,6 @@
         "isr_nuke": 15
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۱۲:۱۷",
-          "gold": 1424.4,
-          "military": 15825,
-          "economy": 100
-        },
         {
           "timestamp": "۱۹:۱۳:۱۸",
           "gold": 1432.4,
@@ -658,6 +652,12 @@
           "gold": 1824.1,
           "military": 15803,
           "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۲۳:۵۸",
+          "gold": 222.1,
+          "military": 15803,
+          "economy": 111
         }
       ]
     },
