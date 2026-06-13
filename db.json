@@ -220,6 +220,57 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376436096_ul85yh7",
+      "username": "kia",
+      "password": "8931",
+      "isAdmin": false,
+      "country": {
+        "name": "سوئد",
+        "originalName": "Sweden",
+        "slogan": "برای سوئد با زمان همگام شویم",
+        "flagUrl": "🇸🇪",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 335,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376436096
+        }
+      },
+      "equipmentSlots": [
+        "swe_strv122",
+        "swe_cv90",
+        "swe_gripen",
+        "swe_hkp16",
+        "swe_visby",
+        "swe_gotland",
+        "swe_rbs15"
+      ],
+      "warehouse": {
+        "swe_strv122": 1,
+        "swe_cv90": 5,
+        "swe_gripen": 1,
+        "swe_hkp16": 1,
+        "swe_visby": 1,
+        "swe_gotland": 1,
+        "swe_rbs15": 1
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 335,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -236,6 +287,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: سوئد (kia) به نقشه جهان پیوست!",
     "🎮 کشور جدید: استرالیا (kia) به نقشه جهان پیوست!",
     "🎮 کشور جدید: چین (yuki) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ژاپن (aidy) به نقشه جهان پیوست!",
