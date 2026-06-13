@@ -16,6 +16,84 @@ import { CATALOG, INITIAL_QUANTITIES } from "./src/catalogData";
 
 dotenv.config();
 
+// --------------------------------------------------------
+// GITHUB BACKUP SYSTEM
+// --------------------------------------------------------
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+const GITHUB_REPO = process.env.GITHUB_REPO || "ShahBazTeam/war-strategy-bot";
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || "data-backup";
+const GITHUB_API = "https://api.github.com";
+
+async function githubFetch(path: string, options: any = {}) {
+  const res = await fetch(`${GITHUB_API}${path}`, {
+    ...options,
+    headers: {
+      "Authorization": `Bearer ${GITHUB_TOKEN}`,
+      "Accept": "application/vnd.github.v3+json",
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+  return res;
+}
+
+async function loadFromGitHub(): Promise<GameDatabase | null> {
+  if (!GITHUB_TOKEN) return null;
+  try {
+    const res = await githubFetch(`/repos/${GITHUB_REPO}/contents/db.json?ref=${GITHUB_BRANCH}`);
+    if (!res.ok) {
+      console.log("[GitHub] No backup found on branch", GITHUB_BRANCH);
+      return null;
+    }
+    const data = await res.json();
+    const content = JSON.parse(Buffer.from(data.content, "base64").toString("utf-8"));
+    if (content && Array.isArray(content.users)) {
+      console.log(`[GitHub] Loaded backup: ${content.users.length} users`);
+      return content as GameDatabase;
+    }
+    return null;
+  } catch (e) {
+    console.error("[GitHub] Load error:", e);
+    return null;
+  }
+}
+
+async function saveToGitHub(dbData: GameDatabase) {
+  if (!GITHUB_TOKEN) return;
+  try {
+    const content = Buffer.from(JSON.stringify(dbData, null, 2)).toString("base64");
+    
+    // Check if file exists
+    let sha: string | undefined;
+    const checkRes = await githubFetch(`/repos/${GITHUB_REPO}/contents/db.json?ref=${GITHUB_BRANCH}`);
+    if (checkRes.ok) {
+      const existing = await checkRes.json();
+      sha = existing.sha;
+    }
+
+    const body: any = {
+      message: `[DB] Auto-save: ${dbData.users.length} users, ${dbData.inventions.length} inventions`,
+      content,
+      branch: GITHUB_BRANCH,
+    };
+    if (sha) body.sha = sha;
+
+    const saveRes = await githubFetch(`/repos/${GITHUB_REPO}/contents/db.json`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+
+    if (saveRes.ok) {
+      console.log("[GitHub] Backup saved successfully");
+    } else {
+      const err = await saveRes.json();
+      console.error("[GitHub] Save failed:", err.message);
+    }
+  } catch (e) {
+    console.error("[GitHub] Save error:", e);
+  }
+}
+
 // Minimal JSON-schema-like type constants used to build prompts.
 // (We only use these values for instructing the LLM, not for runtime schema validation.)
 const Type = {
@@ -264,45 +342,57 @@ let db: GameDatabase = {
 };
 
 // Synchronized read write database functions
-function loadDatabase() {
+async function loadDatabase() {
   const backupFile = DB_FILE + ".backup";
   try {
+    // Try loading from local file first
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
         db = parsed as GameDatabase;
-        console.log(`[DB] Loaded: ${db.users.length} users, ${db.inventions.length} inventions, ${db.wars.length} wars, ${db.tweets.length} tweets`);
-        // Save backup copy
+        console.log(`[DB] Loaded local: ${db.users.length} users`);
         fs.writeFileSync(backupFile, raw, "utf-8");
+        // Also save to GitHub
+        await saveToGitHub(db);
         return;
       }
     }
-    // Main file missing or empty - try backup
+    // Try backup file
     if (fs.existsSync(backupFile)) {
       const raw = fs.readFileSync(backupFile, "utf-8");
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
         db = parsed as GameDatabase;
-        console.log(`[DB] Restored from backup: ${db.users.length} users, ${db.inventions.length} inventions`);
-        // Restore main file
+        console.log(`[DB] Restored from local backup: ${db.users.length} users`);
         fs.writeFileSync(DB_FILE, raw, "utf-8");
+        await saveToGitHub(db);
         return;
       }
     }
+    // Try GitHub backup
+    const ghData = await loadFromGitHub();
+    if (ghData) {
+      db = ghData;
+      console.log(`[DB] Loaded from GitHub: ${db.users.length} users`);
+      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), "utf-8");
+      return;
+    }
     // Nothing found - fresh start
     console.log("[DB] No data found, starting fresh");
-    saveDatabase();
+    await saveDatabase();
   } catch (e) {
     console.error("[DB] Load error:", e);
-    saveDatabase();
+    await saveDatabase();
   }
 }
 
-function saveDatabase() {
+async function saveDatabase() {
   try {
     const data = JSON.stringify(db, null, 2);
     fs.writeFileSync(DB_FILE, data, "utf-8");
+    // Also save to GitHub
+    await saveToGitHub(db);
   } catch (e) {
     console.error("[DB] Save error:", e);
   }
@@ -316,7 +406,7 @@ function saveGeminiLog(log: GeminiLog) {
   saveDatabase();
 }
 
-loadDatabase();
+// loadDatabase() called in startServer()
 
 // --------------------------------------------------------
 // SIMPLE RATE LIMITER (MAX 10 ACTIONS PER MINUTE PER USER)
@@ -3242,6 +3332,8 @@ app.post("/api/user/reset", (req, res) => {
 // VITE DEV MIDDLEWARE AND STATIC PRODUCTION HOSTING Setup
 // --------------------------------------------------------
 async function startServer() {
+  await loadDatabase();
+
   const distPath = path.join(process.cwd(), "dist");
   app.use(express.static(distPath));
   app.get("*", (req, res) => {
