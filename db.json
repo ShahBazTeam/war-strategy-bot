@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 16478.2,
+          "gold": 12080.3,
           "militaryPower": 1421,
           "economicPower": 108,
           "resources": {
             "oil": 45.5,
-            "steel": 14.1,
+            "steel": 213.1,
             "food": 72.9
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۸:۴۵",
-          "gold": 2695.9,
-          "military": 1421,
-          "economy": 108
-        },
         {
           "timestamp": "۲۰:۰۹:۳۸",
           "gold": 2765,
@@ -258,6 +252,12 @@
           "gold": 16478.2,
           "military": 1421,
           "economy": 108
+        },
+        {
+          "timestamp": "۲۰:۱۴:۰۲",
+          "gold": 12080.3,
+          "military": 1421,
+          "economy": 108
         }
       ]
     },
@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 1377.7,
+          "gold": 1156.7,
           "militaryPower": 638,
           "economicPower": 224,
           "resources": {
             "oil": 0.6,
-            "steel": 43.5,
+            "steel": 53.5,
             "food": 55.9
           },
           "techLevel": 4,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۱۰:۵۵",
-          "gold": 889.1,
-          "military": 644,
-          "economy": 224
-        },
         {
           "timestamp": "۲۰:۱۱:۰۰",
           "gold": 1200.1,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۱۳:۴۴",
           "gold": 1377.7,
+          "military": 638,
+          "economy": 224
+        },
+        {
+          "timestamp": "۲۰:۱۴:۰۲",
+          "gold": 1156.7,
           "military": 638,
           "economy": 224
         }
@@ -1562,7 +1562,8 @@
         "user_1781376598616_0e84d2a"
       ],
       "votesNo": [
-        "user_1781376553710_mgz8a2x"
+        "user_1781376553710_mgz8a2x",
+        "user_1781376457938_dt68hxp"
       ],
       "status": "active",
       "createdAt": "2026-06-13T19:52:37.325Z",
