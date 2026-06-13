@@ -45,8 +45,8 @@
         "slogan": "اتحاد و عدالت و آزادی",
         "flagUrl": "🇩🇪",
         "assets": {
-          "gold": 300,
-          "militaryPower": 594,
+          "gold": 70,
+          "militaryPower": 622,
           "economicPower": 100,
           "resources": {
             "oil": 20,
@@ -67,7 +67,7 @@
         "ger_iris"
       ],
       "warehouse": {
-        "ger_leopard": 3,
+        "ger_leopard": 4,
         "ger_puma": 10,
         "ger_typhoon": 5,
         "ger_sachsen": 1,
@@ -79,6 +79,12 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 594,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۱۵:۵۲",
+          "gold": 70,
+          "military": 622,
           "economy": 100
         }
       ]
