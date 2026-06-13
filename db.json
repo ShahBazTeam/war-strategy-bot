@@ -1565,6 +1565,17 @@
   ],
   "tweets": [
     {
+      "id": "t4xes3o",
+      "userId": "user_1781376553710_mgz8a2x",
+      "username": "mahdi",
+      "countryName": "اسرائیل",
+      "flagUrl": "🇮🇱",
+      "text": "با سه روز مهلت مخالف هستم \nتا یک هفته حمله ای صورت نگیرد",
+      "timestamp": "2026-06-13T19:57:32.853Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "dea6owj",
       "userId": "user_1781376598616_0e84d2a",
       "username": "sorena",
