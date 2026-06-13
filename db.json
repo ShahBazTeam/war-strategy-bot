@@ -956,17 +956,17 @@
         "slogan": "آزادی، برابری، برادری",
         "flagUrl": "🇫🇷",
         "assets": {
-          "gold": 580,
+          "gold": 588,
           "militaryPower": 25976,
           "economicPower": 100,
           "resources": {
             "oil": 20.1,
-            "steel": 29.2,
-            "food": 29.2
+            "steel": 29.5,
+            "food": 29.5
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781378848311
+          "lastIncomeUpdate": 1781378908311
         }
       },
       "equipmentSlots": [
@@ -1049,6 +1049,12 @@
         {
           "timestamp": "۱۹:۲۸:۲۳",
           "gold": 580,
+          "military": 25976,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۲۸:۳۰",
+          "gold": 588,
           "military": 25976,
           "economy": 100
         }
