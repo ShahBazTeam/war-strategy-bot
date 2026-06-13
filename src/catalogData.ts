@@ -265,98 +265,100 @@ export const CATALOG: WeaponConfig[] = [
 ];
 
 // Map of english/farsi name to inventory
-// INITIAL QUANTITIES - Based on REAL-WORLD 2024 military rankings
-// USA #1, Russia #2, China #3, India #4, SK #5, Pakistan #6, Japan #7, UK #8, France #9, Italy #10, Brazil #11, Turkey #12, Israel #13, Iran #14, Egypt #15
+// INITIAL QUANTITIES - Based on REAL-WORLD 2024 military power rankings (Global Firepower)
+// Targets: USA ~15200 MP, Russia ~11900, China ~10500, India ~8500, SK ~6200,
+// UK ~5100, Japan ~4600, Turkey ~4000, Pakistan ~3600, Italy ~3300,
+// France ~2900, Brazil ~2500, Iran ~2300, Israel ~2100, Germany ~1900
 export const INITIAL_QUANTITIES: { [countryTag: string]: { [id: string]: number } } = {
-  // 1. USA - #1 global superpower ($886B budget)
-  "usa": { "usa_abrams": 60, "usa_bradley": 70, "usa_f35": 30, "usa_apache": 12, "usa_nimitz": 3, "usa_arleigh": 10, "usa_patriot": 8, "usa_minuteman": 6, "usa_nuke": 50 },
-  "آمریکا": { "usa_abrams": 60, "usa_bradley": 70, "usa_f35": 30, "usa_apache": 12, "usa_nimitz": 3, "usa_arleigh": 10, "usa_patriot": 8, "usa_minuteman": 6, "usa_nuke": 50 },
-  // 2. Russia - #2 global military ($109B budget)
-  "russia": { "rus_t14": 60, "rus_bmp3": 45, "rus_su57": 8, "rus_ka52": 5, "rus_kuznetsov": 2, "rus_kilo": 10, "rus_s400": 12, "rus_sarmat": 6, "rus_nuke": 45 },
-  "روسیه": { "rus_t14": 60, "rus_bmp3": 45, "rus_su57": 8, "rus_ka52": 5, "rus_kuznetsov": 2, "rus_kilo": 10, "rus_s400": 12, "rus_sarmat": 6, "rus_nuke": 45 },
-  // 3. China - #3 growing superpower ($292B budget)
-  "china": { "chn_type99": 70, "chn_zbd04": 35, "chn_j20": 8, "chn_z10": 5, "chn_liaoning": 2, "chn_type055": 8, "chn_hq9": 8, "chn_df41": 5, "chn_nuke": 35 },
-  "چین": { "chn_type99": 70, "chn_zbd04": 35, "chn_j20": 8, "chn_z10": 5, "chn_liaoning": 2, "chn_type055": 8, "chn_hq9": 8, "chn_df41": 5, "chn_nuke": 35 },
-  // 4. India - #4 largest army ($83B budget)
-  "india": { "ind_arjun": 46, "ind_su30": 26, "ind_vikrant": 2, "ind_kolkata": 3, "ind_arihant": 2, "ind_akash": 5, "ind_agni": 3, "ind_nuke": 20 },
-  "هند": { "ind_arjun": 46, "ind_su30": 26, "ind_vikrant": 2, "ind_kolkata": 3, "ind_arihant": 2, "ind_akash": 5, "ind_agni": 3, "ind_nuke": 20 },
-  // 5. South Korea - #5 advanced military ($48B budget)
-  "south korea": { "sk_k2": 25, "sk_k21": 35, "sk_kf21": 20, "sk_surion": 8, "sk_sejong": 2, "sk_dosan": 2, "sk_l_sam": 4, "sk_hyunmoo": 4 },
-  "کره جنوبی": { "sk_k2": 25, "sk_k21": 35, "sk_kf21": 20, "sk_surion": 8, "sk_sejong": 2, "sk_dosan": 2, "sk_l_sam": 4, "sk_hyunmoo": 4 },
-  // 6. Pakistan - #6 large army ($10B budget, nukes)
-  "pakistan": { "pak_alkhalid": 30, "pak_jf17": 18, "pak_agosta": 2, "pak_hq7": 2, "pak_shaheen": 3, "pak_nuke": 16 },
-  "پاکستان": { "pak_alkhalid": 30, "pak_jf17": 18, "pak_agosta": 2, "pak_hq7": 2, "pak_shaheen": 3, "pak_nuke": 16 },
-  // 7. Japan - #7 tech-advanced ($46B budget, no nukes but strong navy/air)
-  "japan": { "jp_type10": 10, "jp_f35": 8, "jp_maya": 4, "jp_soryu": 4, "jp_patriot": 5, "jp_type12": 6 },
-  "ژاپن": { "jp_type10": 10, "jp_f35": 8, "jp_maya": 4, "jp_soryu": 4, "jp_patriot": 5, "jp_type12": 6 },
-  // 8. UK - #8 professional army ($68B budget, nukes)
-  "uk": { "uk_challenger": 5, "uk_warrior": 12, "uk_typhoon": 8, "uk_queen": 2, "uk_daring": 3, "uk_astute": 3, "uk_skysabre": 2, "uk_trident": 2, "uk_nuke": 22 },
-  "بریتانیا": { "uk_challenger": 5, "uk_warrior": 12, "uk_typhoon": 8, "uk_queen": 2, "uk_daring": 3, "uk_astute": 3, "uk_skysabre": 2, "uk_trident": 2, "uk_nuke": 22 },
-  // 9. France - #9 ($61B budget, nukes)
-  "france": { "fra_leclerc": 4, "fra_vbci": 10, "fra_rafale": 14, "fra_charles": 2, "fra_horizon": 3, "fra_suffren": 2, "fra_samp": 2, "fra_m51": 2, "fra_nuke": 25 },
-  "فرانسه": { "fra_leclerc": 4, "fra_vbci": 10, "fra_rafale": 14, "fra_charles": 2, "fra_horizon": 3, "fra_suffren": 2, "fra_samp": 2, "fra_m51": 2, "fra_nuke": 25 },
-  // 10. Italy - #10 ($32B budget)
-  "italy": { "ita_ariete": 4, "ita_freccia": 8, "ita_typhoon": 10, "ita_cavour": 1, "ita_orizzonte": 2 },
-  "ایتالیا": { "ita_ariete": 4, "ita_freccia": 8, "ita_typhoon": 10, "ita_cavour": 1, "ita_orizzonte": 2 },
-  // Germany - Advanced but small army
-  "germany": { "ger_leopard": 4, "ger_puma": 12, "ger_typhoon": 6, "ger_sachsen": 2, "ger_type212": 2, "ger_iris": 2 },
-  "آلمان": { "ger_leopard": 4, "ger_puma": 12, "ger_typhoon": 6, "ger_sachsen": 2, "ger_type212": 2, "ger_iris": 2 },
-  // 11. Brazil - #11 ($22B budget)
-  "brazil": { "bra_leopard": 6, "bra_guarani": 10, "bra_gripen": 4, "bra_h225": 2, "bra_barroso": 2, "bra_tikuna": 2 },
-  "برزیل": { "bra_leopard": 6, "bra_guarani": 10, "bra_gripen": 4, "bra_h225": 2, "bra_barroso": 2, "bra_tikuna": 2 },
-  // 12. Turkey - #12 ($16B budget)
-  "turkey": { "tur_altay": 25, "tur_kirpi": 45, "tur_f16": 15, "tur_tb2": 6, "tur_gabya": 3, "tur_reis": 2, "tur_hisar": 4, "tur_bora": 3 },
-  "ترکیه": { "tur_altay": 25, "tur_kirpi": 45, "tur_f16": 15, "tur_tb2": 6, "tur_gabya": 3, "tur_reis": 2, "tur_hisar": 4, "tur_bora": 3 },
-  // 13. Israel - #13 small but advanced ($24B budget, nukes)
-  "israel": { "isr_merkava": 5, "isr_namer": 6, "isr_f35i": 8, "isr_apache": 2, "isr_saar": 3, "isr_dolphin": 3, "isr_iron_dome": 4, "isr_jericho": 2, "isr_nuke": 15 },
-  "اسرائیل": { "isr_merkava": 5, "isr_namer": 6, "isr_f35i": 8, "isr_apache": 2, "isr_saar": 3, "isr_dolphin": 3, "isr_iron_dome": 4, "isr_jericho": 2, "isr_nuke": 15 },
-  // 14. Iran - #14 large army ($25B budget, missiles)
-  "iran": { "irn_karrar": 18, "irn_bmp2": 12, "irn_kowsar": 5, "irn_chopper": 3, "irn_jamaran": 3, "irn_submarine": 3, "irn_bavar": 3, "irn_khorramshahr": 8, "irn_fattah": 4, "irn_hoveyzeh": 6, "irn_shahed": 30 },
-  "ایران": { "irn_karrar": 18, "irn_bmp2": 12, "irn_kowsar": 5, "irn_chopper": 3, "irn_jamaran": 3, "irn_submarine": 3, "irn_bavar": 3, "irn_khorramshahr": 8, "irn_fattah": 4, "irn_hoveyzeh": 6, "irn_shahed": 30 },
-  // 15. Egypt - #15 ($4B budget)
+  // 1. USA - #1 global superpower, ~15210 MP (140 Abrams=3500, 220 Bradley=2200, 30 F35=1800, 30 Apache=600, 8 Nimitz=1200, 12 Arleigh=420, 12 Patriot=300, 8 Minuteman=640, 5 Nukes=5000)
+  "usa": { "usa_abrams": 140, "usa_bradley": 220, "usa_f35": 30, "usa_apache": 30, "usa_nimitz": 8, "usa_arleigh": 12, "usa_patriot": 12, "usa_minuteman": 8, "usa_nuke": 5 },
+  "آمریکا": { "usa_abrams": 140, "usa_bradley": 220, "usa_f35": 30, "usa_apache": 30, "usa_nimitz": 8, "usa_arleigh": 12, "usa_patriot": 12, "usa_minuteman": 8, "usa_nuke": 5 },
+  // 2. Russia - #2, ~11940 MP (150 T-14=3300, 200 BMP3=1600, 20 Su57=1100, 30 Ka52=540, 1 Kuznetsov=100, 10 Kilo=400, 15 S400=450, 5 Sarmat=450, 4 Nukes=4000)
+  "russia": { "rus_t14": 150, "rus_bmp3": 200, "rus_su57": 20, "rus_ka52": 30, "rus_kuznetsov": 1, "rus_kilo": 10, "rus_s400": 15, "rus_sarmat": 5, "rus_nuke": 4 },
+  "روسیه": { "rus_t14": 150, "rus_bmp3": 200, "rus_su57": 20, "rus_ka52": 30, "rus_kuznetsov": 1, "rus_kilo": 10, "rus_s400": 15, "rus_sarmat": 5, "rus_nuke": 4 },
+  // 3. China - #3, ~10505 MP (140 Type99=3360, 120 ZBD04=1080, 25 J20=1250, 25 Z10=400, 3 Liaoning=360, 10 Type055=380, 10 HQ9=250, 5 DF41=425, 3 Nukes=3000)
+  "china": { "chn_type99": 140, "chn_zbd04": 120, "chn_j20": 25, "chn_z10": 25, "chn_liaoning": 3, "chn_type055": 10, "chn_hq9": 10, "chn_df41": 5, "chn_nuke": 3 },
+  "چین": { "chn_type99": 140, "chn_zbd04": 120, "chn_j20": 25, "chn_z10": 25, "chn_liaoning": 3, "chn_type055": 10, "chn_hq9": 10, "chn_df41": 5, "chn_nuke": 3 },
+  // 4. India - #4, ~8490 MP (100 Arjun=2200, 25 Su30=1250, 2 Vikrant=200, 5 Kolkata=145, 3 Arihant=135, 10 Akash=160, 5 Agni=400, 4 Nukes=4000)
+  "india": { "ind_arjun": 100, "ind_su30": 25, "ind_vikrant": 2, "ind_kolkata": 5, "ind_arihant": 3, "ind_akash": 10, "ind_agni": 5, "ind_nuke": 4 },
+  "هند": { "ind_arjun": 100, "ind_su30": 25, "ind_vikrant": 2, "ind_kolkata": 5, "ind_arihant": 3, "ind_akash": 10, "ind_agni": 5, "ind_nuke": 4 },
+  // 5. South Korea - #5, ~6172 MP (100 K2=2800, 120 K21=1320, 20 KF21=920, 20 Surion=320, 5 Sejong=180, 4 Dosan=120, 8 L-SAM=192, 8 Hyunmoo=320)
+  "south korea": { "sk_k2": 100, "sk_k21": 120, "sk_kf21": 20, "sk_surion": 20, "sk_sejong": 5, "sk_dosan": 4, "sk_l_sam": 8, "sk_hyunmoo": 8 },
+  "کره جنوبی": { "sk_k2": 100, "sk_k21": 120, "sk_kf21": 20, "sk_surion": 20, "sk_sejong": 5, "sk_dosan": 4, "sk_l_sam": 8, "sk_hyunmoo": 8 },
+  // 6. UK - #6, ~5055 MP (25 Challenger=625, 50 Warrior=500, 20 Typhoon=900, 2 Queen=260, 5 Daring=170, 5 Astute=210, 5 SkySabre=105, 3 Trident=285, 2 Nukes=2000)
+  "uk": { "uk_challenger": 25, "uk_warrior": 50, "uk_typhoon": 20, "uk_queen": 2, "uk_daring": 5, "uk_astute": 5, "uk_skysabre": 5, "uk_trident": 3, "uk_nuke": 2 },
+  "بریتانیا": { "uk_challenger": 25, "uk_warrior": 50, "uk_typhoon": 20, "uk_queen": 2, "uk_daring": 5, "uk_astute": 5, "uk_skysabre": 5, "uk_trident": 3, "uk_nuke": 2 },
+  // 7. Japan - #7, ~4607 MP (80 Type10=2000, 25 F35=1375, 8 Maya=256, 10 Soryu=300, 12 Patriot=336, 10 Type12=340) - No nukes
+  "japan": { "jp_type10": 80, "jp_f35": 25, "jp_maya": 8, "jp_soryu": 10, "jp_patriot": 12, "jp_type12": 10 },
+  "ژاپن": { "jp_type10": 80, "jp_f35": 25, "jp_maya": 8, "jp_soryu": 10, "jp_patriot": 12, "jp_type12": 10 },
+  // 8. Turkey - #8, ~4050 MP (75 Altay=1650, 120 Kirpi=960, 20 F16=700, 12 TB2=192, 5 Gabya=100, 4 Reis=100, 8 Hisar=144, 5 Bora=150) - No nukes
+  "turkey": { "tur_altay": 75, "tur_kirpi": 120, "tur_f16": 20, "tur_tb2": 12, "tur_gabya": 5, "tur_reis": 4, "tur_hisar": 8, "tur_bora": 5 },
+  "ترکیه": { "tur_altay": 75, "tur_kirpi": 120, "tur_f16": 20, "tur_tb2": 12, "tur_gabya": 5, "tur_reis": 4, "tur_hisar": 8, "tur_bora": 5 },
+  // 9. Pakistan - #9, ~3640 MP (65 Al-Khalid=1170, 40 JF17=880, 6 Agosta=150, 10 HQ7=140, 6 Shaheen=300, 1 Nuke=1000)
+  "pakistan": { "pak_alkhalid": 65, "pak_jf17": 40, "pak_agosta": 6, "pak_hq7": 10, "pak_shaheen": 6, "pak_nuke": 1 },
+  "پاکستان": { "pak_alkhalid": 65, "pak_jf17": 40, "pak_agosta": 6, "pak_hq7": 10, "pak_shaheen": 6, "pak_nuke": 1 },
+  // 10. Italy - #10, ~3257 MP (80 Ariete=1600, 100 Freccia=1000, 10 Typhoon=480, 1 Cavour=90, 3 Orizzonte=87) - No nukes
+  "italy": { "ita_ariete": 80, "ita_freccia": 100, "ita_typhoon": 10, "ita_cavour": 1, "ita_orizzonte": 3 },
+  "ایتالیا": { "ita_ariete": 80, "ita_freccia": 100, "ita_typhoon": 10, "ita_cavour": 1, "ita_orizzonte": 3 },
+  // 11. France - #11, ~2858 MP (20 Leclerc=480, 40 VBCI=360, 10 Rafale=480, 1 Charles=110, 3 Horizon=96, 2 Suffren=80, 3 SAMP=66, 2 M51=180, 1 Nuke=1000)
+  "france": { "fra_leclerc": 20, "fra_vbci": 40, "fra_rafale": 10, "fra_charles": 1, "fra_horizon": 3, "fra_suffren": 2, "fra_samp": 3, "fra_m51": 2, "fra_nuke": 1 },
+  "فرانسه": { "fra_leclerc": 20, "fra_vbci": 40, "fra_rafale": 10, "fra_charles": 1, "fra_horizon": 3, "fra_suffren": 2, "fra_samp": 3, "fra_m51": 2, "fra_nuke": 1 },
+  // 12. Brazil - #12, ~2542 MP (45 Leopard=855, 100 Guarani=900, 10 Gripen=480, 10 H225=140, 3 Barroso=72, 3 Tikuna=69) - No nukes
+  "brazil": { "bra_leopard": 45, "bra_guarani": 100, "bra_gripen": 10, "bra_h225": 10, "bra_barroso": 3, "bra_tikuna": 3 },
+  "برزیل": { "bra_leopard": 45, "bra_guarani": 100, "bra_gripen": 10, "bra_h225": 10, "bra_barroso": 3, "bra_tikuna": 3 },
+  // 13. Iran - #13, ~2285 MP (28 Karrar=504, 35 BMP2=245, 10 Kowsar=250, 10 Chopper=120, 3 Jamaran=66, 3 Submarine=60, 5 Bavar=100, 4 Khorramshahr=240, 2 Fattah=170, 2 Hoveyzeh=80, 30 Shahed=450)
+  "iran": { "irn_karrar": 28, "irn_bmp2": 35, "irn_kowsar": 10, "irn_chopper": 10, "irn_jamaran": 3, "irn_submarine": 3, "irn_bavar": 5, "irn_khorramshahr": 4, "irn_fattah": 2, "irn_hoveyzeh": 2, "irn_shahed": 30 },
+  "ایران": { "irn_karrar": 28, "irn_bmp2": 35, "irn_kowsar": 10, "irn_chopper": 10, "irn_jamaran": 3, "irn_submarine": 3, "irn_bavar": 5, "irn_khorramshahr": 4, "irn_fattah": 2, "irn_hoveyzeh": 2, "irn_shahed": 30 },
+  // 14. Israel - #14, ~2097 MP (10 Merkava=260, 8 Namer=96, 5 F35I=325, 4 Apache=84, 3 Saar=84, 2 Dolphin=90, 4 IronDome=140, 1 Jericho=70, 1 Nuke=1000)
+  "israel": { "isr_merkava": 10, "isr_namer": 8, "isr_f35i": 5, "isr_apache": 4, "isr_saar": 3, "isr_dolphin": 2, "isr_iron_dome": 4, "isr_jericho": 1, "isr_nuke": 1 },
+  "اسرائیل": { "isr_merkava": 10, "isr_namer": 8, "isr_f35i": 5, "isr_apache": 4, "isr_saar": 3, "isr_dolphin": 2, "isr_iron_dome": 4, "isr_jericho": 1, "isr_nuke": 1 },
+  // 15. Germany - #15, ~1904 MP (28 Leopard=784, 45 Puma=495, 8 Typhoon=360, 3 Sachsen=84, 3 Type212=81, 5 IRIS=100) - No nukes
+  "germany": { "ger_leopard": 28, "ger_puma": 45, "ger_typhoon": 8, "ger_sachsen": 3, "ger_type212": 3, "ger_iris": 5 },
+  "آلمان": { "ger_leopard": 28, "ger_puma": 45, "ger_typhoon": 8, "ger_sachsen": 3, "ger_type212": 3, "ger_iris": 5 },
+  // 16. Egypt
   "egypt": { "egy_abrams": 48, "egy_rafale": 14, "egy_fremm": 2, "egy_hawk": 3, "egy_scud": 4 },
   "مصر": { "egy_abrams": 48, "egy_rafale": 14, "egy_fremm": 2, "egy_hawk": 3, "egy_scud": 4 },
-  // 16. North Korea - #16 large army, poor tech ($3B budget)
-  "north korea": { "nk_pokpung": 45, "nk_mig29": 12, "nk_sub": 3, "nk_hwasong": 3, "nk_nuke": 8 },
-  "کره شمالی": { "nk_pokpung": 45, "nk_mig29": 12, "nk_sub": 3, "nk_hwasong": 3, "nk_nuke": 8 },
-  // 17. Saudi Arabia - #17 ($75B budget, modern imports)
+  // 17. North Korea
+  "north korea": { "nk_pokpung": 45, "nk_mig29": 12, "nk_sub": 3, "nk_hwasong": 3, "nk_nuke": 1 },
+  "کره شمالی": { "nk_pokpung": 45, "nk_mig29": 12, "nk_sub": 3, "nk_hwasong": 3, "nk_nuke": 1 },
+  // 18. Saudi Arabia
   "saudi arabia": { "ksa_abrams": 14, "ksa_f15": 10, "ksa_riyadh": 2, "ksa_patriot": 4 },
   "عربستان سعودی": { "ksa_abrams": 14, "ksa_f15": 10, "ksa_riyadh": 2, "ksa_patriot": 4 },
   "عربستان": { "ksa_abrams": 14, "ksa_f15": 10, "ksa_riyadh": 2, "ksa_patriot": 4 },
-  // 18. Australia - #18 ($32B budget)
+  // 19. Australia
   "australia": { "aus_abrams": 2, "aus_f35": 8, "aus_hobart": 2, "aus_collins": 2 },
   "استرالیا": { "aus_abrams": 2, "aus_f35": 8, "aus_hobart": 2, "aus_collins": 2 },
-  // 19. Canada - #19 ($27B budget)
+  // 20. Canada
   "canada": { "can_leopard": 2, "can_cf18": 6, "can_halifax": 2 },
   "کانادا": { "can_leopard": 2, "can_cf18": 6, "can_halifax": 2 },
-  // 20. Ukraine - #20 wartime army
+  // 21. Ukraine
   "ukraine": { "ukr_t84": 30, "ukr_btr4": 20, "ukr_su27": 5, "ukr_hrim": 2 },
   "اوکراین": { "ukr_t84": 30, "ukr_btr4": 20, "ukr_su27": 5, "ukr_hrim": 2 },
-  // 21. Sweden - #21 advanced tech
+  // 22. Sweden
   "sweden": { "swe_strv122": 2, "swe_cv90": 8, "swe_gripen": 3, "swe_hkp16": 2, "swe_visby": 2, "swe_gotland": 2, "swe_rbs15": 3 },
   "سوئد": { "swe_strv122": 2, "swe_cv90": 8, "swe_gripen": 3, "swe_hkp16": 2, "swe_visby": 2, "swe_gotland": 2, "swe_rbs15": 3 },
-  // 22. Poland - #22 growing military
+  // 23. Poland
   "poland": { "pol_leopard": 4, "pol_borsuk": 8, "pol_f35": 3, "pol_s70": 2, "pol_scarwad": 2, "pol_patriot": 2 },
   "لهستان": { "pol_leopard": 4, "pol_borsuk": 8, "pol_f35": 3, "pol_s70": 2, "pol_scarwad": 2, "pol_patriot": 2 },
-  // 23. Indonesia - #23 large army
+  // 24. Indonesia
   "indonesia": { "idn_leopard": 2, "idn_anoa": 6, "idn_f16": 2, "idn_heli": 2, "idn_martadinata": 2, "idn_nagapasa": 2 },
   "اندونزی": { "idn_leopard": 2, "idn_anoa": 6, "idn_f16": 2, "idn_heli": 2, "idn_martadinata": 2, "idn_nagapasa": 2 },
-  // 24. Vietnam - #24
+  // 25. Vietnam
   "vietnam": { "vn_t90": 8, "vn_bmp1": 10, "vn_su30": 2, "vn_heli": 2, "vn_gepard": 2, "vn_kilo": 2 },
   "ویتنام": { "vn_t90": 8, "vn_bmp1": 10, "vn_su30": 2, "vn_heli": 2, "vn_gepard": 2, "vn_kilo": 2 },
-  // 25. Argentina - #25
+  // 26. Argentina
   "argentina": { "arg_leopard": 3, "arg_vcmd": 4, "arg_f35": 2, "arg_heli": 2, "arg_almirante": 2, "arg_salta": 2 },
   "آرژانتین": { "arg_leopard": 3, "arg_vcmd": 4, "arg_f35": 2, "arg_heli": 2, "arg_almirante": 2, "arg_salta": 2 },
-  // 26. Mexico - #26
+  // 27. Mexico
   "mexico": { "mex_leopard": 3, "mex_panther": 5, "mex_f5": 2, "mex_heli": 2, "mex_armada": 2 },
   "مکزیک": { "mex_leopard": 3, "mex_panther": 5, "mex_f5": 2, "mex_heli": 2, "mex_armada": 2 },
-  // 27. Nigeria - #27
+  // 28. Nigeria
   "nigeria": { "nga_vab": 4, "nga_protech": 3, "nga_jf17": 2, "nga_heli": 2, "nga_nw": 2 },
   "نیجریه": { "nga_vab": 4, "nga_protech": 3, "nga_jf17": 2, "nga_heli": 2, "nga_nw": 2 },
-  // 28. South Africa - #28
+  // 29. South Africa
   "south africa": { "za_ratel": 3, "za_mamba": 4, "za_jf17": 2, "za_heli": 2, "za_valour": 2 },
   "آفریقای جنوبی": { "za_ratel": 3, "za_mamba": 4, "za_jf17": 2, "za_heli": 2, "za_valour": 2 },
-  // 29. Bangladesh - #29
+  // 30. Bangladesh
   "bangladesh": { "bgd_type69": 4, "bgd_bmp": 5, "bgd_jf17": 2, "bgd_heli": 2, "bgd_bangabandhu": 2 },
   "بنگلادش": { "bgd_type69": 4, "bgd_bmp": 5, "bgd_jf17": 2, "bgd_heli": 2, "bgd_bangabandhu": 2 }
 };
