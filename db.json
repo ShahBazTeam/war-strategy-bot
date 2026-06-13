@@ -272,17 +272,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 39.7,
-          "militaryPower": 608,
+          "gold": 634.9,
+          "militaryPower": 606,
           "economicPower": 277,
           "resources": {
-            "oil": 2.2,
-            "steel": 78.3,
-            "food": 101.5
+            "oil": 2.4,
+            "steel": 80.9,
+            "food": 106.5
           },
           "techLevel": 5,
           "factoryLevel": 7,
-          "lastIncomeUpdate": 1781382518012
+          "lastIncomeUpdate": 1781382578012
         }
       },
       "equipmentSlots": [
@@ -302,18 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۷:۰۲",
-          "gold": 9338.3,
-          "military": 612,
-          "economy": 224
-        },
-        {
-          "timestamp": "۲۰:۲۷:۴۳",
-          "gold": 9517.5,
-          "military": 610,
-          "economy": 224
-        },
         {
           "timestamp": "۲۰:۲۷:۵۵",
           "gold": 9802.5,
@@ -390,6 +378,18 @@
           "timestamp": "۲۰:۲۹:۳۴",
           "gold": 39.7,
           "military": 608,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۲۹:۴۰",
+          "gold": 349.9,
+          "military": 606,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۰:۲۹:۴۰",
+          "gold": 634.9,
+          "military": 606,
           "economy": 277
         }
       ]
@@ -544,17 +544,17 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 1322.6,
+          "gold": 1524.2,
           "militaryPower": 54858,
           "economicPower": 180,
           "resources": {
-            "oil": 331.1,
-            "steel": 112.2,
-            "food": 34.2
+            "oil": 347.5,
+            "steel": 125.3,
+            "food": 47.3
           },
           "techLevel": 2,
           "factoryLevel": 7,
-          "lastIncomeUpdate": 1781382517938
+          "lastIncomeUpdate": 1781382577938
         }
       },
       "equipmentSlots": [
@@ -580,12 +580,6 @@
         "usa_nuke": 50
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۴:۱۴",
-          "gold": 1303,
-          "military": 54858,
-          "economy": 170
-        },
         {
           "timestamp": "۲۰:۲۴:۴۰",
           "gold": 1466.2,
@@ -667,6 +661,12 @@
         {
           "timestamp": "۲۰:۲۸:۵۷",
           "gold": 1322.6,
+          "military": 54858,
+          "economy": 180
+        },
+        {
+          "timestamp": "۲۰:۲۹:۳۹",
+          "gold": 1524.2,
           "military": 54858,
           "economy": 180
         }
