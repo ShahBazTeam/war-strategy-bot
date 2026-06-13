@@ -129,16 +129,16 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 12225.1,
+          "gold": 9930.1,
           "militaryPower": 1421,
-          "economicPower": 95,
+          "economicPower": 108,
           "resources": {
             "oil": 37.7,
             "steel": 107.5,
             "food": 59.7
           },
           "techLevel": 1,
-          "factoryLevel": 3,
+          "factoryLevel": 4,
           "lastIncomeUpdate": 1781381255409
         }
       },
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۵۳:۳۸",
-          "gold": 325.7,
-          "military": 1421,
-          "economy": 95
-        },
         {
           "timestamp": "۲۰:۰۱:۳۹",
           "gold": 690.5,
@@ -258,6 +252,12 @@
           "gold": 12225.1,
           "military": 1421,
           "economy": 95
+        },
+        {
+          "timestamp": "۲۰:۰۷:۵۲",
+          "gold": 9930.1,
+          "military": 1421,
+          "economy": 108
         }
       ]
     },
@@ -544,12 +544,12 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 1783.2,
+          "gold": 1120.2,
           "militaryPower": 54858,
           "economicPower": 150,
           "resources": {
             "oil": 17.2,
-            "steel": 37.7,
+            "steel": 67.7,
             "food": 159.7
           },
           "techLevel": 2,
@@ -580,12 +580,6 @@
         "usa_nuke": 50
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۲:۴۴",
-          "gold": 364.2,
-          "military": 54860,
-          "economy": 150
-        },
         {
           "timestamp": "۲۰:۰۳:۴۰",
           "gold": 460.2,
@@ -667,6 +661,12 @@
         {
           "timestamp": "۲۰:۰۷:۳۸",
           "gold": 1783.2,
+          "military": 54858,
+          "economy": 150
+        },
+        {
+          "timestamp": "۲۰:۰۷:۵۱",
+          "gold": 1120.2,
           "military": 54858,
           "economy": 150
         }
