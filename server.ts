@@ -1202,6 +1202,66 @@ app.post("/api/tweets", checkRateLimit, async (req, res) => {
     db.tweets.unshift(tweet);
     saveDatabase();
     res.json({ tweet });
+
+    // AI Journalist auto-reply (fire-and-forget)
+    (async () => {
+      try {
+        const recentTweets = db.tweets.slice(0, 20).map(t => 
+          `${t.countryName} (@${t.username}): ${t.text}`
+        ).join("\n");
+
+        const journalistPrompt = `تو یک خبرنگار بین‌المللی حرفه‌ای به نام " news_desk" هستی. 
+
+آخرین توییت‌های دیپلماتیک رهبران کشورها:
+${recentTweets}
+
+توییت جدید کشور ${user.country.name}:
+"${tweetText.trim()}}
+
+وظیفه تو:
+1. اگر توییت جدید مربوط به جنگ، تهدید یا بحران است ← تحلیل خبری بنویس
+2. اگر توییت مربوط به اقتصاد یا تجارت است ← گزارش اقتصادی بنویس  
+3. اگر توییت مربوط به دیپلماسی یا اتحاد است ← تحلیل سیاسی بنویس
+4. اگر توییت معمولی است ← یک پاسخ کوتاه خبری بنویس
+
+پاسخ باید:
+- حداکثر ۱۰۰ کلمه فارسی
+- لحن خبری حرفه‌ای و بی‌طرف
+- از اصطلاحات خبری استفاده کن
+- مثل خبرنگار CNN یا BBC بنویس`;
+
+        const journalistSchema = {
+          type: Type.OBJECT,
+          properties: {
+            reply: { type: Type.STRING },
+            category: { type: Type.STRING }
+          },
+          required: ["reply", "category"]
+        };
+
+        const text = await callGemini(journalistPrompt, "تو یک خبرنگار حرفه‌ای بین‌المللی هستی. پاسخ‌های خبری کوتاه و حرفه‌ای بنویس.", journalistSchema);
+        const parsed = JSON.parse(text);
+
+        const journalistTweet: Tweet = {
+          id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          userId: "news_system",
+          username: "خبرنگار_بین‌المللی",
+          countryName: "news",
+          flagUrl: "",
+          text: `📰 گزارش خبری | ${parsed.category}\n\n${parsed.reply}\n\n🔗 در واکنش به توییت ${user.country.name}`,
+          timestamp: new Date().toISOString(),
+          likes: [],
+          comments: [],
+          isAiGenerated: true,
+          isVerified: true
+        };
+
+        db.tweets.unshift(journalistTweet);
+        saveDatabase();
+      } catch (e) {
+        console.error("[AI Journalist] Error:", e);
+      }
+    })();
 });
 
 // --------------------------------------------------------
@@ -3476,6 +3536,89 @@ app.post("/api/tweets/:id/comment", checkRateLimit, (req, res) => {
   tweet.comments.push(newComment);
   saveDatabase();
   res.status(201).json({ tweet });
+});
+
+// AI NEWS GENERATION - reads recent tweets and generates news
+app.post("/api/tweets/generate-news", checkRateLimit, async (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  try {
+    const recentTweets = db.tweets.slice(0, 30).map(t => 
+      `${t.countryName} (@${t.username}): ${t.text}`
+    ).join("\n\n");
+
+    const newsPrompt = `تو سردبیر خبرگزاری بین‌المللی "news_agency" هستی. 
+
+آخرین توییت‌ها و رویدادهای جهان:
+${recentTweets}
+
+وظیفه:
+1. یک خبر اصلی بنویس (titl + متن)
+2. یک تیتر فرعی بنویس
+3. دسته‌بندی خبر را مشخص کن
+
+پاسخ به فارسی، حداکثر ۱۵۰ کلمه، لحن خبری رسمی.`;
+
+    const newsSchema = {
+      type: Type.OBJECT,
+      properties: {
+        headline: { type: Type.STRING },
+        subheadline: { type: Type.STRING },
+        body: { type: Type.STRING },
+        category: { type: Type.STRING }
+      },
+      required: ["headline", "body", "category"]
+    };
+
+    const text = await callGemini(newsPrompt, "تو سردبیر خبرگزاری بین‌المللی هستی. اخبار را کوتاه و حرفه‌ای بنویس.", newsSchema);
+    const parsed = JSON.parse(text);
+
+    const newsTweet: Tweet = {
+      id: `news_gen_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      userId: "news_system",
+      username: "خبرگزاری_جهانی",
+      countryName: "news",
+      flagUrl: "",
+      text: `📰 ${parsed.headline}\n\n${parsed.subheadline ? parsed.subheadline + "\n\n" : ""}${parsed.body}\n\n🏷️ ${parsed.category}`,
+      timestamp: new Date().toISOString(),
+      likes: [],
+      comments: [],
+      isAiGenerated: true,
+      isVerified: true
+    };
+
+    db.tweets.unshift(newsTweet);
+    saveDatabase();
+    res.json({ tweet: newsTweet, message: "خبر جدید تولید شد" });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// TRENDING TOPICS
+app.get("/api/tweets/trending", (req, res) => {
+  const allTweets = db.tweets.slice(0, 100);
+  const countryCounts: { [key: string]: number } = {};
+  const wordCounts: { [key: string]: number } = {};
+  
+  allTweets.forEach(t => {
+    countryCounts[t.countryName] = (countryCounts[t.countryName] || 0) + 1;
+    const words = t.text.split(/\s+/).filter(w => w.length > 3);
+    words.forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
+  });
+
+  const trendingCountries = Object.entries(countryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, count]) => ({ name, count }));
+
+  const trendingWords = Object.entries(wordCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([word, count]) => ({ word, count }));
+
+  res.json({ trendingCountries, trendingWords });
 });
 
 // --------------------------------------------------------

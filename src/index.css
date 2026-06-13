@@ -59,3 +59,14 @@ body {
 .ticker-item:nth-child(4) { animation-delay: 15s; }
 .ticker-item:nth-child(5) { animation-delay: 20s; }
 
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
