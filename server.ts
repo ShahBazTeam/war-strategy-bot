@@ -1055,11 +1055,11 @@ const techUpgradeHandler = (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const currentTech = user.country.assets.techLevel;
-  if (currentTech >= 5) {
-    return res.status(400).json({ error: "سطح فناوری شما هم‌اکنون در بیشترین مقدار خود (۵) قرار دارد" });
+  if (currentTech >= 20) {
+    return res.status(400).json({ error: "سطح فناوری شما هم‌اکنون در بیشترین مقدار خود (۲۰) قرار دارد" });
   }
 
-  const upgradeCosts = [0, 400, 800, 1500, 3000]; // Cost for indexes 1 -> 2, 2 -> 3, 3 -> 4, 4 -> 5
+  const upgradeCosts = [0, 12000, 24000, 45000, 90000, 150000, 250000, 400000, 600000, 900000, 1200000, 1600000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000]; // Cost for levels 1→2 through 19→20 (30x)
   const multipliers = getCatchUpMultipliers(user);
   const cost = Math.round(upgradeCosts[currentTech] * multipliers.costMultiplier);
 
@@ -1086,13 +1086,13 @@ app.post("/api/factory/upgrade", checkRateLimit, (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const currentLevel = user.country.assets.factoryLevel || 1;
-  if (currentLevel >= 10) {
+  if (currentLevel >= 20) {
     return res.status(400).json({ error: "کارخانه شما به بالاترین سطح ممکن رسیده است." });
   }
 
-  // Cost calculation: base 1000 + 800 per level
+  // Cost calculation: base 30000 + 24000 per level (30x of original)
   const multipliers = getCatchUpMultipliers(user);
-  const cost = Math.round((1000 + 800 * currentLevel) * multipliers.costMultiplier);
+  const cost = Math.round((30000 + 24000 * currentLevel) * multipliers.costMultiplier);
 
   if (user.country.assets.gold < cost) {
     return res.status(400).json({ error: `ارتقای کارخانه به سطح ${currentLevel + 1} نیازمند ${cost} طلا است!` });

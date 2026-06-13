@@ -339,17 +339,17 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
             <p className="text-slate-400 text-xs mt-1 font-serif text-slate-300">تولید تسلیحات مدرن‌تر و ارتقای توانایی تجاری مستلزم تکامل سطح تکنولوژی است.</p>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[10px] text-slate-500 font-mono">COUNTRY_TECH_INDEX:</span>
-              <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-mono text-cyan-400 font-bold">LEVEL {user.country.assets.techLevel} OF 5</span>
+              <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-mono text-cyan-400 font-bold">LEVEL {user.country.assets.techLevel} OF 20</span>
             </div>
           </div>
         </div>
 
-        {user.country.assets.techLevel < 5 ? (
+        {user.country.assets.techLevel < 20 ? (
           <button
             onClick={onUpgradeTech}
             className="w-full md:w-auto rounded border border-cyan-500/50 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 font-bold py-3 px-6 text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-3 font-sans"
           >
-            <RefreshCw className="h-4 w-4" /> ارتقا به سطح {user.country.assets.techLevel + 1} ({[0, 400, 800, 1500, 3000][user.country.assets.techLevel]} طلا)
+            <RefreshCw className="h-4 w-4" /> ارتقا به سطح {user.country.assets.techLevel + 1} ({[0, 12000, 24000, 45000, 90000, 150000, 250000, 400000, 600000, 900000, 1200000, 1600000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000][user.country.assets.techLevel]} طلا)
           </button>
         ) : (
           <div className="rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 px-4 py-2.5 text-xs font-bold font-mono">
@@ -366,16 +366,16 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
             <p className="text-slate-400 text-xs mt-1 font-serif text-slate-300">ارتقای کارخانه باعث افزایش تولید طلای خالص در هر دقیقه می‌شود.</p>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[10px] text-slate-500 font-mono">FACTORY_LEVEL:</span>
-              <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-500 font-bold">LEVEL {user.country.assets.factoryLevel || 1} OF 10</span>
+              <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-500 font-bold">LEVEL {user.country.assets.factoryLevel || 1} OF 20</span>
             </div>
           </div>
         </div>
-        {user.country.assets.factoryLevel < 10 ? (
+        {user.country.assets.factoryLevel < 20 ? (
           <button
             onClick={onUpgradeFactory}
             className="w-full md:w-auto rounded border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold py-3 px-6 text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-3 font-sans"
           >
-            <RefreshCw className="h-4 w-4" /> ارتقا کارخانه به سطح {(user.country.assets.factoryLevel || 1) + 1} ({(user.country.assets.factoryLevel || 1) * 200} طلا)
+            <RefreshCw className="h-4 w-4" /> ارتقا کارخانه به سطح {(user.country.assets.factoryLevel || 1) + 1} ({30000 + 24000 * (user.country.assets.factoryLevel || 1)} طلا)
           </button>
         ) : (
           <div className="rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 px-4 py-2.5 text-xs font-bold font-mono">
