@@ -272,17 +272,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 9588.5,
-          "militaryPower": 1280,
+          "gold": 11760.2,
+          "militaryPower": 1278,
           "economicPower": 277,
           "resources": {
-            "oil": 8.6,
-            "steel": 534.1,
-            "food": 266.7
+            "oil": 9.7,
+            "steel": 622.3,
+            "food": 302
           },
           "techLevel": 5,
           "factoryLevel": 7,
-          "lastIncomeUpdate": 1781384498012
+          "lastIncomeUpdate": 1781384918012
         }
       },
       "equipmentSlots": [
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۵۸:۴۴",
-          "gold": 11258.9,
-          "military": 1286,
-          "economy": 277
-        },
         {
           "timestamp": "۲۰:۵۸:۴۴",
           "gold": 11037.9,
@@ -390,6 +384,12 @@
           "timestamp": "۲۱:۰۱:۴۱",
           "gold": 9588.5,
           "military": 1280,
+          "economy": 277
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۶",
+          "gold": 11760.2,
+          "military": 1278,
           "economy": 277
         }
       ]
@@ -822,12 +822,12 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 2763.5,
+          "gold": 3903.5,
           "militaryPower": 48047,
           "economicPower": 187,
           "resources": {
             "oil": 318.9,
-            "steel": 295.9,
+            "steel": 255.9,
             "food": 338.9
           },
           "techLevel": 3,
@@ -857,30 +857,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۲۴:۰۰",
-          "gold": 4290.8,
-          "military": 48047,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۲۴:۰۲",
-          "gold": 4579.8,
-          "military": 48047,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۲۴:۰۴",
-          "gold": 4868.8,
-          "military": 48047,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۲۴:۱۰",
-          "gold": 4985.8,
-          "military": 48047,
-          "economy": 167
-        },
         {
           "timestamp": "۲۰:۲۴:۱۱",
           "gold": 5102.8,
@@ -944,6 +920,30 @@
         {
           "timestamp": "۲۱:۰۸:۴۵",
           "gold": 2763.5,
+          "military": 48047,
+          "economy": 187
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۶",
+          "gold": 3048.5,
+          "military": 48047,
+          "economy": 187
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۶",
+          "gold": 3333.5,
+          "military": 48047,
+          "economy": 187
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۷",
+          "gold": 3618.5,
+          "military": 48047,
+          "economy": 187
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۷",
+          "gold": 3903.5,
           "military": 48047,
           "economy": 187
         }
@@ -1238,12 +1238,12 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 21651.7,
+          "gold": 50151.7,
           "militaryPower": 23041,
           "economicPower": 160,
           "resources": {
             "oil": 21.2,
-            "steel": 1148.4,
+            "steel": 148.4,
             "food": 418.8
           },
           "techLevel": 2,
@@ -1272,12 +1272,6 @@
         "ind_nuke": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۰۳:۰۷",
-          "gold": 36411.7,
-          "military": 23041,
-          "economy": 160
-        },
         {
           "timestamp": "۲۱:۰۳:۳۷",
           "gold": 12611.7,
@@ -1359,6 +1353,12 @@
         {
           "timestamp": "۲۱:۰۸:۰۸",
           "gold": 21651.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۱:۰۸:۴۶",
+          "gold": 50151.7,
           "military": 23041,
           "economy": 160
         }
