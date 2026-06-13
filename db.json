@@ -10,17 +10,17 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 50180,
+          "gold": 50240,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 503,
-            "steel": 530,
-            "food": 530
+            "oil": 504,
+            "steel": 540,
+            "food": 540
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781371061163
+          "lastIncomeUpdate": 1781371121163
         }
       },
       "equipmentSlots": [],
@@ -43,6 +43,12 @@
           "gold": 50180,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۱۹:۲۸",
+          "gold": 50240,
+          "military": 100,
+          "economy": 100
         }
       ]
     },
@@ -57,17 +63,17 @@
         "slogan": "اتحاد و عدالت و آزادی",
         "flagUrl": "🇩🇪",
         "assets": {
-          "gold": 82,
+          "gold": 94,
           "militaryPower": 622,
           "economicPower": 100,
           "resources": {
             "oil": 20,
-            "steel": 20.6,
-            "food": 20.4
+            "steel": 21.2,
+            "food": 20.8
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781371012280
+          "lastIncomeUpdate": 1781371132280
         }
       },
       "equipmentSlots": [
@@ -108,6 +114,18 @@
         {
           "timestamp": "۱۷:۱۶:۵۸",
           "gold": 82,
+          "military": 622,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۱۸:۲۷",
+          "gold": 88,
+          "military": 622,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۱۹:۲۸",
+          "gold": 94,
           "military": 622,
           "economy": 100
         }
