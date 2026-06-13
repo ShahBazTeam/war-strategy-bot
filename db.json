@@ -683,17 +683,17 @@
         "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 1300,
-          "militaryPower": 15743,
-          "economicPower": 81,
+          "gold": 1325.9,
+          "militaryPower": 15741,
+          "economicPower": 80,
           "resources": {
             "oil": 0,
-            "steel": 5.1,
-            "food": 6.5
+            "steel": 5.5,
+            "food": 6.7
           },
           "techLevel": 1,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781380453710
+          "lastIncomeUpdate": 1781380513710
         }
       },
       "equipmentSlots": [
@@ -719,12 +719,6 @@
         "isr_nuke": 15
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۴۲:۱۵",
-          "gold": 924.4,
-          "military": 15767,
-          "economy": 93
-        },
         {
           "timestamp": "۱۹:۴۳:۱۷",
           "gold": 954.2,
@@ -808,6 +802,12 @@
           "gold": 1300,
           "military": 15743,
           "economy": 81
+        },
+        {
+          "timestamp": "۱۹:۵۵:۱۸",
+          "gold": 1325.9,
+          "military": 15741,
+          "economy": 80
         }
       ]
     },
