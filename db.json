@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 52560,
+          "gold": 53600,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 583.2,
-            "steel": 1332,
-            "food": 1332
+            "oil": 617,
+            "steel": 1670,
+            "food": 1670
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781391504579
+          "lastIncomeUpdate": 1781392284579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۴۴:۴۸",
-          "gold": 51440,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۴۵:۴۸",
           "gold": 51520,
@@ -115,6 +109,12 @@
           "gold": 52560,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۲۳:۱۱:۴۱",
+          "gold": 53600,
+          "military": 100,
+          "economy": 100
         }
       ]
     }
@@ -123,7 +123,19 @@
   "wars": [],
   "alliances": [],
   "unProposals": [],
-  "tweets": [],
+  "tweets": [
+    {
+      "id": "d5nj6um",
+      "userId": "admin_7o4e547",
+      "username": "admin",
+      "countryName": "سازمان ملل",
+      "flagUrl": "🇺🇳",
+      "text": "با نام و یاد خدا ارزو میکنم تمام دنیا شاد باشد",
+      "timestamp": "2026-06-13T23:12:07.039Z",
+      "likes": [],
+      "comments": []
+    }
+  ],
   "inventions": [],
   "geminiLogs": [],
   "resourcePrices": {
