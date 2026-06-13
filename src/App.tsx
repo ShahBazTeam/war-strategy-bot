@@ -172,9 +172,12 @@ export default function App() {
           localStorage.setItem("modern_world_user_id", data.user.id);
           setUserId(data.user.id);
           updateUser(data.user);
-          showTemporarySuccess("داده‌های شما بازیابی شد!");
           return;
-        } catch {}
+        } catch {
+          // User was deleted by admin - clear all localStorage
+          localStorage.removeItem("modern_world_user_id");
+          localStorage.removeItem("modern_world_user_backup");
+        }
       }
       handleLogout();
     }

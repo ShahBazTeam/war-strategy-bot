@@ -685,25 +685,16 @@ app.post("/api/auth/login", (req, res) => {
 
 app.post("/api/auth/restore", (req, res) => {
   const { userData } = req.body;
-  if (!userData || !userData.username || !userData.id) {
+  if (!userData || !userData.username) {
     return res.status(400).json({ error: "داده‌های کاربر معتبر نیست" });
   }
+  // Only find existing user - NEVER auto-create
   const existing = db.users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
   if (existing) {
     return res.json({ user: existing });
   }
-  const restoredUser: User = {
-    id: userData.id,
-    username: userData.username,
-    isAdmin: userData.isAdmin || false,
-    country: userData.country,
-    equipmentSlots: userData.equipmentSlots || [],
-    warehouse: userData.warehouse || {},
-    assetLog: userData.assetLog || []
-  };
-  db.users.push(restoredUser);
-  saveDatabase();
-  res.json({ user: restoredUser });
+  // User was deleted - clear localStorage on client side
+  res.status(404).json({ error: "کاربر یافت نشد - لطفاً دوباره وارد شوید", deleted: true });
 });
 
 app.get("/api/user/me", (req, res) => {
