@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 228.8,
+          "gold": 7.8,
           "militaryPower": 1449,
           "economicPower": 92,
           "resources": {
             "oil": 5.1,
-            "steel": 42.8,
+            "steel": 52.8,
             "food": 5.3
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۱۹:۱۷:۱۲",
-          "gold": 704.7,
-          "military": 1455,
-          "economy": 95
-        },
         {
           "timestamp": "۱۹:۱۷:۱۷",
           "gold": 1016.7,
@@ -256,6 +250,12 @@
         {
           "timestamp": "۱۹:۲۰:۲۸",
           "gold": 228.8,
+          "military": 1449,
+          "economy": 92
+        },
+        {
+          "timestamp": "۱۹:۲۰:۳۳",
+          "gold": 7.8,
           "military": 1449,
           "economy": 92
         }
