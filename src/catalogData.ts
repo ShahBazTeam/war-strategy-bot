@@ -184,7 +184,84 @@ export const CATALOG: WeaponConfig[] = [
   { id: "ukr_t84", name: "تانک T-84 / T-64", cost: 150, mp: 18, desc: "تانک اصلی رزمی بومی", type: "ground_forces", tags: ["ukraine", "اوکراین"] },
   { id: "ukr_btr4", name: "نفربر BTR-4 / BMP", cost: 80, mp: 9, desc: "نفربر زرهی", type: "ground_forces", tags: ["ukraine", "اوکراین"] },
   { id: "ukr_su27", name: "جنگنده Su-27/MiG-29", cost: 200, mp: 25, desc: "جنگنده نسل چهارم", type: "air_force", tags: ["ukraine", "اوکراین"] },
-  { id: "ukr_hrim", name: "موشک Hrim-2 / Vilkha", cost: 300, mp: 35, desc: "موشک بالستیک", type: "missile", tags: ["ukraine", "اوکراین"] }
+  { id: "ukr_hrim", name: "موشک Hrim-2 / Vilkha", cost: 300, mp: 35, desc: "موشک بالستیک", type: "missile", tags: ["ukraine", "اوکراین"] },
+
+  // Sweden
+  { id: "swe_strv122", name: "تانک Strv 122 / Leopard 2A6", cost: 220, mp: 26, desc: "تانک اصلی مدرن سوئدی", type: "ground_forces", tags: ["sweden", "سوئد"] },
+  { id: "swe_cv90", name: "نفربر CV90", cost: 100, mp: 11, desc: "نفربر زرهی پیشرفته", type: "ground_forces", tags: ["sweden", "سوئد"] },
+  { id: "swe_gripen", name: "جنگنده Gripen E/F", cost: 400, mp: 50, desc: "جنگنده سبک پیشرفته", type: "air_force", tags: ["sweden", "سوئد"] },
+  { id: "swe_hkp16", name: "بالگرد HKP 16 / NH90", cost: 130, mp: 15, desc: "بالگرد چندمنظوره", type: "air_force", tags: ["sweden", "سوئد"] },
+  { id: "swe_visby", name: "ناوشکن Visby", cost: 280, mp: 28, desc: "ناوشکن رادارگریز", type: "navy", tags: ["sweden", "سوئد"] },
+  { id: "swe_gotland", name: "زیردریایی Gotland", cost: 260, mp: 26, desc: "زیردریایی AIP پیشرفته", type: "navy", tags: ["sweden", "سوئد"] },
+  { id: "swe_rbs15", name: "موشک RBS 15 / Robotsystem 15", cost: 350, mp: 35, desc: "موشک ضدکشتی/کروز", type: "missile", tags: ["sweden", "سوئد"] },
+
+  // Poland
+  { id: "pol_leopard", name: "تانک Leopard 2PL / PT-91", cost: 200, mp: 24, desc: "تانک اصلی میدان نبرد", type: "ground_forces", tags: ["poland", "لهستان"] },
+  { id: "pol_borsuk", name: "نفربر Borsuk / Rosomak", cost: 95, mp: 10, desc: "نفربر زرهی", type: "ground_forces", tags: ["poland", "لهستان"] },
+  { id: "pol_f35", name: "جنگنده F-35 / F-16", cost: 420, mp: 52, desc: "جنگنده نسل پنجم", type: "air_force", tags: ["poland", "لهستان"] },
+  { id: "pol_s70", name: "بالگرد S-70 / Mi-24", cost: 110, mp: 13, desc: "بالگرد تهاجمی", type: "air_force", tags: ["poland", "لهستان"] },
+  { id: "pol_scarwad", name: "ناوشکن Ślązak", cost: 250, mp: 25, desc: "ناوچه مدرن", type: "navy", tags: ["poland", "لهستان"] },
+  { id: "pol_patriot", name: "پدافند Patriot / Narew", cost: 200, mp: 22, desc: "سامانه پدافند هوایی", type: "air_defense", tags: ["poland", "لهستان"] },
+
+  // Brazil
+  { id: "bra_leopard", name: "تانک Leopard 1 / EE-T1", cost: 170, mp: 19, desc: "تانک رزمی", type: "ground_forces", tags: ["brazil", "برزیل"] },
+  { id: "bra_guarani", name: "نفربر Guarani", cost: 85, mp: 9, desc: "نفربر زرهی ساخت برزیل", type: "ground_forces", tags: ["brazil", "برزیل"] },
+  { id: "bra_gripen", name: "جنگنده Gripen E / F-39", cost: 380, mp: 48, desc: "جنگنده مدرن", type: "air_force", tags: ["brazil", "برزیل"] },
+  { id: "bra_h225", name: "بالگرد H225 / Panther", cost: 120, mp: 14, desc: "بالگرد چندمنظوره", type: "air_force", tags: ["brazil", "برزیل"] },
+  { id: "bra_barroso", name: "ناوشکن Barroso", cost: 240, mp: 24, desc: "ناوشکن ساخت برزیل", type: "navy", tags: ["brazil", "برزیل"] },
+  { id: "bra_tikuna", name: "زیردریایی Tikuna", cost: 230, mp: 23, desc: "زیردریایی کلاس تیکونا", type: "navy", tags: ["brazil", "برزیل"] },
+
+  // Indonesia
+  { id: "idn_leopard", name: "تانک Leopard 2RI / M1A1", cost: 180, mp: 20, desc: "تانک رزمی وارداتی", type: "ground_forces", tags: ["indonesia", "اندونزی"] },
+  { id: "idn_anoa", name: "نفربر Anoa / Komodo", cost: 80, mp: 8, desc: "نفربر بومی", type: "ground_forces", tags: ["indonesia", "اندونزی"] },
+  { id: "idn_f16", name: "جنگنده F-16 / Su-30", cost: 350, mp: 42, desc: "جنگنده چندمنظوره", type: "air_force", tags: ["indonesia", "اندونزی"] },
+  { id: "idn_heli", name: "بالگرد AH-64 / TNI", cost: 130, mp: 15, desc: "بالگرد تهاجمی", type: "air_force", tags: ["indonesia", "اندونزی"] },
+  { id: "idn_martadinata", name: "ناوشکن Martadinata", cost: 250, mp: 25, desc: "ناوشکن فریگیت", type: "navy", tags: ["indonesia", "اندونزی"] },
+  { id: "idn_nagapasa", name: "زیردریایی Nagapasa", cost: 240, mp: 24, desc: "زیردریایی کلاس ناگاپاسا", type: "navy", tags: ["indonesia", "اندونزی"] },
+
+  // Vietnam
+  { id: "vn_t90", name: "تانک T-90 / T-54", cost: 160, mp: 18, desc: "تانک اصلی رزمی", type: "ground_forces", tags: ["vietnam", "ویتنام"] },
+  { id: "vn_bmp1", name: "نفربر BMP-1 / BTR", cost: 70, mp: 7, desc: "نفربر زرهی", type: "ground_forces", tags: ["vietnam", "ویتنام"] },
+  { id: "vn_su30", name: "جنگنده Su-30MK2 / Su-27", cost: 380, mp: 48, desc: "جنگنده رهگیر", type: "air_force", tags: ["vietnam", "ویتنام"] },
+  { id: "vn_heli", name: "بالگرد Mi-24 / W-3", cost: 100, mp: 12, desc: "بالگرد تهاجمی", type: "air_force", tags: ["vietnam", "ویتنام"] },
+  { id: "vn_gepard", name: "ناوشکن Gepard / Pohang", cost: 220, mp: 22, desc: "ناوشکن سبک", type: "navy", tags: ["vietnam", "ویتنام"] },
+  { id: "vn_kilo", name: "زیردریایی Kilo / Yugo", cost: 280, mp: 28, desc: "زیردریایی تهاجمی", type: "navy", tags: ["vietnam", "ویتنام"] },
+
+  // Argentina
+  { id: "arg_leopard", name: "تانک TAM / Leopard", cost: 170, mp: 19, desc: "تانک اصلی رزمی", type: "ground_forces", tags: ["argentina", "آرژانتین"] },
+  { id: "arg_vcmd", name: "نفربر VCMD / M113", cost: 75, mp: 8, desc: "نفربر زرهی", type: "ground_forces", tags: ["argentina", "آرژانتین"] },
+  { id: "arg_f35", name: "جنگنده F-16 / Super Étendard", cost: 320, mp: 38, desc: "جنگنده چندمنظوره", type: "air_force", tags: ["argentina", "آرژانتین"] },
+  { id: "arg_heli", name: "بالگرد AH-1 / Pucará", cost: 100, mp: 12, desc: "بالگرد تهاجمی", type: "air_force", tags: ["argentina", "آرژانتین"] },
+  { id: "arg_almirante", name: "ناوشکن Almirante Brown", cost: 200, mp: 20, desc: "ناوشکن فریگیت", type: "navy", tags: ["argentina", "آرژانتین"] },
+  { id: "arg_salta", name: "زیردریایی Salta / Santa Cruz", cost: 220, mp: 22, desc: "زیردریایی تهاجمی", type: "navy", tags: ["argentina", "آرژانتین"] },
+
+  // Mexico
+  { id: "mex_leopard", name: "تانک DN-V / Leopard", cost: 150, mp: 16, desc: "تانک رزمی", type: "ground_forces", tags: ["mexico", "مکزیک"] },
+  { id: "mex_panther", name: "نفربر Panther / DN-V", cost: 70, mp: 7, desc: "نفربر زرهی", type: "ground_forces", tags: ["mexico", "مکزیک"] },
+  { id: "mex_f5", name: "جنگنده F-5 / Scorpion", cost: 200, mp: 25, desc: "جنگنده سبک", type: "air_force", tags: ["mexico", "مکزیک"] },
+  { id: "mex_heli", name: "بالگرد UH-60 / MD530", cost: 90, mp: 10, desc: "بالگرد چندمنظوره", type: "air_force", tags: ["mexico", "مکزیک"] },
+  { id: "mex_armada", name: "ناوشکن ARM Reformador", cost: 180, mp: 18, desc: "ناوچه مدرن", type: "navy", tags: ["mexico", "مکزیک"] },
+
+  // Nigeria
+  { id: "nga_vab", name: "تانک VAB / Type-59", cost: 140, mp: 15, desc: "تانک سبک", type: "ground_forces", tags: ["nigeria", "نیجریه"] },
+  { id: "nga_protech", name: "نفربر Protech", cost: 65, mp: 6, desc: "نفربر زرهی", type: "ground_forces", tags: ["nigeria", "نیجریه"] },
+  { id: "nga_jf17", name: "جنگنده JF-17 / F-7", cost: 250, mp: 30, desc: "جنگنده چندمنظوره", type: "air_force", tags: ["nigeria", "نیجریه"] },
+  { id: "nga_heli", name: "بالگرد Mi-35 / AW139", cost: 100, mp: 11, desc: "بالگرد تهاجمی", type: "air_force", tags: ["nigeria", "نیجریه"] },
+  { id: "nga_nw", name: "ناوشکن Nwamba", cost: 160, mp: 16, desc: "ناوچه سبک", type: "navy", tags: ["nigeria", "نیجریه"] },
+
+  // South Africa
+  { id: "za_ratel", name: "تانک Ratel / Olifant", cost: 160, mp: 17, desc: "تانک رزمی", type: "ground_forces", tags: ["south africa", "آفریقای جنوبی"] },
+  { id: "za_mamba", name: "نفربر Mamba / Casspir", cost: 75, mp: 8, desc: "نفربر ضدکمین", type: "ground_forces", tags: ["south africa", "آفریقای جنوبی"] },
+  { id: "za_jf17", name: "جنگنده JF-17 / Gripen", cost: 300, mp: 35, desc: "جنگنده چندمنظوره", type: "air_force", tags: ["south africa", "آفریقای جنوبی"] },
+  { id: "za_heli", name: "بالگرد Rooivalk / Oryx", cost: 120, mp: 14, desc: "بالگرد تهاجمی", type: "air_force", tags: ["south africa", "آفریقای جنوبی"] },
+  { id: "za_valour", name: "ناوشکن Valour / Warrior", cost: 230, mp: 23, desc: "ناوشکن فریگیت", type: "navy", tags: ["south africa", "آفریقای جنوبی"] },
+
+  // Bangladesh
+  { id: "bgd_type69", name: "تانک Type-69 / MBT-2000", cost: 150, mp: 16, desc: "تانک رزمی", type: "ground_forces", tags: ["bangladesh", "بنگلادش"] },
+  { id: "bgd_bmp", name: "نفربر BMP-2 / M113", cost: 65, mp: 6, desc: "نفربر زرهی", type: "ground_forces", tags: ["bangladesh", "بنگلادش"] },
+  { id: "bgd_jf17", name: "جنگنده JF-17 / MiG-29", cost: 250, mp: 30, desc: "جنگنده چندمنظوره", type: "air_force", tags: ["bangladesh", "بنگلادش"] },
+  { id: "bgd_heli", name: "بالگرد Mi-17 / AW139", cost: 80, mp: 9, desc: "بالگرد چندمنظوره", type: "air_force", tags: ["bangladesh", "بنگلادش"] },
+  { id: "bgd_bangabandhu", name: "ناوشکن Bangabandhu", cost: 200, mp: 20, desc: "ناوشکن فریگیت", type: "navy", tags: ["bangladesh", "بنگلادش"] }
 ];
 
 // Map of english/farsi name to inventory
@@ -229,5 +306,25 @@ export const INITIAL_QUANTITIES: { [countryTag: string]: { [id: string]: number 
   "canada": { "can_leopard": 82, "can_cf18": 380, "can_halifax": 10 },
   "کانادا": { "can_leopard": 82, "can_cf18": 380, "can_halifax": 10 },
   "ukraine": { "ukr_t84": 2500, "ukr_btr4": 1500, "ukr_su27": 300, "ukr_hrim": 50 },
-  "اوکراین": { "ukr_t84": 2500, "ukr_btr4": 1500, "ukr_su27": 300, "ukr_hrim": 50 }
+  "اوکراین": { "ukr_t84": 2500, "ukr_btr4": 1500, "ukr_su27": 300, "ukr_hrim": 50 },
+  "sweden": { "swe_strv122": 120, "swe_cv90": 500, "swe_gripen": 96, "swe_hkp16": 50, "swe_visby": 5, "swe_gotland": 5, "swe_rbs15": 100 },
+  "سوئد": { "swe_strv122": 120, "swe_cv90": 500, "swe_gripen": 96, "swe_hkp16": 50, "swe_visby": 5, "swe_gotland": 5, "swe_rbs15": 100 },
+  "poland": { "pol_leopard": 250, "pol_borsuk": 600, "pol_f35": 32, "pol_s70": 40, "pol_scarwad": 2, "pol_patriot": 60 },
+  "لهستان": { "pol_leopard": 250, "pol_borsuk": 600, "pol_f35": 32, "pol_s70": 40, "pol_scarwad": 2, "pol_patriot": 60 },
+  "brazil": { "bra_leopard": 400, "bra_guarani": 600, "bra_gripen": 36, "bra_h225": 30, "bra_barroso": 1, "bra_tikuna": 7 },
+  "برزیل": { "bra_leopard": 400, "bra_guarani": 600, "bra_gripen": 36, "bra_h225": 30, "bra_barroso": 1, "bra_tikuna": 7 },
+  "indonesia": { "idn_leopard": 100, "idn_anoa": 400, "idn_f16": 32, "idn_heli": 30, "idn_martadinata": 6, "idn_nagapasa": 5 },
+  "اندونزی": { "idn_leopard": 100, "idn_anoa": 400, "idn_f16": 32, "idn_heli": 30, "idn_martadinata": 6, "idn_nagapasa": 5 },
+  "vietnam": { "vn_t90": 600, "vn_bmp1": 800, "vn_su30": 36, "vn_heli": 40, "vn_gepard": 4, "vn_kilo": 6 },
+  "ویتنام": { "vn_t90": 600, "vn_bmp1": 800, "vn_su30": 36, "vn_heli": 40, "vn_gepard": 4, "vn_kilo": 6 },
+  "argentina": { "arg_leopard": 200, "arg_vcmd": 300, "arg_f35": 12, "arg_heli": 20, "arg_almirante": 4, "arg_salta": 3 },
+  "آرژانتین": { "arg_leopard": 200, "arg_vcmd": 300, "arg_f35": 12, "arg_heli": 20, "arg_almirante": 4, "arg_salta": 3 },
+  "mexico": { "mex_leopard": 180, "mex_panther": 400, "mex_f5": 12, "mex_heli": 30, "mex_armada": 3 },
+  "مکزیک": { "mex_leopard": 180, "mex_panther": 400, "mex_f5": 12, "mex_heli": 30, "mex_armada": 3 },
+  "nigeria": { "nga_vab": 300, "nga_protech": 200, "nga_jf17": 12, "nga_heli": 15, "nga_nw": 2 },
+  "نیجریه": { "nga_vab": 300, "nga_protech": 200, "nga_jf17": 12, "nga_heli": 15, "nga_nw": 2 },
+  "south africa": { "za_ratel": 200, "za_mamba": 300, "za_jf17": 12, "za_heli": 15, "za_valour": 3 },
+  "آفریقای جنوبی": { "za_ratel": 200, "za_mamba": 300, "za_jf17": 12, "za_heli": 15, "za_valour": 3 },
+  "bangladesh": { "bgd_type69": 300, "bgd_bmp": 400, "bgd_jf17": 12, "bgd_heli": 20, "bgd_bangabandhu": 2 },
+  "بنگلادش": { "bgd_type69": 300, "bgd_bmp": 400, "bgd_jf17": 12, "bgd_heli": 20, "bgd_bangabandhu": 2 }
 };
