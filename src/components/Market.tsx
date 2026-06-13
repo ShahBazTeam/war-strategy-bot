@@ -46,6 +46,7 @@ export default function Market({
   // IMF State
   const [imfProposal, setImfProposal] = useState<LoanProposal | null>(null);
   const [isIMFRequested, setIsIMFRequested] = useState(false);
+  const [loanAmount, setLoanAmount] = useState("");
 
   // Peer-to-Peer trade send state
   const [p2pReceiverId, setP2pReceiverId] = useState("");
@@ -112,6 +113,40 @@ export default function Market({
       setIsIMFRequested(false);
     }
   };
+
+  const handleLoan = async () => {
+    const amount = parseFloat(loanAmount);
+    if (!amount || amount < 1000 || amount > 500000) {
+      alert("مبلغ وام باید بین ۱,۰۰۰ تا ۵۰۰,۰۰۰ طلا باشد.");
+      return;
+    }
+    setIsIMFRequested(true);
+    try {
+      const resp = await fetch("/api/market/quick-loan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ amount })
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error);
+      alert(data.message);
+      setLoanAmount("");
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.message || "خطا در دریافت وام");
+    } finally {
+      setIsIMFRequested(false);
+    }
+  };
+
+  function dbPrice(k: string) {
+    if (k === "oil") return prices.oil;
+    if (k === "steel") return prices.steel;
+    return prices.food;
+  }
 
   return (
     <div className="space-y-6">
@@ -293,68 +328,31 @@ export default function Market({
           </button>
         </div>
 
-        {/* IMF DISBURSEMENT & SMART LOAN (@TheSurenax INTEGRATION) */}
+        {/* LOAN SECTION */}
         <div className="rounded-lg border border-white/10 bg-black/40 p-6 space-y-4">
-          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">💸 وام و تأمین بودجه اضطراری با صندوق بین‌المللی پول (IMF)</h2>
-          <p className="text-slate-400 text-xs font-serif text-slate-300 text-slate-400">فرستادن تقاضای مکتوب سرمایه‌گذاری برای محاسبه ریسک اعتباری و دریافت وام متغیر با بهره هوشمند.</p>
+          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">💸 وام با بهره ۱۰٪</h2>
+          <p className="text-slate-400 text-xs">مبلغ وام را وارد کنید (۱,۰۰۰ تا ۵۰۰,۰۰۰ طلا). مهلت بازپرداخت: ۵ روز. سود: ۱۰٪.</p>
 
-          {!imfProposal ? (
-            <button
-              onClick={handleIMFRequest}
-              disabled={isIMFRequested}
-              className="w-full rounded border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold py-3 text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {isIMFRequested ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin text-amber-405" /> در حال گفت‌وگو و مذاکره برای تخصیص وام...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 text-amber-400" /> درخواست وام و آنالیز بودجه با هوش مصنوعی IMF
-                </>
-              )}
-            </button>
-          ) : (
-            <div className="rounded border border-yellow-500/30 bg-yellow-950/15 p-4 space-y-3 font-sans">
-              <h3 className="text-xs font-black uppercase tracking-wider text-yellow-300">طرح پیشنهادی صندوق بین‌المللی پول (IMF Proposal)</h3>
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="bg-black/20 p-2 rounded border border-white/5">
-                  <span className="text-slate-500 text-[9px] block uppercase">LOAN_PRINCIPAL:</span>
-                  <span className="text-white font-bold text-sm">{imfProposal.loanAmount} G</span>
-                </div>
-                <div className="bg-black/20 p-2 rounded border border-white/5">
-                  <span className="text-slate-500 text-[9px] block uppercase">INTEREST_RATE:</span>
-                  <span className="text-red-400 font-bold text-sm">+{imfProposal.interestRate}%</span>
-                </div>
-                <div className="bg-black/20 p-2 rounded border border-white/5">
-                  <span className="text-slate-500 text-[9px] block uppercase">TERM_LIMIT:</span>
-                  <span className="text-white font-bold text-sm">{imfProposal.durationRounds} ROUNDS</span>
-                </div>
-                <div className="bg-black/20 p-2 rounded border border-white/5">
-                  <span className="text-slate-500 text-[9px] block uppercase">TOTAL_REPAYMENT:</span>
-                  <span className="text-yellow-405 font-bold text-sm">{imfProposal.repaymentAmount} G</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setImfProposal(null)}
-                  className="flex-1 border border-white/10 bg-white/5 hover:bg-white/10 text-xs rounded text-slate-300 py-1.5 transition cursor-pointer"
-                >
-                  رد کردن
-                </button>
-                <button
-                  onClick={() => {
-                    onAcceptIMFLoan(imfProposal);
-                    setImfProposal(null);
-                  }}
-                  className="flex-1 bg-yellow-600 hover:bg-yellow-500 text-xs text-white font-bold py-1.5 rounded transition cursor-pointer"
-                >
-                  پذیرش و دریافت طلا
-                </button>
-              </div>
+          {!user.loan || user.loan.repaid ? (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*"
+                placeholder="مبلغ وام..."
+                value={loanAmount}
+                onChange={(e) => setLoanAmount(e.target.value)}
+                className="flex-1 bg-black/40 border border-white/10 rounded px-3 py-2 text-white text-sm placeholder-slate-600 focus:border-amber-500/50 focus:outline-none"
+              />
+              <button
+                onClick={handleLoan}
+                disabled={!loanAmount || parseFloat(loanAmount) < 1000 || isIMFRequested}
+                className="bg-amber-600 hover:bg-amber-500 disabled:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded transition cursor-pointer"
+              >
+                {isIMFRequested ? "در حال دریافت..." : "دریافت وام"}
+              </button>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -543,10 +541,4 @@ export default function Market({
       </div>
     </div>
   );
-
-  function dbPrice(k: string) {
-    if (k === "oil") return prices.oil;
-    if (k === "steel") return prices.steel;
-    return prices.food;
-  }
 }

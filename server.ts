@@ -1113,10 +1113,34 @@ app.post("/api/factory/upgrade", checkRateLimit, (req, res) => {
 app.post("/api/market/quick-loan", checkRateLimit, (req, res) => {
   const user = getCurrentUser(req);
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
-  
-  user.country.assets.gold += 300;
+
+  if (user.loan && !user.loan.repaid) {
+    return res.status(400).json({ error: "شما در حال حاضر یک وام فعال دارید. ابتدا آن را بازپرداخت کنید." });
+  }
+
+  const { amount } = req.body;
+  const loanAmount = parseFloat(amount);
+
+  if (!loanAmount || loanAmount < 1000 || loanAmount > 500000) {
+    return res.status(400).json({ error: "مبلغ وام باید بین ۱,۰۰۰ تا ۵۰۰,۰۰۰ طلا باشد." });
+  }
+
+  user.country.assets.gold += loanAmount;
+
+  user.loan = {
+    amount: loanAmount,
+    borrowedAt: Date.now(),
+    repaid: false
+  };
+
+  user.country.assets.economicPower = Math.max(5, user.country.assets.economicPower - 10);
+
+  updateAndLogUserAssets(user);
+
+  db.globalAnnouncements.unshift(`💸 وام ${loanAmount} طلا به دولت ${user.country.name} اعطا شد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
+
   saveDatabase();
-  res.json({ message: "وام فوری ۳۰۰ طلایی اعطا شد.", user });
+  res.json({ user, message: `وام ${loanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۵ روز. سود: ۱۰٪.` });
 });
 
 app.post("/api/market/fast-trade", checkRateLimit, (req, res) => {
@@ -1467,10 +1491,9 @@ const imfAcceptHandler = (req, res) => {
 
   const { loanAmount, repaymentAmount, proposal } = req.body;
   const targetLoanAmount = parseFloat(loanAmount || proposal?.loanAmount);
-  const targetRepaymentAmount = parseFloat(repaymentAmount || proposal?.repaymentAmount);
 
-  if (!targetLoanAmount || targetLoanAmount <= 0) {
-    return res.status(400).json({ error: "اطلاعات وام معتبر نیست" });
+  if (!targetLoanAmount || targetLoanAmount < 1000 || targetLoanAmount > 500000) {
+    return res.status(400).json({ error: "مبلغ وام باید بین ۱,۰۰۰ تا ۵۰۰,۰۰۰ طلا باشد." });
   }
 
   // Check if user already has an active loan
@@ -1480,7 +1503,7 @@ const imfAcceptHandler = (req, res) => {
 
   user.country.assets.gold += targetLoanAmount;
   
-  // Store loan data (3 real days to repay, 10% interest)
+  // Store loan data (5 real days to repay, 10% interest)
   user.loan = {
     amount: targetLoanAmount,
     borrowedAt: Date.now(),
@@ -1492,17 +1515,17 @@ const imfAcceptHandler = (req, res) => {
   
   updateAndLogUserAssets(user);
   
-  db.globalAnnouncements.unshift(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} تصویب کرد. مهلت بازپرداخت: ۳ روز واقعی با سود ۱۰٪.`);
+  db.globalAnnouncements.unshift(`💸 صندوق بین‌المللی پول (IMF) اعطای تسهیلات ${targetLoanAmount} طلا را به دولت ${user.country.name} تصویب کرد. مهلت بازپرداخت: ۵ روز واقعی با سود ۱۰٪.`);
   
   saveDatabase();
-  res.json({ user, message: `وام ${targetLoanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۳ روز واقعی. سود: ۱۰٪.` });
+  res.json({ user, message: `وام ${targetLoanAmount} طلا با موفقیت واریز شد! مهلت بازپرداخت: ۵ روز. سود: ۱۰٪.` });
 };
 
 app.post("/api/trade/imf/accept", checkRateLimit, imfAcceptHandler);
 app.post("/api/market/imf-accept", checkRateLimit, imfAcceptHandler);
 
 // LOAN REPAYMENT ENDPOINT
-const LOAN_DEADLINE_MS = 3 * 24 * 60 * 60 * 1000; // 3 real days in milliseconds
+const LOAN_DEADLINE_MS = 5 * 24 * 60 * 60 * 1000; // 5 real days in milliseconds
 const LOAN_INTEREST_RATE = 0.10; // 10% interest
 
 app.post("/api/market/loan-repay", checkRateLimit, (req, res) => {
