@@ -581,7 +581,7 @@ function updatePassiveIncome(user: User) {
     const ecoBonus = Math.max(0.1, user.country.assets.economicPower / 100); // minimum 10% income even with 0 EP
     
     // Gold income
-    const incomePerMinute = Math.max(0.5, 6 * factoryLvl * ecoBonus); // minimum 0.5 gold/min
+    const incomePerMinute = Math.max(0.8, 8 * factoryLvl * ecoBonus); // 30% easier than before
     const goldEarned = elapsedMinutes * incomePerMinute;
     user.country.assets.gold += goldEarned;
 
@@ -589,9 +589,9 @@ function updatePassiveIncome(user: User) {
     const countryKey = (user.country.originalName || "").toLowerCase();
     const production = RESOURCE_PRODUCTION[countryKey] || { oil: 0.1, steel: 1, food: 1 };
     
-    const oilPerMinute = production.oil * factoryLvl * ecoBonus;
-    const steelPerMinute = production.steel * factoryLvl * ecoBonus;
-    const foodPerMinute = production.food * factoryLvl * ecoBonus;
+    const oilPerMinute = production.oil * factoryLvl * ecoBonus * 1.3; // 30% easier
+    const steelPerMinute = production.steel * factoryLvl * ecoBonus * 1.3; // 30% easier
+    const foodPerMinute = production.food * factoryLvl * ecoBonus * 1.3; // 30% easier
 
     user.country.assets.resources.oil += elapsedMinutes * oilPerMinute;
     user.country.assets.resources.steel += elapsedMinutes * steelPerMinute;
