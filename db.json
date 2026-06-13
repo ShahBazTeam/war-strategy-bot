@@ -961,17 +961,17 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 769,
+          "gold": 785,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
-            "oil": 11.9,
-            "steel": 39.8,
-            "food": 49.8
+            "oil": 12,
+            "steel": 40.3,
+            "food": 50.2
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781379411736
+          "lastIncomeUpdate": 1781379471736
         }
       },
       "equipmentSlots": [
@@ -1036,6 +1036,12 @@
         {
           "timestamp": "۱۹:۳۷:۴۴",
           "gold": 769,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۹:۳۷:۵۵",
+          "gold": 785,
           "military": 22847,
           "economy": 100
         }
