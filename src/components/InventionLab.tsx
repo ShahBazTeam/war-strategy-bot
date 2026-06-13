@@ -8,8 +8,21 @@ interface InventionLabProps {
 
 export default function InventionLab({ currentUser }: InventionLabProps) {
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("ground_forces");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{message: string; equipment?: EquipmentItem; error?: string} | null>(null);
+
+  const categories = [
+    { value: "ground_forces", label: "نیروی زمینی (تانک/نفربر)" },
+    { value: "air_force", label: "نیروی هوایی (جنگنده/بالگرد)" },
+    { value: "navy", label: "نیروی دریایی (ناو/زیردریایی)" },
+    { value: "air_defense", label: "پدافند ضدهوایی" },
+    { value: "missile", label: "موشک بالستیک/کروز" },
+    { value: "nuclear", label: "تسلیحات هسته‌ای" },
+    { value: "drone", label: "پهپاد رزمی/شناسایی" },
+    { value: "artillery", label: "توپخانه سنگین" },
+    { value: "special_forces", label: "نیروهای عملیات ویژه" }
+  ];
 
   const handleInvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +33,7 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
       const res = await fetch("/api/research/invent", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-user-id": currentUser.id },
-        body: JSON.stringify({ description })
+        body: JSON.stringify({ description, category })
       });
       const data = await res.json();
       if (res.ok) {
@@ -50,6 +63,18 @@ export default function InventionLab({ currentUser }: InventionLabProps) {
       {/* Invention Form */}
       <div className="rounded-lg border border-white/10 bg-black/40 p-6 space-y-4 font-sans">
         <form onSubmit={handleInvent} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-300 mb-1">دسته‌بندی اختراع</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 p-3 rounded text-sm text-white focus:outline-none focus:border-emerald-500"
+            >
+              {categories.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}

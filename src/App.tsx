@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, UNProposal, Alliance, TradeOffer, Resources, LoanProposal } from "./types";
+import { User, UNProposal, Alliance, TradeOffer, Resources, LoanProposal, EquipmentItem } from "./types";
 import Dashboard from "./components/Dashboard";
 import Armory from "./components/Armory";
 import Market from "./components/Market";
@@ -75,6 +75,7 @@ export default function App() {
   const [alliances, setAlliances] = useState<Alliance[]>([]);
   const [announcements, setAnnouncements] = useState<string[]>([]);
   const [announcementText, setAnnouncementText] = useState("");
+  const [inventions, setInventions] = useState<EquipmentItem[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -180,14 +181,15 @@ export default function App() {
 
   const fetchGlobalData = async () => {
     try {
-      const [usersData, pricesData, offersData, warsData, unData, alliancesData, annData] = await Promise.all([
+      const [usersData, pricesData, offersData, warsData, unData, alliancesData, annData, inventionsData] = await Promise.all([
         apiCall("/api/all-users"),
         apiCall("/api/market/prices"),
         apiCall("/api/market/trade-offers"),
         apiCall("/api/diplomacy/wars"),
         apiCall("/api/un/proposals"),
         apiCall("/api/alliances"),
-        apiCall("/api/global/announcements")
+        apiCall("/api/global/announcements"),
+        apiCall("/api/inventions")
       ]);
 
       setAllUsers(usersData.users || []);
@@ -197,6 +199,7 @@ export default function App() {
       setProposals(unData.proposals || []);
       setAlliances(alliancesData.alliances || []);
       setAnnouncements(annData.announcements || []);
+      setInventions(inventionsData.inventions || []);
       if (annData.announcements && annData.announcements.length > 0) {
         setAnnouncementText(annData.announcements.join(" | "));
       }
@@ -1019,10 +1022,12 @@ export default function App() {
                 {activeTab === "armory" && (
                   <Armory 
                     user={currentUser} 
+                    inventions={inventions}
                     onBuyWeapon={buyArmoryWeapon} 
                     onEquipChange={changeSlotsEquip}
                     onUpgradeTech={levelUpTechnology}
                     onUpgradeFactory={upgradeFactory}
+                    onScrapWeapon={scrapArmoryWeapon}
                   />
                 )}
                 {activeTab === "market" && (

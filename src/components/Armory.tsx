@@ -5,6 +5,7 @@ import { CATALOG } from "../catalogData";
 
 interface ArmoryProps {
   user: User;
+  inventions: EquipmentItem[];
   onBuyWeapon: (itemType: string, quantity: number) => void;
   onEquipChange: (active: string[], warehouse: string[]) => void;
   onUpgradeTech: () => void;
@@ -36,7 +37,7 @@ const categoryNames: Record<string, string> = {
   artillery: "توپخانه سنگین"
 };
 
-export default function Armory({ user, onBuyWeapon, onEquipChange, onUpgradeTech, onUpgradeFactory, onScrapWeapon }: ArmoryProps) {
+export default function Armory({ user, inventions, onBuyWeapon, onEquipChange, onUpgradeTech, onUpgradeFactory, onScrapWeapon }: ArmoryProps) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [scrapModal, setScrapModal] = useState<{ id: string; name: string; maxQty: number } | null>(null);
   const [scrapQty, setScrapQty] = useState(1);
@@ -50,7 +51,16 @@ export default function Armory({ user, onBuyWeapon, onEquipChange, onUpgradeTech
 
   const categories = categoryNames;
 
-  const categorizedWeapons = CATALOG.reduce((acc, item) => {
+  const userCountryEn = (user.country as any).originalName?.toLowerCase() || "";
+  const userCountryFa = user.country.name.toLowerCase();
+  const isInvented = (id: string) => id.startsWith("inv_");
+
+  const filteredCatalog = CATALOG.filter(item => {
+    if (!item.tags || item.tags.length === 0) return true;
+    return item.tags.some(tag => userCountryFa.includes(tag) || userCountryEn.includes(tag));
+  });
+
+  const categorizedWeapons = filteredCatalog.reduce((acc, item) => {
     const cat = item.type || 'ground_forces';
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push({ 
@@ -62,6 +72,25 @@ export default function Armory({ user, onBuyWeapon, onEquipChange, onUpgradeTech
     });
     return acc;
   }, {} as Record<string, any[]>);
+
+  const countryInventions = inventions.filter(inv => 
+    inv.inventorCountryName?.toLowerCase() === user.country.name.toLowerCase()
+  );
+  countryInventions.forEach(inv => {
+    const cat = inv.type || 'ground_forces';
+    if (!categorizedWeapons[cat]) categorizedWeapons[cat] = [];
+    categorizedWeapons[cat].push({
+      id: inv.id,
+      name: inv.name,
+      cost: inv.cost,
+      mp: inv.militaryGained,
+      type: inv.type,
+      minTech: inv.minTech || 1,
+      icon: iconMap[inv.type] || Swords,
+      desc: `اختراع ملی - ${inv.inventorUsername}`,
+      isInvention: true
+    });
+  });
 
   const handleEquipSwap = (id: string, currentlyActive: boolean) => {
     let newActive = [...user.equipmentSlots];

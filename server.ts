@@ -2370,6 +2370,10 @@ app.post("/api/admin/delete-all-users", (req, res) => {
   res.json({ message: `${count} کاربر حذف شدند. تمام داده‌ها ریست شد.` });
 });
 
+app.get("/api/inventions", (req, res) => {
+  res.json({ inventions: db.inventions || [] });
+});
+
 // CRON-LIKE FORCE UPDATE OF PRICES USING GEMINI VALUE FORECASTING
 app.post("/api/market/update-prices-ai", checkRateLimit, async (req, res) => {
   const prompt = `نرخ ارزش معاملاتی روز گذشته منابع حیاتی و استراتژیک در کلان بازار ملل:
@@ -2518,22 +2522,28 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   const user = getCurrentUser(req);
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
-  const { description } = req.body;
+  const { description, category } = req.body;
   if (!description || description.length < 10) return res.status(400).json({ error: "شرح اختراع کوتاه است" });
+
+  const validTypes = ["ground_forces", "air_force", "navy", "air_defense", "missile", "nuclear", "drone", "artillery", "special_forces"];
+  const selectedType = validTypes.includes(category) ? category : "ground_forces";
 
   // Use AI to validate and define stats
   const prompt = `یک اختراع نظامی جدید برای بازی شبیه‌ساز جنگی پیشنهاد شده است:
 "${description}"
 کشور پیشنهاد دهنده: ${user.country.name}
+دسته‌بندی انتخاب شده: ${selectedType}
 
 این اختراع را بررسی کن. اگر "منطقی" است (مثلا تانک، موشک، هواپیما، پهپاد با ویژگی‌های علمی و واقع‌بینانه)، آن را تایید کن و stats زیر را برایش تولید کن. اگر غیرمنطقی است (مثلا اژدها، اسلحه جادویی، سلاح‌های تخیلی غول‌آسا)، آن را رد کن.
+
+نوع اختراع باید حتماً یکی از اینها باشد: ${selectedType}
 
 پاسخ را در فرمت JSON بده:
 {
   "valid": boolean,
   "reason": string,
   "name": string,
-  "type": "artillery" | "air_defense" | "navy" | "special_forces" | "missile" | "drone",
+  "type": "${selectedType}",
   "cost": number (100-1000),
   "mp": number (5-50),
   "description": string (short),
@@ -2546,7 +2556,7 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
       valid: { type: Type.BOOLEAN },
       reason: { type: Type.STRING },
       name: { type: Type.STRING },
-      type: { type: Type.STRING, enum: ["artillery", "air_defense", "navy", "special_forces", "missile", "drone"] },
+      type: { type: Type.STRING, enum: [selectedType] },
       cost: { type: Type.NUMBER },
       mp: { type: Type.NUMBER },
       description: { type: Type.STRING },
