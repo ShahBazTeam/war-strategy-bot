@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 76580,
+          "gold": 78980,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 6127.3,
-            "steel": 9973,
-            "food": 9973
+            "oil": 6129.9,
+            "steel": 9999,
+            "food": 9999
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781387728567
+          "lastIncomeUpdate": 1781387788567
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۱:۴۱:۳۱",
-          "gold": 74340,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۱:۴۲:۴۸",
           "gold": 74500,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۲۱:۵۵:۴۸",
           "gold": 76580,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۲۱:۵۶:۴۸",
+          "gold": 78980,
           "military": 100,
           "economy": 100
         }
@@ -405,17 +405,17 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 60434.5,
+          "gold": 62114.5,
           "militaryPower": 37932,
           "economicPower": 140,
           "resources": {
-            "oil": "4351.9101.81999999999999981.81999999999999981.81999999999999981.81999999999999981001001001001.819999999999999810100100",
-            "steel": 6029.9000000000015,
-            "food": 6087.799999999998
+            "oil": "4351.9101.81999999999999981.81999999999999981.81999999999999981.81999999999999981001001001001.8199999999999998101001001.8199999999999998",
+            "steel": 6039.000000000002,
+            "food": 6095.079999999998
           },
           "techLevel": 1,
           "factoryLevel": 5,
-          "lastIncomeUpdate": 1781387717856
+          "lastIncomeUpdate": 1781387777856
         }
       },
       "equipmentSlots": [
