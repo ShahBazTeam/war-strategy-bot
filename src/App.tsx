@@ -562,6 +562,19 @@ export default function App() {
     } catch {}
   };
 
+  const nuclearLaunch = async (warId: string) => {
+    try {
+      const res = await apiCall("/api/diplomacy/nuclear-launch", {
+        method: "POST",
+        body: JSON.stringify({ warId })
+      });
+      showTemporarySuccess(res.message);
+      fetchGlobalData();
+    } catch (err: any) {
+      showTemporarySuccess(err.message || "خطا در پرتاب هسته‌ای");
+    }
+  };
+
   // ALLIANCE ACTIONS
   const createModernAlliance = async (name: string, charter: string, logoUrl: string) => {
     try {
@@ -1094,7 +1107,7 @@ export default function App() {
                   />
                 )}
                 {activeTab === "diplomacy" && (
-                  <Diplomacy 
+                   <Diplomacy 
                     user={currentUser} 
                     allUsers={allUsers}
                     wars={wars}
@@ -1105,6 +1118,7 @@ export default function App() {
                     onProposeCeasefire={proposeBattleCeasefire}
                     onRespondCeasefire={respondToCeasefireRequest}
                     onResolveWar={resolveWarEnd}
+                    onNuclearLaunch={nuclearLaunch}
                   />
                 )}
                 {activeTab === "un" && (

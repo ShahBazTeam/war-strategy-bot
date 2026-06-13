@@ -132,6 +132,7 @@ export interface WarReasonSubmission {
   winnerChoice?: 'annex' | 'colonize' | 'tribute' | 'spare';
   resolution?: 'annex' | 'colonize' | 'tribute' | 'spare';
   peaceTermsNarrative?: string;
+  nuclearLaunched?: string[];
   timestamp: string;
 }
 

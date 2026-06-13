@@ -1904,7 +1904,154 @@ app.post("/api/wars/:warId/resolve", checkRateLimit, async (req, res) => {
   updateAndLogUserAssets(loser);
   saveDatabase();
 
-  res.json({ war, summary, decision });
+  // CHECK VICTORY CONDITION
+  const remainingCountries = db.users.filter(u => u.id !== winner.id && u.country.assets.militaryPower > 10);
+  if (remainingCountries.length === 0) {
+    // WINNER!
+    db.globalAnnouncements.unshift(`🏆🏆🏆 پیروز نهایی: کشور ${winner.country.name} به رهبری ${winner.username} تمام کشورهای جهان را فتح کرد و برنده بازی شد! 🏆🏆🏆`);
+    try {
+      db.tweets.unshift({
+        id: `victory_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: "warroom_system",
+        username: "اتاق_جنگ",
+        countryName: "system",
+        flagUrl: "🏆",
+        text: `🏆🏆🏆 اعلام پیروزی نهایی!\n\n${winner.country.name} به رهبری ${winner.username} تمام کشورهای جهان را فتح کرد!\n\nاین کشور رسماً ابرقدرت بلامنازع جهان اعلام می‌شود.\n\n🌍 تعداد کشورهای باقیمانده: ۰\n⚔️ جنگ‌های برنده شده: ${db.wars.filter(w => w.winnerId === winner.id).length}`,
+        timestamp: new Date().toISOString(),
+        likes: [],
+        comments: []
+      });
+    } catch (e) { /* ignore */ }
+    return res.json({ war, summary, decision, victory: true, message: `🏆 ${winner.country.name} برنده نهایی بازی شد!` });
+  }
+
+  res.json({ war, summary, decision, victory: false });
+});
+
+// --------------------------------------------------------
+// NUCLEAR LAUNCH RESTRICTIONS
+// --------------------------------------------------------
+app.post("/api/diplomacy/nuclear-launch", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { warId, targetId } = req.body;
+  const war = db.wars.find(w => w.id === warId && (w.attackerId === user.id || w.defenderId === user.id));
+  if (!war) return res.status(404).json({ error: "جنگ یافت نشد" });
+  if (war.status !== "active") return res.status(400).json({ error: "جنگ فعال نیست" });
+
+  // Check: must have nuclear weapons
+  const nukeCount = user.warehouse["usa_nuke"] || user.warehouse["rus_nuke"] || user.warehouse["chn_nuke"] || 
+                    user.warehouse["ind_nuke"] || user.warehouse["pak_nuke"] || user.warehouse["uk_nuke"] ||
+                    user.warehouse["fra_nuke"] || user.warehouse["isr_nuke"] || user.warehouse["nk_nuke"] || 0;
+  
+  // Also check inventions
+  let inventionNukes = 0;
+  for (const [wpnId, qty] of Object.entries(user.warehouse)) {
+    const inv = db.inventions.find(i => i.id === wpnId && i.type === "nuclear");
+    if (inv) inventionNukes += Number(qty) || 0;
+  }
+  
+  const totalNukes = nukeCount + inventionNukes;
+  if (totalNukes <= 0) {
+    return res.status(400).json({ error: "شما کلاهک هسته‌ای ندارید! ابتدا باید تسلیحات هسته‌ای بسازید." });
+  }
+
+  // Check: tech level must be at least 4
+  if (user.country.assets.techLevel < 4) {
+    return res.status(400).json({ error: "سطوح فناوری ۴ به بالا برای پرتاب هسته‌ای لازم است." });
+  }
+
+  // Check: must have enough resources (uranium simulation)
+  if (user.country.assets.resources.oil < 50 || user.country.assets.resources.steel < 30) {
+    return res.status(400).json({ error: "منابع کافی نیست! حداقل ۵۰ نفت و ۳۰ فولاد برای پرتاب هسته‌ای لازم است." });
+  }
+
+  // Check: launch cost
+  const LAUNCH_COST = 500;
+  if (user.country.assets.gold < LAUNCH_COST) {
+    return res.status(400).json({ error: `هزینه پرتاب: ${LAUNCH_COST} طلا. طلای کافی ندارید.` });
+  }
+
+  // Check: can only launch once per war
+  if (war.nuclearLaunched?.includes(user.id)) {
+    return res.status(400).json({ error: "شما قبلاً در این جنگ هسته‌ای پرتاب کرده‌اید. فقط یکبار مجازید." });
+  }
+
+  // Execute nuclear launch
+  user.country.assets.gold -= LAUNCH_COST;
+  user.country.assets.resources.oil -= 50;
+  user.country.assets.resources.steel -= 30;
+
+  // Remove one nuke from warehouse
+  for (const wpnId of ["usa_nuke", "rus_nuke", "chn_nuke", "ind_nuke", "pak_nuke", "uk_nuke", "fra_nuke", "isr_nuke", "nk_nuke"]) {
+    if (user.warehouse[wpnId] && user.warehouse[wpnId] > 0) {
+      user.warehouse[wpnId] -= 1;
+      if (user.warehouse[wpnId] <= 0) delete user.warehouse[wpnId];
+      break;
+    }
+  }
+  // Also check inventions
+  for (const [wpnId, qty] of Object.entries(user.warehouse)) {
+    const inv = db.inventions.find(i => i.id === wpnId && i.type === "nuclear");
+    if (inv && Number(qty) > 0) {
+      user.warehouse[wpnId] = Number(qty) - 1;
+      if (user.warehouse[wpnId] <= 0) delete user.warehouse[wpnId];
+      break;
+    }
+  }
+
+  // Record nuclear launch
+  if (!war.nuclearLaunched) war.nuclearLaunched = [];
+  war.nuclearLaunched.push(user.id);
+
+  // Find target
+  const targetUserId = targetId || (war.attackerId === user.id ? war.defenderId : war.attackerId);
+  const target = db.users.find(u => u.id === targetUserId);
+  if (target) {
+    // Nuclear damage: massive military + economic damage
+    const militaryDamage = Math.floor(target.country.assets.militaryPower * 0.6);
+    const economicDamage = Math.floor(target.country.assets.economicPower * 0.4);
+    const goldDamage = Math.floor(target.country.assets.gold * 0.3);
+    
+    target.country.assets.militaryPower = Math.max(1, target.country.assets.militaryPower - militaryDamage);
+    target.country.assets.economicPower = Math.max(1, target.country.assets.economicPower - economicDamage);
+    target.country.assets.gold = Math.max(0, target.country.assets.gold - goldDamage);
+    target.country.assets.resources.oil = Math.max(0, target.country.assets.resources.oil * 0.5);
+    target.country.assets.resources.steel = Math.max(0, target.country.assets.resources.steel * 0.5);
+    target.country.assets.resources.food = Math.max(0, target.country.assets.resources.food * 0.5);
+
+    db.globalAnnouncements.unshift(`☢️ حمله هسته‌ای: ${user.country.name} یک کلاهک هسته‌ای بر ${target.country.name} پرتاب کرد! خسارات سنگین: ${militaryDamage} قدرت نظامی، ${economicDamage} قدرت اقتصادی، ${goldDamage} طلا نابود شد.`);
+    
+    try {
+      db.tweets.unshift({
+        id: `nuke_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: "warroom_system",
+        username: "اتاق_جنگ",
+        countryName: "system",
+        flagUrl: "☢️",
+        text: `☢️ حمله هسته‌ای!\n\n${user.country.name} یک کلاهک هسته‌ای بر ${target.country.name} پرتاب کرد!\n\n💥 خسارات:\nنظامی: -${militaryDamage} MP\nاقتصادی: -${economicDamage} EP\nطلا: -${goldDamage}\nمنابع: ۵۰٪ نابود\n\n⚠️ این حمله عواقب سنگین بین‌المللی خواهد داشت.`,
+        timestamp: new Date().toISOString(),
+        likes: [],
+        comments: []
+      });
+    } catch (e) { /* ignore */ }
+
+    updateAndLogUserAssets(target);
+  }
+
+  updateAndLogUserAssets(user);
+  saveDatabase();
+
+  res.json({ 
+    war, 
+    message: `☢️ حمله هسته‌ای با موفقیت انجام شد! هزینه: ${LAUNCH_COST} طلا + ۵۰ نفت + ۳۰ فولاد. یک کلاهک هسته‌ای مصرف شد.`,
+    damage: target ? {
+      military: Math.floor(target.country.assets.militaryPower * 0.6),
+      economic: Math.floor(target.country.assets.economicPower * 0.4),
+      gold: Math.floor(target.country.assets.gold * 0.3)
+    } : null
+  });
 });
 
 // Helper for drafting custom AI laws
@@ -2831,6 +2978,16 @@ app.post("/api/research/invent", checkRateLimit, async (req, res) => {
   const validTypes = ["ground_forces", "air_force", "navy", "air_defense", "missile", "nuclear", "drone", "artillery", "special_forces"];
   const selectedType = validTypes.includes(category) ? category : "ground_forces";
 
+  // NUCLEAR RESTRICTIONS: require tech level 5
+  if (selectedType === "nuclear" && user.country.assets.techLevel < 5) {
+    return res.status(400).json({ error: "اختراع تسلیحات هسته‌ای نیازمند سطح فناوری ۵ (حداکثر) است. ابتدا فناوری خود را ارتقا دهید." });
+  }
+
+  // NUCLEAR: minimum description length is higher
+  if (selectedType === "nuclear" && description.length < 200) {
+    return res.status(400).json({ error: "اختراع هسته‌ای نیازمند توضیحات بسیار دقیق (حداقل ۲۰۰ کاراکتر) شامل: نوع کلاهک، مواد شکافت‌پذیر، سیستم چاشنی، ابعاد، وزن، بازده انفجاری (کیلوتن/مگاتن)، سیستم حمل و پرتاب." });
+  }
+
   // Reference values for the AI to compare against
   const REFERENCE_WEAPONS: Record<string, { name: string; mp: number; specs: string }[]> = {
     ground_forces: [
@@ -2952,8 +3109,13 @@ ${refText}
     // Clamp MP to reasonable range
     const finalMP = Math.max(4, Math.min(20, result.mp || 5));
 
-    // Invent cost is HIGH (500-2000 gold) - scales with MP
-    const inventCost = Math.min(2000, Math.max(500, finalMP * 80));
+    // Invent cost: HIGHER for nuclear (1500-5000 gold)
+    let inventCost;
+    if (selectedType === "nuclear") {
+      inventCost = Math.min(5000, Math.max(1500, finalMP * 200));
+    } else {
+      inventCost = Math.min(2000, Math.max(500, finalMP * 80));
+    }
 
     if (user.country.assets.gold < inventCost) {
       return res.status(400).json({ error: `هزینه R&D: ${inventCost} طلا. شما طلا کافی ندارید.` });

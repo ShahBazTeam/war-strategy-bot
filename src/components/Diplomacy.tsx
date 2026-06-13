@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { User, WarReasonSubmission } from "../types";
-import { Swords, ShieldAlert, Sparkles, RefreshCw, Send, HelpCircle, FileText, AlertCircle, ShieldCheck } from "lucide-react";
+import { Swords, ShieldAlert, Sparkles, RefreshCw, Send, HelpCircle, FileText, AlertCircle, ShieldCheck, Radiation } from "lucide-react";
 
 interface DiplomacyProps {
   user: User;
@@ -13,6 +13,7 @@ interface DiplomacyProps {
   onProposeCeasefire: (warId: string) => void;
   onRespondCeasefire: (warId: string, accept: boolean) => void;
   onResolveWar: (warId: string, decision: string) => void;
+  onNuclearLaunch: (warId: string) => void;
 }
 
 export default function Diplomacy({
@@ -25,7 +26,8 @@ export default function Diplomacy({
   onExecuteBattleRound,
   onProposeCeasefire,
   onRespondCeasefire,
-  onResolveWar
+  onResolveWar,
+  onNuclearLaunch
 }: DiplomacyProps) {
   // Warfare declaration states
   const [declareTargetId, setDeclareTargetId] = useState("");
@@ -322,6 +324,35 @@ export default function Diplomacy({
                                 >
                                   🏳️ پیشنهاد معاهده آتش‌بس توافقی
                                 </button>
+                                {!war.nuclearLaunched?.includes(user.id) && (
+                                  <button
+                                    onClick={() => {
+                                      if (confirm("⚠️ آیا مطمئنید؟ پرتاب هسته‌ای هزینه ۵۰۰ طلا + ۵۰ نفت + ۳۰ فولاد دارد و فقط یکبار مجازید!")) {
+                                        onNuclearLaunch(war.id);
+                                      }
+                                    }}
+                                    disabled={
+                                      user.country.assets.techLevel < 4 ||
+                                      user.country.assets.gold < 500 ||
+                                      user.country.assets.resources.oil < 50 ||
+                                      user.country.assets.resources.steel < 30
+                                    }
+                                    className="px-3 py-1.5 text-xs bg-amber-950/30 border border-amber-900/30 text-amber-400 rounded-lg hover:bg-slate-900 transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1"
+                                    title={
+                                      user.country.assets.techLevel < 4 ? "نیاز به فناوری سطح ۴" :
+                                      user.country.assets.gold < 500 ? "نیاز به ۵۰۰ طلا" :
+                                      user.country.assets.resources.oil < 50 ? "نیاز به ۵۰ نفت" :
+                                      user.country.assets.resources.steel < 30 ? "نیاز به ۳۰ فولاد" : ""
+                                    }
+                                  >
+                                    <Radiation className="h-3 w-3" /> ☢️ پرتاب هسته‌ای
+                                  </button>
+                                )}
+                                {war.nuclearLaunched?.includes(user.id) && (
+                                  <span className="px-3 py-1.5 text-xs bg-amber-950/10 border border-amber-900/10 text-amber-600 rounded-lg">
+                                    ☢️ هسته‌ای استفاده شد
+                                  </span>
+                                )}
                               </div>
 
                               <button
