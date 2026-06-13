@@ -37,6 +37,31 @@ async function githubFetch(path: string, options: any = {}) {
   return res;
 }
 
+async function ensureBranchExists() {
+  const checkRes = await githubFetch(`/repos/${GITHUB_REPO}/branches/${GITHUB_BRANCH}`);
+  if (checkRes.ok) return true;
+  const mainRef = await githubFetch(`/repos/${GITHUB_REPO}/git/refs/heads/main`);
+  if (!mainRef.ok) {
+    console.error("[GitHub] Cannot find main branch");
+    return false;
+  }
+  const mainData = await mainRef.json();
+  const createRes = await githubFetch(`/repos/${GITHUB_REPO}/git/refs`, {
+    method: "POST",
+    body: JSON.stringify({
+      ref: `refs/heads/${GITHUB_BRANCH}`,
+      sha: mainData.object.sha,
+    }),
+  });
+  if (createRes.ok) {
+    console.log("[GitHub] Created branch:", GITHUB_BRANCH);
+    return true;
+  }
+  const err = await createRes.json();
+  console.error("[GitHub] Failed to create branch:", err.message);
+  return false;
+}
+
 async function loadFromGitHub(): Promise<GameDatabase | null> {
   if (!GITHUB_TOKEN) return null;
   try {
@@ -61,28 +86,24 @@ async function loadFromGitHub(): Promise<GameDatabase | null> {
 async function saveToGitHub(dbData: GameDatabase) {
   if (!GITHUB_TOKEN) return;
   try {
+    await ensureBranchExists();
     const content = Buffer.from(JSON.stringify(dbData, null, 2)).toString("base64");
-    
-    // Check if file exists
     let sha: string | undefined;
     const checkRes = await githubFetch(`/repos/${GITHUB_REPO}/contents/db.json?ref=${GITHUB_BRANCH}`);
     if (checkRes.ok) {
       const existing = await checkRes.json();
       sha = existing.sha;
     }
-
     const body: any = {
       message: `[DB] Auto-save: ${dbData.users.length} users, ${dbData.inventions.length} inventions`,
       content,
       branch: GITHUB_BRANCH,
     };
     if (sha) body.sha = sha;
-
     const saveRes = await githubFetch(`/repos/${GITHUB_REPO}/contents/db.json`, {
       method: "PUT",
       body: JSON.stringify(body),
     });
-
     if (saveRes.ok) {
       console.log("[GitHub] Backup saved successfully");
     } else {
