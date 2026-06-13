@@ -71,6 +71,7 @@ export default function Diplomacy({
   };
 
   const myAlliances = alliances.filter(a => a.members.some(m => m.userId === user.id));
+  const myAllianceMemberIds = myAlliances.flatMap(a => a.members.map(m => m.userId));
 
   // Filter combat files
   const filteredWars = wars.filter(w => {
@@ -116,7 +117,7 @@ export default function Diplomacy({
                 className="w-full rounded bg-white/5 border border-white/10 p-2.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
               >
                 <option value="">-- یک کشور انتخاب کنید --</option>
-                {allUsers.filter(u => u.id !== user.id).map(u => (
+                {allUsers.filter(u => u.id !== user.id && !myAllianceMemberIds.includes(u.id)).map(u => (
                   <option key={u.id} value={u.id}>{u.country.name} (رهبر: {u.username})</option>
                 ))}
               </select>
