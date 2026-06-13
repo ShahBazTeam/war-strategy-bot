@@ -939,6 +939,59 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781378287031_0dv9alc",
+      "username": "yukimura",
+      "password": "c8XmF3D8",
+      "isAdmin": false,
+      "country": {
+        "name": "هند",
+        "originalName": "India",
+        "slogan": "حقیقت به تنهایی پیروز می‌شود",
+        "flagUrl": "🇮🇳",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 23109,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781378287030
+        }
+      },
+      "equipmentSlots": [
+        "ind_arjun",
+        "ind_su30",
+        "ind_vikrant",
+        "ind_kolkata",
+        "ind_arihant",
+        "ind_akash",
+        "ind_agni",
+        "ind_nuke"
+      ],
+      "warehouse": {
+        "ind_arjun": 46,
+        "ind_su30": 26,
+        "ind_vikrant": 2,
+        "ind_kolkata": 3,
+        "ind_arihant": 2,
+        "ind_akash": 5,
+        "ind_agni": 3,
+        "ind_nuke": 20
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 23109,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -1318,6 +1371,7 @@
     "lastUpdated": "2026-06-13T19:18:03.745Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: هند (yukimura) به نقشه جهان پیوست!",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 21.3 | فولاد 28.7 | ارزاق عمومی 12.4",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 19.4 | فولاد 26.8 | ارزاق عمومی 11.2",
     "📊 نوسان بازار جهانی: با تحلیل بورس پیشرفته جمینی، نرخ قیمت روز منبع بروز شد: نفت 18.2 | فولاد 28.5 | ارزاق عمومی 10.9",
