@@ -311,6 +311,61 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376553710_mgz8a2x",
+      "username": "mahdi",
+      "password": "8QWABm1U",
+      "isAdmin": false,
+      "country": {
+        "name": "اسرائیل",
+        "originalName": "Israel",
+        "slogan": "آزادی و بازیابی اقتدار تاریخی",
+        "flagUrl": "🇮🇱",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 15853,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376553710
+        }
+      },
+      "equipmentSlots": [
+        "isr_merkava",
+        "isr_namer",
+        "isr_f35i",
+        "isr_apache",
+        "isr_saar",
+        "isr_dolphin",
+        "isr_iron_dome",
+        "isr_jericho",
+        "isr_nuke"
+      ],
+      "warehouse": {
+        "isr_merkava": 4,
+        "isr_namer": 5,
+        "isr_f35i": 6,
+        "isr_apache": 1,
+        "isr_saar": 1,
+        "isr_dolphin": 1,
+        "isr_iron_dome": 1,
+        "isr_jericho": 1,
+        "isr_nuke": 15
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 15853,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -340,6 +395,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: اسرائیل (mahdi) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایالات متحده آمریکا (kiakia) به نقشه جهان پیوست!",
     "🎮 کشور جدید: سوئد (kia) به نقشه جهان پیوست!",
     "🎮 کشور جدید: استرالیا (kia) به نقشه جهان پیوست!",
