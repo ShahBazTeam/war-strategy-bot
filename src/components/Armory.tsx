@@ -51,13 +51,17 @@ export default function Armory({ user, inventions, onBuyWeapon, onEquipChange, o
 
   const categories = categoryNames;
 
-  const userCountryEn = (user.country as any).originalName?.toLowerCase() || "";
+  const userCountryEn = user.country.originalName?.toLowerCase() || "";
   const userCountryFa = user.country.name.toLowerCase();
   const isInvented = (id: string) => id.startsWith("inv_");
 
   const filteredCatalog = CATALOG.filter(item => {
     if (!item.tags || item.tags.length === 0) return true;
-    return item.tags.some(tag => userCountryFa.includes(tag) || userCountryEn.includes(tag));
+    return item.tags.some(tag => {
+      const t = tag.toLowerCase();
+      return t === userCountryFa || t === userCountryEn || 
+             userCountryFa.includes(t) || userCountryEn.includes(t);
+    });
   });
 
   const categorizedWeapons = filteredCatalog.reduce((acc, item) => {

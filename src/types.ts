@@ -41,7 +41,7 @@ export interface User {
 export interface EquipmentItem {
   id: string;
   name: string;
-  type: 'artillery' | 'air_defense' | 'navy' | 'special_forces' | 'missile' | 'drone';
+  type: 'artillery' | 'air_defense' | 'navy' | 'special_forces' | 'missile' | 'drone' | 'ground_forces' | 'air_force' | 'nuclear';
   cost: number;
   militaryGained: number;
   airDefenseGained?: number;

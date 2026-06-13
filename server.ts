@@ -638,7 +638,7 @@ app.post("/api/auth/register", (req, res) => {
     isAdmin: false,
     country: {
       name: countryName || picked.name,
-      originalName: countryName || picked.englishName,
+      originalName: picked.englishName,
       slogan: slogan || picked.slogan,
       flagUrl: flagUrl || picked.flagUrl,
       assets: initialAssets
