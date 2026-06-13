@@ -544,13 +544,13 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 2506.2,
+          "gold": 3706.2,
           "militaryPower": 54858,
           "economicPower": 150,
           "resources": {
             "oil": 28.4,
             "steel": 112.5,
-            "food": 164.5
+            "food": 64.5
           },
           "techLevel": 2,
           "factoryLevel": 4,
@@ -580,12 +580,6 @@
         "usa_nuke": 50
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۰۷:۳۸",
-          "gold": 1783.2,
-          "military": 54858,
-          "economy": 150
-        },
         {
           "timestamp": "۲۰:۰۷:۵۱",
           "gold": 1120.2,
@@ -667,6 +661,12 @@
         {
           "timestamp": "۲۰:۱۱:۳۹",
           "gold": 2506.2,
+          "military": 54858,
+          "economy": 150
+        },
+        {
+          "timestamp": "۲۰:۱۲:۲۴",
+          "gold": 3706.2,
           "military": 54858,
           "economy": 150
         }
