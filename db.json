@@ -824,11 +824,11 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 265276.1,
+          "gold": 452276.1,
           "militaryPower": 48047,
           "economicPower": 287,
           "resources": {
-            "oil": 13404.5,
+            "oil": 3404.5,
             "steel": 451.5,
             "food": 22964.5
           },
@@ -861,66 +861,6 @@
       },
       "assetLog": [
         {
-          "timestamp": "۲۱:۵۸:۰۶",
-          "gold": 607544.9,
-          "military": 48047,
-          "economy": 267
-        },
-        {
-          "timestamp": "۲۱:۵۸:۰۶",
-          "gold": 635344.9,
-          "military": 48047,
-          "economy": 267
-        },
-        {
-          "timestamp": "۲۱:۵۸:۰۶",
-          "gold": 663144.9,
-          "military": 48047,
-          "economy": 267
-        },
-        {
-          "timestamp": "۲۱:۵۸:۱۳",
-          "gold": 393144.9,
-          "military": 48047,
-          "economy": 277
-        },
-        {
-          "timestamp": "۲۱:۵۸:۱۴",
-          "gold": 99144.9,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۱:۵۹:۰۰",
-          "gold": 107410.5,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۳",
-          "gold": 115676.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۸",
-          "gold": 134376.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۸",
-          "gold": 153076.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
-          "timestamp": "۲۲:۰۰:۰۹",
-          "gold": 171776.1,
-          "military": 48047,
-          "economy": 287
-        },
-        {
           "timestamp": "۲۲:۰۰:۰۹",
           "gold": 190476.1,
           "military": 48047,
@@ -947,6 +887,66 @@
         {
           "timestamp": "۲۲:۰۰:۰۹",
           "gold": 265276.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 283976.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 302676.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 321376.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 340076.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 358776.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 377476.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۰",
+          "gold": 396176.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 414876.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 433576.1,
+          "military": 48047,
+          "economy": 287
+        },
+        {
+          "timestamp": "۲۲:۰۰:۱۱",
+          "gold": 452276.1,
           "military": 48047,
           "economy": 287
         }
