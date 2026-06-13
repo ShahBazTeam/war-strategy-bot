@@ -683,8 +683,8 @@
         "slogan": "قدرت در اتحاد ، آینده در نوآوری",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 850950,
-          "militaryPower": 85262,
+          "gold": 743058,
+          "militaryPower": 130217,
           "economicPower": 239,
           "resources": {
             "oil": 0,
@@ -719,28 +719,10 @@
         "isr_iron_dome": 1,
         "isr_jericho": 1,
         "isr_nuke": 24,
-        "inv_0sq19px": 2997,
-        "inv_5quyxa1": 999
+        "inv_0sq19px": 3996,
+        "inv_5quyxa1": 2997
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۵۳:۲۰",
-          "gold": 961945.2,
-          "military": 25338,
-          "economy": 239
-        },
-        {
-          "timestamp": "۲۱:۵۴:۱۶",
-          "gold": 962327.6,
-          "military": 25336,
-          "economy": 239
-        },
-        {
-          "timestamp": "۲۱:۵۵:۱۸",
-          "gold": 962710,
-          "military": 25334,
-          "economy": 239
-        },
         {
           "timestamp": "۲۱:۵۵:۴۱",
           "gold": 961510,
@@ -811,6 +793,24 @@
           "timestamp": "۲۲:۰۱:۱۶",
           "gold": 850950,
           "military": 85262,
+          "economy": 239
+        },
+        {
+          "timestamp": "۲۲:۰۲:۰۹",
+          "gold": 814986,
+          "military": 100247,
+          "economy": 239
+        },
+        {
+          "timestamp": "۲۲:۰۲:۰۹",
+          "gold": 779022,
+          "military": 115232,
+          "economy": 239
+        },
+        {
+          "timestamp": "۲۲:۰۲:۰۹",
+          "gold": 743058,
+          "military": 130217,
           "economy": 239
         }
       ]
