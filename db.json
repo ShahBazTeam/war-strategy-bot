@@ -129,12 +129,12 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 7437.9,
+          "gold": 13368.1,
           "militaryPower": 1421,
           "economicPower": 108,
           "resources": {
             "oil": 50.7,
-            "steel": 616.5,
+            "steel": 417.5,
             "food": 81.7
           },
           "techLevel": 1,
@@ -169,12 +169,6 @@
         "irn_shahed": 20
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۱۴:۰۳",
-          "gold": 7682.4,
-          "military": 1421,
-          "economy": 108
-        },
         {
           "timestamp": "۲۰:۱۴:۰۵",
           "gold": 3284.5,
@@ -258,6 +252,12 @@
           "gold": 7437.9,
           "military": 1421,
           "economy": 108
+        },
+        {
+          "timestamp": "۲۰:۱۸:۰۶",
+          "gold": 13368.1,
+          "military": 1421,
+          "economy": 108
         }
       ]
     },
@@ -272,12 +272,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 627.5,
+          "gold": 925.5,
           "militaryPower": 630,
           "economicPower": 224,
           "resources": {
             "oil": 1,
-            "steel": 152.7,
+            "steel": 142.7,
             "food": 67.5
           },
           "techLevel": 4,
@@ -302,12 +302,6 @@
         "jp_type12": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۱۶:۳۰",
-          "gold": 1697.1,
-          "military": 634,
-          "economy": 224
-        },
         {
           "timestamp": "۲۰:۱۶:۳۰",
           "gold": 1986.1,
@@ -389,6 +383,12 @@
         {
           "timestamp": "۲۰:۱۷:۳۹",
           "gold": 627.5,
+          "military": 630,
+          "economy": 224
+        },
+        {
+          "timestamp": "۲۰:۱۸:۰۴",
+          "gold": 925.5,
           "military": 630,
           "economy": 224
         }
@@ -840,7 +840,6 @@
         "rus_bmp3",
         "rus_su57",
         "rus_ka52",
-        "rus_kuznetsov",
         "rus_kilo",
         "rus_s400",
         "rus_sarmat",
