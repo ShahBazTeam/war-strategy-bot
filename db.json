@@ -1274,18 +1274,6 @@
       },
       "assetLog": [
         {
-          "timestamp": "۲۱:۱۸:۴۳",
-          "gold": 75371.7,
-          "military": 23041,
-          "economy": 160
-        },
-        {
-          "timestamp": "۲۱:۱۸:۴۴",
-          "gold": 75688.7,
-          "military": 23041,
-          "economy": 160
-        },
-        {
           "timestamp": "۲۱:۱۹:۰۸",
           "gold": 75816.7,
           "military": 23041,
@@ -1359,6 +1347,18 @@
         },
         {
           "timestamp": "۲۱:۲۱:۴۴",
+          "gold": 108772.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۱:۲۱:۴۹",
+          "gold": 80272.7,
+          "military": 23041,
+          "economy": 160
+        },
+        {
+          "timestamp": "۲۱:۲۱:۵۴",
           "gold": 108772.7,
           "military": 23041,
           "economy": 160
