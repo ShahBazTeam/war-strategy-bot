@@ -116,13 +116,15 @@ export interface WarReasonSubmission {
   attackerCountry: string;
   defenderId: string;
   defenderCountry: string;
+  attackerAllies: string[];   // User IDs of allies who joined attacker's side
+  defenderAllies: string[];   // User IDs of allies who joined defender's side
   casusBelli: string;
   valid: boolean;
   aiExplanation: string;
   tensionPoints: number;
   status: 'waiting_defender' | 'active' | 'ended' | 'ceasefire';
   defenderDefenseScenario?: string;
-  pendingScenarios?: { attackerId?: string; defenderId?: string; attackerScenario?: string; defenderScenario?: string };
+  pendingScenarios?: { [userId: string]: string };  // userId -> scenario text
   rounds: {
     roundNumber: number;
     attackerScenario: string;
@@ -131,6 +133,7 @@ export interface WarReasonSubmission {
     timestamp: string;
   }[];
   winnerId?: string;
+  winnerSide?: 'attacker' | 'defender';
   winnerChoice?: 'annex' | 'colonize' | 'tribute' | 'spare';
   resolution?: 'annex' | 'colonize' | 'tribute' | 'spare';
   peaceTermsNarrative?: string;

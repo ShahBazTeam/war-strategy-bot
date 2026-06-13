@@ -1665,6 +1665,8 @@ app.post("/api/diplomacy/declare-war", checkRateLimit, async (req, res) => {
       attackerCountry: user.country.name,
       defenderId: defender.id,
       defenderCountry: defender.country.name,
+      attackerAllies: [],
+      defenderAllies: [],
       casusBelli: casusBelli,
       valid: true,
       aiExplanation: result.reason,
@@ -1701,6 +1703,66 @@ app.post("/api/diplomacy/submit-defense", checkRateLimit, (req, res) => {
   res.json({ war, message: "سناریو دفاعی با موفقیت ثبت و جنگ وارد وضعیت برخورد نظامی شد" });
 });
 
+// JOIN WAR - Coalition members can join on either side
+app.post("/api/diplomacy/join-war", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { warId, side } = req.body; // side: 'attacker' or 'defender'
+  if (!warId || !side || !['attacker', 'defender'].includes(side)) {
+    return res.status(400).json({ error: "اطلاعات نامعتبر" });
+  }
+
+  const war = db.wars.find(w => w.id === warId);
+  if (!war) return res.status(404).json({ error: "جنگی با این شناسه یافت نشد" });
+  if (war.status !== 'active') return res.status(400).json({ error: "فقط در جنگ‌های فعال می‌توان شرکت کرد" });
+
+  // Can't join your own side as the main participant
+  if (side === 'attacker' && war.attackerId === user.id) {
+    return res.status(400).json({ error: "شما از قبل حمله‌کننده اصلی هستید" });
+  }
+  if (side === 'defender' && war.defenderId === user.id) {
+    return res.status(400).json({ error: "شما از قبل مدافع اصلی هستید" });
+  }
+
+  // Check if user is in an alliance with either side
+  const attackerAlliance = db.alliances.find(a => a.members.some(m => m.userId === war.attackerId));
+  const defenderAlliance = db.alliances.find(a => a.members.some(m => m.userId === war.defenderId));
+
+  let canJoin = false;
+  if (side === 'attacker' && attackerAlliance && attackerAlliance.members.some(m => m.userId === user.id)) {
+    canJoin = true;
+  }
+  if (side === 'defender' && defenderAlliance && defenderAlliance.members.some(m => m.userId === user.id)) {
+    canJoin = true;
+  }
+
+  if (!canJoin) {
+    return res.status(400).json({ error: "شما عضو ائتلاف هیچ‌یک از طرفین نیستید" });
+  }
+
+  // Check not already in this war
+  if (war.attackerAllies.includes(user.id) || war.defenderAllies.includes(user.id)) {
+    return res.status(400).json({ error: "شما قبلاً در این جنگ شرکت کرده‌اید" });
+  }
+  if (war.attackerId === user.id || war.defenderId === user.id) {
+    return res.status(400).json({ error: "شما از قبل طرف اصلی این جنگ هستید" });
+  }
+
+  // Add to the war
+  if (side === 'attacker') {
+    war.attackerAllies.push(user.id);
+  } else {
+    war.defenderAllies.push(user.id);
+  }
+
+  const sideName = side === 'attacker' ? 'مهاجم' : 'مدافع';
+  db.globalAnnouncements.unshift(`⚔️ ${user.country.name} به عنوان متحد ${sideName} به جنگ ${war.attackerCountry} علیه ${war.defenderCountry} پیوست!`);
+
+  saveDatabase();
+  res.json({ war, message: `${user.country.name} به عنوان متحد ${sideName} به جنگ پیوست!` });
+});
+
 // COMBAT ROUND EVALUATOR (THE MOST EPIC GEMINI PROCESS)
 app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   const user = getCurrentUser(req);
@@ -1711,7 +1773,11 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     return res.status(400).json({ error: "سناریوی تاکتیکی باید حداقل ۱۰ کاراکتر باشد" });
   }
 
-  const war = db.wars.find(w => w.id === warId && (w.attackerId === user.id || w.defenderId === user.id));
+  // Check user is participant (main or ally)
+  const war = db.wars.find(w => w.id === warId && (
+    w.attackerId === user.id || w.defenderId === user.id ||
+    w.attackerAllies.includes(user.id) || w.defenderAllies.includes(user.id)
+  ));
   if (!war) return res.status(404).json({ error: "سناریویی جنگی با این شناسه یافت نشد" });
   if (war.status !== "active") return res.status(400).json({ error: "جنگ فعال نیست" });
 
@@ -1724,8 +1790,8 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     war.pendingScenarios = {};
   }
 
-  const isAttacker = user.id === war.attackerId;
-  const role = isAttacker ? "attacker" : "defender";
+  // Determine user's side
+  const isAttacker = user.id === war.attackerId || war.attackerAllies.includes(user.id);
 
   // Validate: user cannot claim more weapons than they actually have
   const validateClaims = (scenario: string, u: User) => {
@@ -1733,7 +1799,6 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     for (const match of claims) {
       const claimedNum = parseInt(match[1]);
       const weaponKeyword = match[2];
-      // Find matching warehouse items
       let totalHave = 0;
       for (const [wpnId, qty] of Object.entries(u.warehouse || {})) {
         const catItem = CATALOG.find(c => c.id === wpnId);
@@ -1756,37 +1821,55 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   }
 
   // Store this user's scenario
-  if (isAttacker) {
-    war.pendingScenarios.attackerId = user.id;
-    war.pendingScenarios.attackerScenario = tacticalScenario.trim();
-  } else {
-    war.pendingScenarios.defenderId = user.id;
-    war.pendingScenarios.defenderScenario = tacticalScenario.trim();
-  }
+  war.pendingScenarios[user.id] = tacticalScenario.trim();
 
-  // Check if both users have submitted
-  const bothSubmitted = war.pendingScenarios.attackerScenario && war.pendingScenarios.defenderScenario;
+  // Collect all participants on each side
+  const attackerSide = [war.attackerId, ...war.attackerAllies];
+  const defenderSide = [war.defenderId, ...war.defenderAllies];
 
-  if (!bothSubmitted) {
+  // Check if all participants have submitted
+  const allAttackerSubmitted = attackerSide.every(id => war.pendingScenarios![id]);
+  const allDefenderSubmitted = defenderSide.every(id => war.pendingScenarios![id]);
+  const allSubmitted = allAttackerSubmitted && allDefenderSubmitted;
+
+  if (!allSubmitted) {
+    // Count who hasn't submitted yet
+    const missingAttacker = attackerSide.filter(id => !war.pendingScenarios![id]).length;
+    const missingDefender = defenderSide.filter(id => !war.pendingScenarios![id]).length;
+    const totalParticipants = attackerSide.length + defenderSide.length;
+    const submitted = Object.keys(war.pendingScenarios!).filter(k => war.pendingScenarios![k]).length;
+
     saveDatabase();
     return res.json({ 
       war, 
       waiting: true, 
-      message: `سناریوی شما ثبت شد. منتظر ارسال سناریوی ${isAttacker ? "مدافع" : "مهاجم"}...`,
+      message: `سناریوی شما ثبت شد. ${submitted}/${totalParticipants} سناریو ارسال شده. منتظر ${missingAttacker + missingDefender} نفر دیگر...`,
       roundResolution: null 
     });
   }
 
-  // Both submitted - now evaluate with AI
+  // All submitted - now evaluate with AI
   const roundNum = war.rounds.length + 1;
-  const attackerScenario = war.pendingScenarios.attackerScenario!;
-  const defenderScenario = war.pendingScenarios.defenderScenario!;
+
+  // Build combined scenarios for each side
+  const attackerScenarios = attackerSide.map(id => {
+    const u = db.users.find(u => u.id === id);
+    const name = u ? u.country.name : "م未知";
+    const scenario = war.pendingScenarios![id];
+    return `${name}: "${scenario}"`;
+  }).join("\n");
+
+  const defenderScenarios = defenderSide.map(id => {
+    const u = db.users.find(u => u.id === id);
+    const name = u ? u.country.name : "م未知";
+    const scenario = war.pendingScenarios![id];
+    return `${name}: "${scenario}"`;
+  }).join("\n");
 
   // Clear pending scenarios for next round
   war.pendingScenarios = {};
 
-
-  // Compile active weapons detailed catalog to Gemini for evaluation
+  // Compile active weapons detailed catalog for all participants
   const getInventoryDesc = (u: User) => {
     const list = u.equipmentSlots.map(wpnId => {
       const catItem = CATALOG.find(c => c.id === wpnId);
@@ -1798,72 +1881,92 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     return list.length > 0 ? list.join("، ") : "تفنگ‌ ساده انفرادی";
   };
 
-  const attackerWeapons = getInventoryDesc(attacker);
-  const defenderWeapons = getInventoryDesc(defender);
+  // Build attacker side info
+  const attackerSideInfo = attackerSide.map(id => {
+    const u = db.users.find(u => u.id === id);
+    if (!u) return "";
+    return `⚔️ ${u.country.name} (متحد مهاجم):
+- قدرت نظامی: ${u.country.assets.militaryPower}
+- اقتصاد: ${u.country.assets.economicPower}
+- فناوری: ${u.country.assets.techLevel}
+- تسلیحات: ${getInventoryDesc(u)}`;
+  }).join("\n\n");
 
-  const prompt = `🔴 جنگ راند ${roundNum}: شبیه‌سازی سینمایی نبرد
+  // Build defender side info
+  const defenderSideInfo = defenderSide.map(id => {
+    const u = db.users.find(u => u.id === id);
+    if (!u) return "";
+    return `🛡️ ${u.country.name} (متحد مدافع):
+- قدرت نظامی: ${u.country.assets.militaryPower}
+- اقتصاد: ${u.country.assets.economicPower}
+- فناوری: ${u.country.assets.techLevel}
+- تسلیحات: ${getInventoryDesc(u)}`;
+  }).join("\n\n");
 
-⚔️ مهاجم: "${attacker.country.name}"
-- قدرت نظامی: ${attacker.country.assets.militaryPower}
-- اقتصاد: ${attacker.country.assets.economicPower}
-- فناوری: ${attacker.country.assets.techLevel}
-- تسلیحات فعال: ${attackerWeapons}
+  const totalAttackerMP = attackerSide.reduce((sum, id) => {
+    const u = db.users.find(u => u.id === id);
+    return sum + (u?.country.assets.militaryPower || 0);
+  }, 0);
 
-🛡️ مدافع: "${defender.country.name}"
-- قدرت نظامی: ${defender.country.assets.militaryPower}
-- اقتصاد: ${defender.country.assets.economicPower}
-- فناوری: ${defender.country.assets.techLevel}
-- تسلیحات فعال: ${defenderWeapons}
+  const totalDefenderMP = defenderSide.reduce((sum, id) => {
+    const u = db.users.find(u => u.id === id);
+    return sum + (u?.country.assets.militaryPower || 0);
+  }, 0);
+
+  const prompt = `🔴 جنگ راند ${roundNum}: شبیه‌سازی سینمایی نبرد (${attackerSide.length}vs${defenderSide.length})
+
+=== تیم مهاجم (مجموع MP: ${totalAttackerMP}) ===
+${attackerSideInfo}
+
+=== تیم مدافع (مجموع MP: ${totalDefenderMP}) ===
+${defenderSideInfo}
 
 📜 علت جنگ: "${war.casusBelli}"
 
-🎯 سناریوی تاکتیکی مهاجم:
-"${attackerScenario}"
+🎯 سناریوهای تاکتیکی تیم مهاجم:
+${attackerScenarios}
 
-🎯 سناریوی تاکتیکی مدافع:
-"${defenderScenario}"
+🎯 سناریوهای تاکتیکی تیم مدافع:
+${defenderScenarios}
 
 === قوانین بسیار مهم ===
 
 ۱. سناریوی هر کاربر باید کاملاً رعایت شود:
-   - اگر مهاجم حمله زمینی گفت ← حمله زمینی انجام بده
-   - اگر مدافع گفت هیچ کاری نمیکنم ← مدافع هیچ کاری نکن و تلفات سنگین بخور
-   - اگر مهاجم گفت عقب‌نشینی میکنم ← مهاجم عقب‌نشینی کند و تلفات بده
-   - اگر مدافع گفت پاتک میزنم ← پاتک انجام بده
-   - دقیقاً بر اساس سناریوی کاربر عمل کن، نه چیز دیگر
+   - سناریوی هر متحد در تیم خودش لحاظ شود
+   - اگر یک متحد عقب‌نشینی کرد ← آن متحد عقب‌نشینی کند
+   - اگر یک متحد حمله کرد ← آن متحد حمله کند
+   - دقیقاً بر اساس سناریوی هر کاربر عمل کن
 
 ۲. نتیجه بر اساس قدرت واقعی + سناریو:
-   - اگر سناریوی مهاجم قوی باشد و مدافع هیچ کاری نکند → مهاجم پیروز مطلق
-   - اگر سناریوی مدافع قوی باشد و مهاجم ضعیف → مدافع پیروز
-   - اگر هر دو قوی باشند → بر اساس MP و تسلیحات تصمیم بگیر
+   - مجموع MP تیم مهاجم vs مجموع MP تیم مدافع
+   - سناریوهای هر متحد تأثیر مستقیم دارد
+   - تلفات بر اساس MP واقعی هر کشور محاسبه شود
 
 ۳. تلفات واقعی و متناسب:
+   - هر کشور تلفات جداگانه دارد
    - طرفی که سناریوی بهتری دارد تلفات کمتری می‌دهد
-   - طرفی که هیچ کاری نمیکند تلفات بسیار سنگین می‌خورد
-   - تلفات بر اساس MP واقعی محاسبه شود (MP بالاتر = تلفات کمتر)
+   - تلفات بر اساس MP واقعی محاسبه شود
 
 ۴. روایت سینمایی:
    - مثل فیلم اکشن هالیوود بنویس
    - از نام تسلیحات واقعی استفاده کن
    - صحنه‌های دراماتیک بنویس (دود، آتش، انفجار، فرار)
-   - حداکثر ۱۵۰ کلمه فارسی سینمایی
+   - حداکثر ۲۰۰ کلمه فارسی سینمایی
 
 ۵. درصد فتح سرزمین:
    - مشخص کن چند درصد از سرزمین مدافع فتح شد
-   - اگر حمله زمینی قوی باشد و مدافع ضعیف → درصد بالا
-   - اگر مدافع قوی باشد → درصد کم یا صفر
 
 قالب JSON:
 {
   "narrative": "روایت سینمایی جنگ به فارسی...",
-  "attacker_loss": عدد (قدرت نظامی از دست رفته مهاجم),
-  "defender_loss": عدد (قدرت نظامی از دست رفته مدافع),
-  "attacker_economy_damage": عدد (خسارت اقتصادی مهاجم),
-  "defender_economy_damage": عدد (خسارت اقتصادی مدافع),
-  "attacker_resource_loss": { "oil": عدد, "steel": عدد, "food": 数字 },
-  "defender_resource_loss": { "oil": عدد, "steel": عدد, "food": 数字 },
-  "attacker_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": 数字, "ships_lost": عدد },
-  "defender_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": 数字, "ships_lost": عدد },
+  "attacker_loss": عدد (مجموع قدرت نظامی از دست رفته تیم مهاجم),
+  "defender_loss": عدد (مجموع قدرت نظامی از دست رفته تیم مدافع),
+  "attacker_economy_damage": عدد (خسارت اقتصادی تیم مهاجم),
+  "defender_economy_damage": عدد (خسارت اقتصادی تیم مدافع),
+  "attacker_resource_loss": { "oil": عدد, "steel": عدد, "food": عدد },
+  "defender_resource_loss": { "oil": عدد, "steel": عدد, "food": عدد },
+  "attacker_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": عدد, "ships_lost": عدد },
+  "defender_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": عدد, "ships_lost": عدد },
   "territory_conquered_percent": عدد (درصد سرزمین فتح شده از ۰ تا ۱۰۰),
   "winner_advantage": "attacker" | "defender" | "none",
   "suggested_next_action": "continue" | "ceasefire"
@@ -1943,47 +2046,83 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     );
     const parsed: CombatRoundResponse = JSON.parse(text);
 
-    // Apply casualties directly in DB (clamp to 0 before winner check)
-    attacker.country.assets.militaryPower = Math.max(0, attacker.country.assets.militaryPower - parsed.attacker_loss);
-    defender.country.assets.militaryPower = Math.max(0, defender.country.assets.militaryPower - parsed.defender_loss);
+    // Distribute damage across all allies proportionally
+    const applyDamageToSide = (sideUserIds: string[], totalLoss: number, totalEcoDamage: number, resourceLoss: Resources) => {
+      const sideUsers = sideUserIds.map(id => db.users.find(u => u.id === id)).filter(Boolean) as User[];
+      const totalMP = sideUsers.reduce((sum, u) => sum + u.country.assets.militaryPower, 0);
+      
+      sideUsers.forEach(u => {
+        const mpShare = totalMP > 0 ? u.country.assets.militaryPower / totalMP : 1 / sideUsers.length;
+        u.country.assets.militaryPower = Math.max(0, u.country.assets.militaryPower - Math.round(totalLoss * mpShare));
+        u.country.assets.economicPower = Math.max(0, u.country.assets.economicPower - Math.round(totalEcoDamage * mpShare));
+        u.country.assets.resources.oil = Math.max(0, u.country.assets.resources.oil - Math.round(resourceLoss.oil * mpShare));
+        u.country.assets.resources.steel = Math.max(0, u.country.assets.resources.steel - Math.round(resourceLoss.steel * mpShare));
+        u.country.assets.resources.food = Math.max(0, u.country.assets.resources.food - Math.round(resourceLoss.food * mpShare));
+      });
+    };
 
-    attacker.country.assets.economicPower = Math.max(0, attacker.country.assets.economicPower - parsed.attacker_economy_damage);
-    defender.country.assets.economicPower = Math.max(0, defender.country.assets.economicPower - parsed.defender_economy_damage);
-
-    attacker.country.assets.resources.oil = Math.max(0, attacker.country.assets.resources.oil - parsed.attacker_resource_loss.oil);
-    attacker.country.assets.resources.steel = Math.max(0, attacker.country.assets.resources.steel - parsed.attacker_resource_loss.steel);
-    attacker.country.assets.resources.food = Math.max(0, attacker.country.assets.resources.food - parsed.attacker_resource_loss.food);
-
-    defender.country.assets.resources.oil = Math.max(0, defender.country.assets.resources.oil - parsed.defender_resource_loss.oil);
-    defender.country.assets.resources.steel = Math.max(0, defender.country.assets.resources.steel - parsed.defender_resource_loss.steel);
-    defender.country.assets.resources.food = Math.max(0, defender.country.assets.resources.food - parsed.defender_resource_loss.food);
+    applyDamageToSide(attackerSide, parsed.attacker_loss, parsed.attacker_economy_damage, parsed.attacker_resource_loss);
+    applyDamageToSide(defenderSide, parsed.defender_loss, parsed.defender_economy_damage, parsed.defender_resource_loss);
 
     // Check military <= 0 to Trigger ultimate Peace Accord / Booty settlement via Gemini
     let combatEnded = false;
     let endNarrative = "";
 
-    if (attacker.country.assets.militaryPower <= 0 || defender.country.assets.militaryPower <= 0) {
+    // Calculate total MP for each side
+    const totalAttackerMP = attackerSide.reduce((sum, id) => {
+      const u = db.users.find(u => u.id === id);
+      return sum + (u?.country.assets.militaryPower || 0);
+    }, 0);
+    const totalDefenderMP = defenderSide.reduce((sum, id) => {
+      const u = db.users.find(u => u.id === id);
+      return sum + (u?.country.assets.militaryPower || 0);
+    }, 0);
+
+    if (totalAttackerMP <= 0 || totalDefenderMP <= 0) {
       combatEnded = true;
       war.status = "ended";
 
-      // If both have 0 MP, the one with higher economy wins (or defender by default)
-      const winner = attacker.country.assets.militaryPower > defender.country.assets.militaryPower ? attacker :
-                     defender.country.assets.militaryPower > attacker.country.assets.militaryPower ? defender :
-                     defender; // default: defender wins tie
-      const loser = winner.id === attacker.id ? defender : attacker;
-      war.winnerId = winner.id;
+      // Determine winner based on total side MP
+      const attackerWon = totalAttackerMP > totalDefenderMP;
+      const defenderWon = totalDefenderMP > totalAttackerMP;
+      
+      // Winner is the main user of the winning side
+      if (attackerWon) {
+        war.winnerId = attacker.id;
+        war.winnerSide = 'attacker';
+      } else if (defenderWon) {
+        war.winnerId = defender.id;
+        war.winnerSide = 'defender';
+      } else {
+        // Tie: defender wins
+        war.winnerId = defender.id;
+        war.winnerSide = 'defender';
+      }
 
-      // Ask @TheSurenax (AI System) to draft peace terms & booty transfer values
-      const peacePrompt = `جنگ با مرگ نظامی یکی از طرفین به پایان رسیده است. کشور بازنده اکنون رسماً مستعمره یا تحت الحمایه برنده محسوب می‌شود.
-برنده نهایی (کشور فاتح): "${winner.country.name}" (قدرت نظامی باقی‌مانده: ${winner.country.assets.militaryPower})
-بازنده بزرگ (کشور شکست‌خورده): "${loser.country.name}" (قدرت نظامی نابود شده: ${loser.country.assets.militaryPower})
+      const winner = db.users.find(u => u.id === war.winnerId)!;
+      const loserSideIds = war.winnerSide === 'attacker' ? defenderSide : attackerSide;
+      const loserMainUser = war.winnerSide === 'attacker' ? defender : attacker;
 
-به عنوان قاضی عادل هم‌پیمان، لطفاً بنویس چه میزان طلا، نفت یا فولاد به عنوان غنایم جنگی سنگین جهت مستعمره‌سازی از کشور بازنده به برنده تعلق می‌گیرد و یک روایت زیبای تاریخی پایانی ارائه بده:
+      // Ask AI to draft peace terms
+      const winnerAllies = (war.winnerSide === 'attacker' ? war.attackerAllies : war.defenderAllies)
+        .map(id => db.users.find(u => u.id === id)?.country.name).filter(Boolean);
+      const loserAllies = (war.winnerSide === 'attacker' ? war.defenderAllies : war.attackerAllies)
+        .map(id => db.users.find(u => u.id === id)?.country.name).filter(Boolean);
+
+      const peacePrompt = `جنگ با مرگ نظامی یکی از طرفین به پایان رسیده است.
+
+تیم برنده: ${winner.country.name}${winnerAllies.length > 0 ? ` + متحدین: ${winnerAllies.join(", ")}` : ""}
+تیم بازنده: ${loserMainUser.country.name}${loserAllies.length > 0 ? ` + متحدین: ${loserAllies.join(", ")}` : ""}
+
+MP باقی‌مانده تیم برنده: ${attackerWon ? totalAttackerMP : totalDefenderMP}
+MP باقی‌مانده تیم بازنده: ${attackerWon ? totalDefenderMP : totalAttackerMP}
+
+به عنوان قاضی عادل، لطفاً بنویس چه میزان غنایم جنگی از تیم بازنده به تیم برنده تعلق می‌گیرد:
 {
-  "peace_summary": "مجموعه غرامتی انتقالی با لحن حماسی به زبان فارسی روان شامل تسخیر کامل منابع، مستعمره شدن کشور بازنده و جابه‌جایی مقادیر طلا و منابع",
-  "gold_booty": integer (مبلغ چشمگیر بین ۵۰۰ تا ۲۰۰۰ بر مبنای طلای فعلی کشورِ بازنده),
-  "oil_booty": integer (مبلغ بین ۵۰ تا ۳۰۰),
-  "steel_booty": integer (مبلغ بین ۵۰ تا ۳۰۰)
+  "peace_summary": "روایت حماسی پایان جنگ به فارسی",
+  "gold_booty": integer (بین ۵۰۰ تا ۲۰۰۰),
+  "oil_booty": integer (بین ۵۰ تا ۳۰۰),
+  "steel_booty": integer (بین ۵۰ تا ۳۰۰)
 }`;
 
       const peaceSchema = {
@@ -2005,29 +2144,30 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         );
         const peaceObj = JSON.parse(peaceText);
 
-        const transferGold = Math.min(loser.country.assets.gold, peaceObj.gold_booty);
-        const transferOil = Math.min(loser.country.assets.resources.oil, peaceObj.oil_booty);
-        const transferSteel = Math.min(loser.country.assets.resources.steel, peaceObj.steel_booty);
+        // Transfer resources from loser side to winner side
+        const transferGold = Math.min(loserMainUser.country.assets.gold, peaceObj.gold_booty);
+        const transferOil = Math.min(loserMainUser.country.assets.resources.oil, peaceObj.oil_booty);
+        const transferSteel = Math.min(loserMainUser.country.assets.resources.steel, peaceObj.steel_booty);
 
-        loser.country.assets.gold -= transferGold;
+        loserMainUser.country.assets.gold -= transferGold;
         winner.country.assets.gold += transferGold;
 
-        loser.country.assets.resources.oil -= transferOil;
+        loserMainUser.country.assets.resources.oil -= transferOil;
         winner.country.assets.resources.oil += transferOil;
 
-        loser.country.assets.resources.steel -= transferSteel;
+        loserMainUser.country.assets.resources.steel -= transferSteel;
         winner.country.assets.resources.steel += transferSteel;
 
         war.peaceTermsNarrative = peaceObj.peace_summary;
         endNarrative = peaceObj.peace_summary;
 
-        db.globalAnnouncements.unshift(`🏆 پایان بحران جنگی: کشور بزرگ ${winner.country.name} با درهم شکستن پایداری نظامی حریف، قهرمان جنگ بین‌المللی شد! مفاد عهدنامه صلح: ${peaceObj.peace_summary}`);
+        db.globalAnnouncements.unshift(`🏆 پایان بحران جنگی: تیم ${winner.country.name}${winnerAllies.length > 0 ? ` و متحدینش` : ""} پیروز شد! مفاد عهدنامه صلح: ${peaceObj.peace_summary}`);
       } catch (e: any) {
         // Fallback default booty transfer if AI fails
-        const gGain = Math.min(loser.country.assets.gold, 200);
-        loser.country.assets.gold -= gGain;
+        const gGain = Math.min(loserMainUser.country.assets.gold, 200);
+        loserMainUser.country.assets.gold -= gGain;
         winner.country.assets.gold += gGain;
-        war.peaceTermsNarrative = `کشور ${winner.country.name} به عنوان فاتح شناخته شد. غرامتی معادل ${gGain} طلا اتوماتیک منتقل گردید.`;
+        war.peaceTermsNarrative = `تیم ${winner.country.name} به عنوان فاتح شناخته شد. غرامتی معادل ${gGain} طلا منتقل گردید.`;
         endNarrative = war.peaceTermsNarrative;
       }
     }
@@ -2035,24 +2175,30 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
     // Add round history
     war.rounds.push({
       roundNumber: roundNum,
-      attackerScenario,
-      defenderScenario,
+      attackerScenario: attackerScenarios,
+      defenderScenario: defenderScenarios,
       resolution: parsed,
       timestamp: new Date().toISOString()
     });
 
-    updateAndLogUserAssets(attacker);
-    updateAndLogUserAssets(defender);
+    // Update all participants' asset logs
+    [...attackerSide, ...defenderSide].forEach(id => {
+      const u = db.users.find(u => u.id === id);
+      if (u) updateAndLogUserAssets(u);
+    });
 
     // Auto-post to War Room Twitter feed
     try {
+      const attackerNames = attackerSide.map(id => db.users.find(u => u.id === id)?.country.name).filter(Boolean).join(" + ");
+      const defenderNames = defenderSide.map(id => db.users.find(u => u.id === id)?.country.name).filter(Boolean).join(" + ");
+
       const warRoomTweet = {
         id: `warroom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId: "warroom_system",
         username: "اتاق_جنگ",
         countryName: "system",
         flagUrl: "",
-        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🌍 درصد فتح: ${parsed.territory_conquered_percent || 0}%\n\n🪦 تلفات مهاجم:\nکشته: ${parsed.attacker_casualties?.killed || 0} | زخمی: ${parsed.attacker_casualties?.wounded || 0}\nغیرنظامی: ${parsed.attacker_casualties?.civilians || 0}\nجنگنده: ${parsed.attacker_casualties?.aircraft_lost || 0} | تانک: ${parsed.attacker_casualties?.tanks_lost || 0}\n\n🪦 تلفات مدافع:\nکشته: ${parsed.defender_casualties?.killed || 0} | زخمی: ${parsed.defender_casualties?.wounded || 0}\nغیرنظامی: ${parsed.defender_casualties?.civilians || 0}\nجنگنده: ${parsed.defender_casualties?.aircraft_lost || 0} | تانک: ${parsed.defender_casualties?.tanks_lost || 0}\n\n🔴 ${attacker.country.name} MP: ${attacker.country.assets.militaryPower} | 🛡️ ${defender.country.name} MP: ${defender.country.assets.militaryPower}`,
+        text: `⚔️ گزارش راند ${roundNum} جنگ (${attackerSide.length}vs${defenderSide.length})\n\n${attackerNames} 🆚 ${defenderNames}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: تیم مهاجم` : parsed.winner_advantage === "defender" ? `🏆 برتری: تیم مدافع` : "⚖️ تساوی"}\n\n🌍 درصد فتح: ${parsed.territory_conquered_percent || 0}%\n\n🪦 تلفات تیم مهاجم:\nکشته: ${parsed.attacker_casualties?.killed || 0} | زخمی: ${parsed.attacker_casualties?.wounded || 0}\nغیرنظامی: ${parsed.attacker_casualties?.civilians || 0}\nجنگنده: ${parsed.attacker_casualties?.aircraft_lost || 0} | تانک: ${parsed.attacker_casualties?.tanks_lost || 0}\n\n🪦 تلفات تیم مدافع:\nکشته: ${parsed.defender_casualties?.killed || 0} | زخمی: ${parsed.defender_casualties?.wounded || 0}\nغیرنظامی: ${parsed.defender_casualties?.civilians || 0}\nجنگنده: ${parsed.defender_casualties?.aircraft_lost || 0} | تانک: ${parsed.defender_casualties?.tanks_lost || 0}\n\n🔴 تیم مهاجم MP: ${totalAttackerMP} | 🛡️ تیم مدافع MP: ${totalDefenderMP}`,
         timestamp: new Date().toISOString(),
         likes: [],
         comments: []

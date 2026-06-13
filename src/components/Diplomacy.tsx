@@ -14,6 +14,7 @@ interface DiplomacyProps {
   onRespondCeasefire: (warId: string, accept: boolean) => void;
   onResolveWar: (warId: string, decision: string) => void;
   onNuclearLaunch: (warId: string) => void;
+  onJoinWar: (warId: string, side: 'attacker' | 'defender') => void;
 }
 
 export default function Diplomacy({
@@ -27,7 +28,8 @@ export default function Diplomacy({
   onProposeCeasefire,
   onRespondCeasefire,
   onResolveWar,
-  onNuclearLaunch
+  onNuclearLaunch,
+  onJoinWar
 }: DiplomacyProps) {
   // Warfare declaration states
   const [declareTargetId, setDeclareTargetId] = useState("");
@@ -80,7 +82,7 @@ export default function Diplomacy({
   // Filter combat files
   const filteredWars = wars.filter(w => {
     if (warFilter === "active") return w.status !== "ended";
-    if (warFilter === "mine") return w.attackerId === user.id || w.defenderId === user.id;
+    if (warFilter === "mine") return w.attackerId === user.id || w.defenderId === user.id || w.attackerAllies.includes(user.id) || w.defenderAllies.includes(user.id);
     return true;
   });
 
@@ -260,6 +262,78 @@ export default function Diplomacy({
                       {war.casusBelli || "علت جنگ نامشخص"}
                     </div>
 
+                    {/* ALL PARTICIPANTS DISPLAY */}
+                    <div className="grid grid-cols-2 gap-3 text-[10px]">
+                      <div className="rounded bg-rose-950/15 border border-rose-500/20 p-2.5 space-y-1.5">
+                        <span className="font-bold text-rose-400 block">⚔️ طرف مهاجم:</span>
+                        <span className="text-slate-300 block">{war.attackerCountry}</span>
+                        {war.attackerAllies.length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {war.attackerAllies.map(uid => {
+                              const ally = allUsers.find(u => u.id === uid);
+                              return ally ? (
+                                <div key={uid} className="flex items-center gap-1 text-rose-300/80">
+                                  <span>🤝</span>
+                                  <span>{ally.country.name}</span>
+                                  <span className="text-slate-500">({ally.username})</span>
+                                  {war.status === "active" && war.pendingScenarios && (
+                                    <span className={war.pendingScenarios[uid] ? "text-emerald-400" : "text-amber-400"}>
+                                      {war.pendingScenarios[uid] ? "✅" : "⏳"}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      <div className="rounded bg-teal-950/15 border border-teal-500/20 p-2.5 space-y-1.5">
+                        <span className="font-bold text-teal-400 block">🛡️ طرف مدافع:</span>
+                        <span className="text-slate-300 block">{war.defenderCountry}</span>
+                        {war.defenderAllies.length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {war.defenderAllies.map(uid => {
+                              const ally = allUsers.find(u => u.id === uid);
+                              return ally ? (
+                                <div key={uid} className="flex items-center gap-1 text-teal-300/80">
+                                  <span>🤝</span>
+                                  <span>{ally.country.name}</span>
+                                  <span className="text-slate-500">({ally.username})</span>
+                                  {war.status === "active" && war.pendingScenarios && (
+                                    <span className={war.pendingScenarios[uid] ? "text-emerald-400" : "text-amber-400"}>
+                                      {war.pendingScenarios[uid] ? "✅" : "⏳"}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* JOIN WAR BUTTON - for alliance members not already a participant */}
+                    {war.status === "active" && !isMyWar && !war.attackerAllies.includes(user.id) && !war.defenderAllies.includes(user.id) && (
+                      <div className="flex flex-wrap gap-2">
+                        {myAllianceMemberIds.includes(war.attackerId) && (
+                          <button
+                            onClick={() => onJoinWar(war.id, "attacker")}
+                            className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded border border-rose-500/40 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition cursor-pointer flex items-center gap-1.5"
+                          >
+                            <Swords className="h-3 w-3" /> پیوستن به مهاجم
+                          </button>
+                        )}
+                        {myAllianceMemberIds.includes(war.defenderId) && (
+                          <button
+                            onClick={() => onJoinWar(war.id, "defender")}
+                            className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded border border-teal-500/40 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 transition cursor-pointer flex items-center gap-1.5"
+                          >
+                            <ShieldAlert className="h-3 w-3" /> پیوستن به مدافع
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* DEFENDER SCENARIO CAPTURE FORM */}
                     {war.status === "waiting_defender" && isDefender && (
                       <div className="rounded-xl bg-amber-950/10 border border-amber-900/30 p-3 space-y-3.5">
@@ -297,7 +371,7 @@ export default function Diplomacy({
                         </div>
 
                         {/* Check if this user already submitted */}
-                        {war.pendingScenarios && ((isAttacker && war.pendingScenarios.attackerScenario) || (!isAttacker && war.pendingScenarios.defenderScenario)) ? (
+                        {war.pendingScenarios && war.pendingScenarios[user.id] ? (
                           <div className="bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-3 text-center">
                             <p className="text-xs text-cyan-400 font-bold">✅ سناریوی شما ثبت شد</p>
                             <p className="text-[10px] text-slate-400 mt-1">منتظر ارسال سناریوی حریف...</p>

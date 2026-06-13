@@ -486,6 +486,17 @@ export default function App() {
     } catch {}
   };
 
+  const joinWarSide = async (warId: string, side: 'attacker' | 'defender') => {
+    try {
+      const res = await apiCall("/api/diplomacy/join-war", {
+        method: "POST",
+        body: JSON.stringify({ warId, side })
+      });
+      showTemporarySuccess(res.message || "با موفقیت به جنگ پیوستید!");
+      fetchGlobalData();
+    } catch {}
+  };
+
   const proposeBattleCeasefire = async (warId: string) => {
     try {
       await apiCall("/api/diplomacy/ceasefire-propose", {
@@ -1142,6 +1153,7 @@ export default function App() {
                     onRespondCeasefire={respondToCeasefireRequest}
                     onResolveWar={resolveWarEnd}
                     onNuclearLaunch={nuclearLaunch}
+                    onJoinWar={joinWarSide}
                   />
                 )}
                 {activeTab === "un" && (
