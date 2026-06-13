@@ -182,7 +182,8 @@ export default function AdminPanel({
           </h2>
           <button
             onClick={async () => {
-              if (!confirm("آیا مطمئنید؟ تمام کشورها، جنگ‌ها، اتحادها و معاملات پاک می‌شوند!")) return;
+              if (!confirm("⚠️ هشدار: تمام کشورها، کاربران، جنگ‌ها، اتحادها، معاملات، اختراعات، توییت‌ها و قیمت‌ها پاک می‌شوند!\n\nآیا کاملاً مطمئنید؟")) return;
+              if (!confirm("最后一次 تایید: تمام داده‌ها برای همیشه حذف می‌شوند!")) return;
               setIsProcessing("delete_all");
               await onAdminDeleteAllUsers();
               setIsProcessing(null);
@@ -191,7 +192,7 @@ export default function AdminPanel({
             className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
           >
             <AlertTriangle className="h-3.5 w-3.5" />
-            {isProcessing === "delete_all" ? "در حال حذف..." : "حذف تمام کاربران و ریست کامل"}
+            {isProcessing === "delete_all" ? "در حال ریست کامل..." : "🔄 ریست کامل بازی (حذف همه چیز)"}
           </button>
         </div>
 

@@ -2528,8 +2528,12 @@ app.post("/api/admin/delete-all-users", (req, res) => {
   db.alliances = [];
   db.tradeOffers = [];
   db.unProposals = [];
+  db.inventions = [];
+  db.tweets = [];
+  db.globalAnnouncements = ["پلتفرم شبیه‌ساز امنیتی دنیای مدرن فعال شد. تمام محاسبات با هوش مصنوعی برتر گوگل جمینی پایش می‌شود!"];
+  db.resourcePrices = { oil: 12, steel: 18, food: 7, lastUpdated: new Date().toISOString() };
   saveDatabase();
-  res.json({ message: `${count} کاربر حذف شدند. تمام داده‌ها ریست شد.` });
+  res.json({ message: `ریست کامل انجام شد. ${count} کاربر حذف شدند. تمام داده‌ها پاک شد.` });
 });
 
 app.get("/api/inventions", (req, res) => {
