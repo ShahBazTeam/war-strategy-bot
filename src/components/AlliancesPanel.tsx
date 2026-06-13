@@ -166,6 +166,7 @@ export default function AlliancesPanel({
                     placeholder={aidType === "financial" ? "مبلغ طلا..." : "واحد قدرت نظامی..."}
                     className="w-full bg-white/5 text-xs rounded border border-white/10 p-2 text-white focus:outline-none focus:border-cyan-500"
                     min="1"
+                    inputMode="numeric"
                   />
                   <div className="flex gap-2 text-[9px] font-black uppercase tracking-widest">
                     <button
