@@ -2536,6 +2536,14 @@ app.post("/api/admin/delete-all-users", (req, res) => {
 });
 
 app.get("/api/inventions", (req, res) => {
+  // Auto-expire old sales
+  const now = new Date();
+  for (const inv of db.inventions) {
+    if (inv.isForSale && inv.forSaleUntil && new Date(inv.forSaleUntil) < now) {
+      inv.isForSale = false;
+      inv.forSaleUntil = undefined;
+    }
+  }
   res.json({ inventions: db.inventions || [] });
 });
 
@@ -2545,17 +2553,30 @@ app.post("/api/inventions/:id/set-price", checkRateLimit, (req, res) => {
   if (!user) return res.status(401).json({ error: "ورود لغو شد" });
 
   const { id } = req.params;
-  const { sellPrice, isForSale } = req.body;
+  const { sellPrice, isForSale, durationHours } = req.body;
 
   const inv = db.inventions.find(i => i.id === id);
   if (!inv) return res.status(404).json({ error: "اختراع یافت نشد" });
   if (inv.inventorUsername !== user.username) return res.status(403).json({ error: "فقط مخترع می‌تواند قیمت تعیین کند" });
 
   inv.sellPrice = Math.max(10, Math.min(5000, Number(sellPrice) || 100));
-  inv.isForSale = isForSale !== false;
+  
+  const hours = Math.max(1, Math.min(168, Number(durationHours) || 24));
+  
+  if (isForSale === true) {
+    // Time-based sale
+    inv.isForSale = true;
+    inv.forSaleUntil = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+  } else {
+    // Remove from sale
+    inv.isForSale = false;
+    inv.forSaleUntil = undefined;
+  }
 
   saveDatabase();
-  res.json({ success: true, invent: inv, message: `قیمت فروش ${inv.name}: ${inv.sellPrice} طلا` });
+  
+  const durationText = inv.isForSale ? `${hours} ساعت` : "حذف از فروش";
+  res.json({ success: true, invent: inv, message: `${inv.name} ${inv.isForSale ? `برای فروش ثبت شد (${durationText})` : "از فروشگاه حذف شد"}` });
 });
 
 // Buy invention from another user's inventor shop
@@ -2570,6 +2591,12 @@ app.post("/api/inventions/:id/buy", checkRateLimit, (req, res) => {
   const inv = db.inventions.find(i => i.id === id);
   if (!inv) return res.status(404).json({ error: "اختراع یافت نشد" });
   if (!inv.isForSale) return res.status(400).json({ error: "این اختراع فروشی نیست" });
+  if (inv.forSaleUntil && new Date(inv.forSaleUntil) < new Date()) {
+    inv.isForSale = false;
+    inv.forSaleUntil = undefined;
+    saveDatabase();
+    return res.status(400).json({ error: "زمان فروش این اختراع تمام شده" });
+  }
   if (inv.inventorUsername === user.username) return res.status(400).json({ error: "شما خودتان مخترع این اختراع هستید! از انبار خود خریداری کنید." });
 
   const sellPrice = inv.sellPrice || 100;

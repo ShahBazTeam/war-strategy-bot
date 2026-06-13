@@ -42,8 +42,9 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [scrapModal, setScrapModal] = useState<{ id: string; name: string; maxQty: number } | null>(null);
   const [scrapQty, setScrapQty] = useState(1);
-  const [priceModal, setPriceModal] = useState<{ id: string; name: string; currentPrice: number } | null>(null);
+  const [priceModal, setPriceModal] = useState<{ id: string; name: string; currentPrice: number; isForSale: boolean } | null>(null);
   const [newPrice, setNewPrice] = useState(100);
+  const [saleDuration, setSaleDuration] = useState(24);
   const [shopQty, setShopQty] = useState<Record<string, number>>({});
   
   const getWeaponDetails = (id: string) => {
@@ -155,13 +156,13 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
     setScrapQty(1);
   };
 
-  const handleSetPrice = async () => {
+  const handleSetPrice = async (startSale: boolean) => {
     if (!priceModal) return;
     try {
       const res = await fetch(`/api/inventions/${priceModal.id}/set-price`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-user-id": user.id },
-        body: JSON.stringify({ sellPrice: newPrice, isForSale: true })
+        body: JSON.stringify({ sellPrice: newPrice, isForSale: startSale, durationHours: saleDuration })
       });
       const data = await res.json();
       if (res.ok) {
@@ -262,16 +263,16 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setPriceModal(null)}>
           <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-6 w-full max-w-sm space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-amber-400">💰 تعیین قیمت فروش</h3>
+              <h3 className="text-sm font-bold text-amber-400">💰 مدیریت فروش اختراع</h3>
               <button onClick={() => setPriceModal(null)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <p className="text-xs text-slate-300">{priceModal.name}</p>
-            <p className="text-[10px] text-slate-500">قیمت فعلی: {priceModal.currentPrice} طلا</p>
+            <p className="text-xs text-white font-bold">{priceModal.name}</p>
+            <p className="text-[10px] text-slate-500">وضعیت: {priceModal.isForSale ? "🟢 در فروشگاه" : "🔴 فروشی نیست"}</p>
             
             <div>
-              <label className="block text-[10px] text-slate-400 mb-1">قیمت جدید (طلا)</label>
+              <label className="block text-[10px] text-slate-400 mb-1">قیمت فروش (طلا)</label>
               <input
                 type="number"
                 min="10"
@@ -283,6 +284,22 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
               />
             </div>
 
+            <div>
+              <label className="block text-[10px] text-slate-400 mb-1">مدت زمان فروش</label>
+              <select
+                value={saleDuration}
+                onChange={(e) => setSaleDuration(parseInt(e.target.value))}
+                className="w-full bg-black/50 border border-amber-500/20 rounded-lg p-2 text-white text-sm"
+              >
+                <option value={1}>۱ ساعت</option>
+                <option value={6}>۶ ساعت</option>
+                <option value={12}>۱۲ ساعت</option>
+                <option value={24}>۲۴ ساعت (۱ روز)</option>
+                <option value={72}>۳ روز</option>
+                <option value={168}>۷ روز</option>
+              </select>
+            </div>
+
             <div className="flex gap-2">
               <button
                 onClick={() => setPriceModal(null)}
@@ -290,11 +307,19 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
               >
                 انصراف
               </button>
+              {priceModal.isForSale && (
+                <button
+                  onClick={() => handleSetPrice(false)}
+                  className="flex-1 py-2.5 rounded-lg border border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold cursor-pointer"
+                >
+                  حذف از فروش
+                </button>
+              )}
               <button
-                onClick={handleSetPrice}
+                onClick={() => handleSetPrice(true)}
                 className="flex-1 py-2.5 rounded-lg border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-bold cursor-pointer"
               >
-                ثبت قیمت
+                {priceModal.isForSale ? "بروزرسانی" : "شروع فروش"}
               </button>
             </div>
           </div>
@@ -397,10 +422,10 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
                         {item.isInvention && item.inventorUsername === user.username && (
                           <div className="mt-2 flex items-center gap-2">
                             <button
-                              onClick={() => { setPriceModal({ id: item.id, name: item.name, currentPrice: item.cost }); setNewPrice(item.cost); }}
-                              className="text-[9px] px-2 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 cursor-pointer"
+                              onClick={() => { setPriceModal({ id: item.id, name: item.name, currentPrice: item.cost, isForSale: item.isForSale || false }); setNewPrice(item.sellPrice || item.cost); }}
+                              className={`text-[9px] px-2 py-1 rounded border cursor-pointer ${item.isForSale ? "bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20" : "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20"}`}
                             >
-                              💰 تعیین قیمت فروش
+                              {item.isForSale ? "🟢 در فروشگاه" : "💰 تعیین قیمت فروش"}
                             </button>
                             <span className="text-[9px] text-amber-300/60">شما مخترع هستید</span>
                           </div>
@@ -544,21 +569,23 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
       </div>
 
       {/* INVENTION SHOP - Other users' inventions for sale */}
-      {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice).length > 0 && (
+      {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice && inv.forSaleUntil && new Date(inv.forSaleUntil) > new Date()).length > 0 && (
         <div className="rounded-lg border border-amber-500/20 bg-amber-950/10 p-6">
           <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-400 mb-4 font-sans">🏪 فروشگاه اختراعات</h2>
           <p className="text-[10px] text-slate-400 mb-4">اختراعات سایر کشورها برای خرید</p>
           <div className="space-y-2">
-            {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice).map(inv => {
+            {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice && inv.forSaleUntil && new Date(inv.forSaleUntil) > new Date()).map(inv => {
               const qty = shopQty[inv.id] || 1;
               const totalCost = (inv.sellPrice || 100) * qty;
               const canAfford = user.country.assets.gold >= totalCost;
+              const hoursLeft = Math.max(0, Math.round((new Date(inv.forSaleUntil!).getTime() - Date.now()) / (1000 * 60 * 60)));
               return (
                 <div key={inv.id} className="flex items-center justify-between gap-3 p-3 rounded border border-amber-500/10 bg-black/20">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-white font-bold truncate">{inv.name}</p>
                     <p className="text-[9px] text-slate-400">مخترع: {inv.inventorUsername} | 🇰 {inv.inventorCountryName}</p>
                     <p className="text-[9px] text-amber-400 font-mono">+{inv.militaryGained} MP | {inv.sellPrice} طلا/عدد</p>
+                    <p className="text-[8px] text-red-300/60 mt-0.5">⏰ {hoursLeft} ساعت باقی‌مانده</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => setShopQty(prev => ({ ...prev, [inv.id]: Math.max(1, qty - 1) }))} className="w-6 h-6 rounded bg-white/5 flex items-center justify-center text-white cursor-pointer">-</button>
