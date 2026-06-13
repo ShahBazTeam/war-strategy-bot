@@ -38,6 +38,52 @@ export default function AdminPanel({
   const [isLogsLoading, setIsLogsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
+  // New user creation states
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newCountry, setNewCountry] = useState("");
+  const [createdCredentials, setCreatedCredentials] = useState<{ username: string; password: string; country: string } | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const AVAILABLE_COUNTRIES = [
+    "ایران", "آمریکا", "چین", "روسیه", "هند", "ترکیه", "کره جنوبی", "ژاپن",
+    "بریتانیا", "فرانسه", "آلمان", "ایتالیا", "اسرائیل", "پاکستان", "مصر",
+    "عربستان", "برزیل", "کانادا", "استرالیا", "اندونزی", "ویتنام", "تایلند",
+    " لهستان", "اوکراین", "سوئد", "نروژ", "فنلاند", "یونان", "اسپانیا", "پرتغال"
+  ];
+
+  const generatePassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    let pass = "";
+    for (let i = 0; i < 10; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    setNewPassword(pass);
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUsername || !newPassword) {
+      alert("نام کاربری و رمز عبور الزامی است");
+      return;
+    }
+    setIsCreating(true);
+    try {
+      const res = await fetch("/api/admin/create-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-id": user.id },
+        body: JSON.stringify({ username: newUsername, password: newPassword, countryName: newCountry })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCreatedCredentials(data.credentials);
+        setNewUsername("");
+        setNewPassword("");
+        setNewCountry("");
+      } else {
+        alert(data.error);
+      }
+    } catch { alert("خطا در ایجاد کاربر"); }
+    setIsCreating(false);
+  };
+
   const loadLogs = async () => {
     setIsLogsLoading(true);
     try {
@@ -268,6 +314,86 @@ export default function AdminPanel({
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* CREATE NEW USER */}
+      <div className="rounded-xl bg-gradient-to-br from-emerald-950/30 to-green-950/20 border border-emerald-500/20 p-6 space-y-4">
+        <h2 className="text-sm font-black text-emerald-400 flex items-center gap-2">
+          <Users className="h-5 w-5" /> ایجاد کاربر جدید
+        </h2>
+        <p className="text-[10px] text-slate-400">فقط ادمین می‌تواند حساب کاربری ایجاد کند. رمز عبور را به کاربر پیام دهید.</p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="text-[10px] text-slate-400 block mb-1">نام کاربری</label>
+            <input
+              type="text"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              placeholder="username"
+              className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800 text-xs"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-400 block mb-1">رمز عبور</label>
+            <div className="flex gap-1">
+              <input
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="password"
+                className="flex-1 bg-slate-950 p-2 rounded text-white border border-slate-800 text-xs font-mono"
+              />
+              <button
+                onClick={generatePassword}
+                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] cursor-pointer"
+              >
+                🎲
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-400 block mb-1">کشور (اختیاری)</label>
+            <select
+              value={newCountry}
+              onChange={(e) => setNewCountry(e.target.value)}
+              className="w-full bg-slate-950 p-2 rounded text-white border border-slate-800 text-xs"
+            >
+              <option value="">انتخاب تصادفی</option>
+              {AVAILABLE_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <button
+          onClick={handleCreateUser}
+          disabled={isCreating || !newUsername || !newPassword}
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 text-white rounded text-xs font-bold cursor-pointer"
+        >
+          {isCreating ? "در حال ایجاد..." : "✅ ایجاد کاربر"}
+        </button>
+
+        {/* Show created credentials */}
+        {createdCredentials && (
+          <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-lg p-4 space-y-2">
+            <p className="text-xs font-bold text-emerald-400">✅ کاربر با موفقیت ایجاد شد!</p>
+            <div className="bg-black/30 rounded p-3 font-mono text-xs space-y-1">
+              <p className="text-white">👤 نام کاربری: <span className="text-emerald-400 font-bold">{createdCredentials.username}</span></p>
+              <p className="text-white">🔑 رمز عبور: <span className="text-yellow-400 font-bold">{createdCredentials.password}</span></p>
+              <p className="text-white">🌍 کشور: <span className="text-cyan-400 font-bold">{createdCredentials.country}</span></p>
+            </div>
+            <p className="text-[10px] text-slate-400">⚠️ این اطلاعات را به کاربر پیام دهید و سپس اینجا را ببندید.</p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`نام کاربری: ${createdCredentials.username}\nرمز عبور: ${createdCredentials.password}\nکشور: ${createdCredentials.country}`);
+                alert("کپی شد!");
+              }}
+              className="px-3 py-1 bg-white/5 border border-white/10 text-white rounded text-[10px] cursor-pointer hover:bg-white/10"
+            >
+              📋 کپی اطلاعات
+            </button>
           </div>
         )}
       </div>

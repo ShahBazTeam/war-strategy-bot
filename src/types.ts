@@ -30,6 +30,7 @@ export interface Country {
 export interface User {
   id: string;
   username: string;
+  password?: string;
   email?: string;
   isAdmin: boolean;
   country: Country;

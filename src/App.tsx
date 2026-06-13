@@ -706,25 +706,15 @@ export default function App() {
 
             <div className="flex gap-4 mb-6 border-b border-white/10 pb-2">
               <button
-                onClick={() => setIsRegisterMode(false)}
-                className={`flex-1 text-center py-2 text-xs font-bold tracking-widest uppercase transition-all ${
-                  !isRegisterMode ? "text-cyan-400 border-b-2 border-cyan-500" : "text-slate-500 hover:text-white"
-                }`}
+                className="flex-1 text-center py-2 text-xs font-bold tracking-widest uppercase text-cyan-400 border-b-2 border-cyan-500"
               >
-                ورود راهبران مجمع
-              </button>
-              <button
-                onClick={() => setIsRegisterMode(true)}
-                className={`flex-1 text-center py-2 text-xs font-bold tracking-widest uppercase transition-all ${
-                  isRegisterMode ? "text-cyan-400 border-b-2 border-cyan-500" : "text-slate-500 hover:text-white"
-                }`}
-              >
-                کابینه نوین (ثبت‌نام)
+                ورود به فرماندهی
               </button>
             </div>
+            <p className="text-[10px] text-slate-500 text-center mb-4">ثبت‌نام فقط توسط ادمین امکان‌پذیر است</p>
 
             {/* FORM BODY */}
-            <form onSubmit={isRegisterMode ? handleRegister : handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">شناسه کاربری کابینه (فرمانروا)</label>
                 <div className="relative">
@@ -836,10 +826,6 @@ export default function App() {
               >
                 {isAuthLoading ? (
                   <RefreshCw className="h-4 w-4 animate-spin text-black" />
-                ) : isRegisterMode ? (
-                  <>
-                    <UserPlus className="h-4 w-4" /> ثبت‌نام و تاسیس مقتدرانه کشور نوین
-                  </>
                 ) : (
                   <>
                     <RefreshCw className="h-4 w-4" /> امضای ورود به فرماندهی

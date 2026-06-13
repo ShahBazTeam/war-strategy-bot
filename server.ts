@@ -551,23 +551,31 @@ function getCatchUpMultipliers(user: User): { costMultiplier: number; powerGainM
 // API ENDPOINTS - AUTH & ACCOUNT
 // --------------------------------------------------------
 app.post("/api/auth/register", (req, res) => {
-  const { username, password, email, countryName, flagUrl, slogan } = req.body;
+  // Public registration is DISABLED - only admin can create accounts
+  return res.status(403).json({ error: "ثبت‌نام عمومی غیرفعال است. فقط ادمین می‌تواند حساب کاربری ایجاد کند." });
+});
+
+// Admin-only: Create user account
+app.post("/api/admin/create-user", checkRateLimit, (req, res) => {
+  const admin = getCurrentUser(req);
+  if (!admin || !admin.isAdmin) return res.status(403).json({ error: "فقط ادمین دسترسی دارد" });
+
+  const { username, password, countryName } = req.body;
   if (!username || !password) {
-    return res.status(400).json({ error: "لطفاً نام کاربری و رمز عبور را وارد کنید" });
+    return res.status(400).json({ error: "نام کاربری و رمز عبور الزامی است" });
   }
 
   const existing = db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
   if (existing) {
-    return res.status(400).json({ error: "شرمنده، نام کاربری تکراری است" });
+    return res.status(400).json({ error: "نام کاربری تکراری است" });
   }
 
-  // Assign random country not already assigned if possible
+  // Assign country
   const assignedCountries = db.users.map(u => u.country.originalName.toLowerCase());
   const remainingCountries = AVAILABLE_COUNTRIES.filter(c => !assignedCountries.includes(c.englishName.toLowerCase()));
   const pool = remainingCountries.length > 0 ? remainingCountries : AVAILABLE_COUNTRIES;
   let picked = pool[Math.floor(Math.random() * pool.length)];
 
-  // If user chose a specific country, validate it's not taken
   if (countryName) {
     const requestedLower = countryName.toLowerCase();
     const isTaken = db.users.some(u => {
@@ -576,9 +584,8 @@ app.post("/api/auth/register", (req, res) => {
       return origLower === requestedLower || nameLower === requestedLower;
     });
     if (isTaken) {
-      return res.status(400).json({ error: "این کشور قبلاً توسط کشور دیگری انتخاب شده است. لطفاً کشور دیگری برگزینید." });
+      return res.status(400).json({ error: "این کشور قبلاً انتخاب شده است" });
     }
-    // Find the matching country from AVAILABLE_COUNTRIES
     const matchedCountry = AVAILABLE_COUNTRIES.find(c => 
       c.englishName.toLowerCase() === requestedLower || 
       c.name.toLowerCase() === requestedLower
@@ -588,7 +595,6 @@ app.post("/api/auth/register", (req, res) => {
     }
   }
 
-  // Unequal, realistic starting assets based on chosen country
   let initialAssets: NationalAssets = {
     gold: 1000,
     militaryPower: 100,
@@ -599,90 +605,48 @@ app.post("/api/auth/register", (req, res) => {
     lastIncomeUpdate: Date.now()
   };
 
-  const selectedEng = (countryName || picked.englishName || "unknown").toLowerCase();
-  const selectedFa = (countryName || picked.name || "unknown");
-
-  if (["usa", "china", "russia", "آمریکا", "چین", "روسیه"].some(x => selectedEng.includes(x) || selectedFa.includes(x))) {
-    // Military-Industrial Superpowers
-    initialAssets = {
-      gold: 1100,
-      militaryPower: 150,
-      economicPower: 140,
-      resources: { oil: 100, steel: 100, food: 100 },
-      techLevel: 2,
-      factoryLevel: 1,
-      lastIncomeUpdate: Date.now()
-    };
-  } else if (["germany", "france", "uk", "japan", "south korea", "آلمان", "فرانسه", "بریتانیا", "ژاپن", "کره"].some(x => selectedEng.includes(x) || selectedFa.includes(x))) {
-    // High-Tech Economic Giants
-    initialAssets = {
-      gold: 1300,
-      militaryPower: 130,
-      economicPower: 160,
-      resources: { oil: 60, steel: 90, food: 80 },
-      techLevel: 3,
-      factoryLevel: 1,
-      lastIncomeUpdate: Date.now()
-    };
-  } else if (["saudi", "brazil", "canada", "australia", "عربستان", "برزیل", "کانادا", "استرالیا"].some(x => selectedEng.includes(x) || selectedFa.includes(x))) {
-    // Resource Superpowers
-    initialAssets = {
-      gold: 1400,
-      militaryPower: 110,
-      economicPower: 130,
-      resources: { oil: 160, steel: 120, food: 110 },
-      techLevel: 2,
-      factoryLevel: 1,
-      lastIncomeUpdate: Date.now()
-    };
-  } else if (["iran", "turkey", "india", "egypt", "ایران", "ترکیه", "هند", "مصر"].some(x => selectedEng.includes(x) || selectedFa.includes(x))) {
-    // Strategic Defense Regional Powers
-    initialAssets = {
-      gold: 1200,
-      militaryPower: 120,
-      economicPower: 110,
-      resources: { oil: 110, steel: 80, food: 95 },
-      techLevel: 1,
-      factoryLevel: 1,
-      lastIncomeUpdate: Date.now()
-    };
-  } else {
-    // Balanced Tech Sovereign
-    initialAssets = {
-      gold: 1200,
-      militaryPower: 100,
-      economicPower: 100,
-      resources: { oil: 80, steel: 80, food: 90 },
-      techLevel: 2,
-      factoryLevel: 1,
-      lastIncomeUpdate: Date.now()
-    };
-  }
-
-  const inventoryData = getInitialInventoryAndMP(picked.name, picked.englishName);
-  initialAssets.militaryPower = inventoryData.mp > 0 ? inventoryData.mp : initialAssets.militaryPower;
+  const selectedEng = (picked.englishName || "unknown").toLowerCase();
+  const inventory = getInitialInventoryAndMP(picked.name, picked.englishName);
+  initialAssets.militaryPower += inventory.mp;
 
   const newUser: User = {
-    id: "user_" + Math.random().toString(36).substring(2, 9),
-    username: username,
-    email: email || "",
+    id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    username,
+    password,
     isAdmin: false,
     country: {
-      name: countryName || picked.name,
+      name: picked.name,
       originalName: picked.englishName,
-      slogan: slogan || picked.slogan,
-      flagUrl: flagUrl || picked.flagUrl,
-      assets: initialAssets
+      slogan: picked.slogan,
+      flagUrl: picked.flagUrl,
+      assets: initialAssets,
     },
-    equipmentSlots: inventoryData.equipmentSlots,
-    warehouse: inventoryData.warehouse,
-    assetLog: [{ timestamp: "شروع", gold: initialAssets.gold, military: initialAssets.militaryPower, economy: initialAssets.economicPower }]
+    equipmentSlots: inventory.equipmentSlots,
+    warehouse: inventory.warehouse,
+    assetLog: [{ timestamp: "ثبت‌نام توسط ادمین", gold: initialAssets.gold, military: initialAssets.militaryPower, economy: initialAssets.economicPower }],
   };
 
   db.users.push(newUser);
   saveDatabase();
 
-  res.status(201).json({ user: newUser });
+  db.globalAnnouncements.unshift(`🎮 کشور جدید: ${picked.name} (${username}) به نقشه جهان پیوست!`);
+
+  res.json({ 
+    success: true, 
+    message: `کاربر ${username} با کشور ${picked.name} ایجاد شد`,
+    credentials: { username, password, country: picked.name }
+  });
+});
+
+// Admin: Generate random password
+app.get("/api/admin/generate-password", (req, res) => {
+  const admin = getCurrentUser(req);
+  if (!admin || !admin.isAdmin) return res.status(403).json({ error: "فقط ادمین" });
+  
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let pass = "";
+  for (let i = 0; i < 10; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  res.json({ password: pass });
 });
 
 app.post("/api/auth/login", (req, res) => {
