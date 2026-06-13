@@ -1588,40 +1588,70 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
   const attackerWeapons = getInventoryDesc(attacker);
   const defenderWeapons = getInventoryDesc(defender);
 
-  const prompt = `🔴 بلیط جنگ: شبیه‌سازی سینمایی نبرد حماسی بین:
+  const prompt = `🔴 جنگ راند ${roundNum}: شبیه‌سازی سینمایی نبرد
 
-⚔️ مهاجم: "${attacker.country.name}" (MP: ${attacker.country.assets.militaryPower} | GDP: ${attacker.country.assets.economicPower} | TECH: ${attacker.country.assets.techLevel})
-🛡️ مدافع: "${defender.country.name}" (MP: ${defender.country.assets.militaryPower} | GDP: ${defender.country.assets.economicPower} | TECH: ${defender.country.assets.techLevel})
+⚔️ مهاجم: "${attacker.country.name}"
+- قدرت نظامی: ${attacker.country.assets.militaryPower}
+- اقتصاد: ${attacker.country.assets.economicPower}
+- فناوری: ${attacker.country.assets.techLevel}
+- تسلیحات فعال: ${attackerWeapons}
+
+🛡️ مدافع: "${defender.country.name}"
+- قدرت نظامی: ${defender.country.assets.militaryPower}
+- اقتصاد: ${defender.country.assets.economicPower}
+- فناوری: ${defender.country.assets.techLevel}
+- تسلیحات فعال: ${defenderWeapons}
 
 📜 علت جنگ: "${war.casusBelli}"
-🎯 سناریوی دفاع مدافع: "${war.defenderDefenseScenario || "استقرار پدافندی در خطوط مرزی"}"
-🎬 راند شماره: ${roundNum}
-⚡ دستورات تاکتیکی مهاجم: "${attackerScenario}"
-⚡ دستورات تاکتیکی مدافع: "${defenderScenario}"
 
-🔫 تسلیحات مهاجم: ${attackerWeapons}
-🔫 تسلیحات مدافع: ${defenderWeapons}
+🎯 سناریوی تاکتیکی مهاجم:
+"${attackerScenario}"
 
-تو یک فیلمنامه‌نویس جنگی هالیوودی و تحلیلگر نظامی CNN هستی. این راند نبرد را مانند یک صحنه سینمایی اکشن روایت کن.
+🎯 سناریوی تاکتیکی مدافع:
+"${defenderScenario}"
 
-قوانین:
-- از اصطلاحات نظامی واقعی استفاده کن (مثل: عملیات آفندی، پاتک، شکست محاصره، بمباران دقیق)
-- نام تسلیحات واقعی را بیاور (F-35، S-400، Abrams، کروزموشک)
-- صحنه‌های دراماتیک بنویس (دود، آتش، انفجار، فرار نیروها)
-- حداکثر ۱۵۰ کلمه فارسی روان و سینمایی
-- اعداد تلفات باید واقعی باشد (بین ۵ تا ۳۰)
+=== قوانین بسیار مهم ===
+
+۱. سناریوی هر کاربر باید کاملاً رعایت شود:
+   - اگر مهاجم حمله زمینی گفت ← حمله زمینی انجام بده
+   - اگر مدافع گفت هیچ کاری نمیکنم ← مدافع هیچ کاری نکن و تلفات سنگین بخور
+   - اگر مهاجم گفت عقب‌نشینی میکنم ← مهاجم عقب‌نشینی کند و تلفات بده
+   - اگر مدافع گفت پاتک میزنم ← پاتک انجام بده
+   - دقیقاً بر اساس سناریوی کاربر عمل کن، نه چیز دیگر
+
+۲. نتیجه بر اساس قدرت واقعی + سناریو:
+   - اگر سناریوی مهاجم قوی باشد و مدافع هیچ کاری نکند → مهاجم پیروز مطلق
+   - اگر سناریوی مدافع قوی باشد و مهاجم ضعیف → مدافع پیروز
+   - اگر هر دو قوی باشند → بر اساس MP و تسلیحات تصمیم بگیر
+
+۳. تلفات واقعی و متناسب:
+   - طرفی که سناریوی بهتری دارد تلفات کمتری می‌دهد
+   - طرفی که هیچ کاری نمیکند تلفات بسیار سنگین می‌خورد
+   - تلفات بر اساس MP واقعی محاسبه شود (MP بالاتر = تلفات کمتر)
+
+۴. روایت سینمایی:
+   - مثل فیلم اکشن هالیوود بنویس
+   - از نام تسلیحات واقعی استفاده کن
+   - صحنه‌های دراماتیک بنویس (دود، آتش، انفجار، فرار)
+   - حداکثر ۱۵۰ کلمه فارسی سینمایی
+
+۵. درصد فتح سرزمین:
+   - مشخص کن چند درصد از سرزمین مدافع فتح شد
+   - اگر حمله زمینی قوی باشد و مدافع ضعیف → درصد بالا
+   - اگر مدافع قوی باشد → درصد کم یا صفر
 
 قالب JSON:
 {
-  "narrative": "متن سینمایی جنگ به فارسی...",
-  "attacker_loss": integer (5-30),
-  "defender_loss": integer (5-30),
-  "attacker_economy_damage": integer (1-15),
-  "defender_economy_damage": integer (1-15),
-  "attacker_resource_loss": { "oil": integer, "steel": integer, "food": integer },
-  "defender_resource_loss": { "oil": integer, "steel": integer, "food": integer },
-  "attacker_casualties": { "killed": integer, "wounded": integer, "civilians": integer, "aircraft_lost": integer, "tanks_lost": integer, "ships_lost": integer },
-  "defender_casualties": { "killed": integer, "wounded": integer, "civilians": integer, "aircraft_lost": integer, "tanks_lost": integer, "ships_lost": integer },
+  "narrative": "روایت سینمایی جنگ به فارسی...",
+  "attacker_loss": عدد (قدرت نظامی از دست رفته مهاجم),
+  "defender_loss": عدد (قدرت نظامی از دست رفته مدافع),
+  "attacker_economy_damage": عدد (خسارت اقتصادی مهاجم),
+  "defender_economy_damage": عدد (خسارت اقتصادی مدافع),
+  "attacker_resource_loss": { "oil": عدد, "steel": عدد, "food": 数字 },
+  "defender_resource_loss": { "oil": عدد, "steel": عدد, "food": 数字 },
+  "attacker_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": 数字, "ships_lost": عدد },
+  "defender_casualties": { "killed": عدد, "wounded": عدد, "civilians": عدد, "aircraft_lost": عدد, "tanks_lost": 数字, "ships_lost": عدد },
+  "territory_conquered_percent": عدد (درصد سرزمین فتح شده از ۰ تا ۱۰۰),
   "winner_advantage": "attacker" | "defender" | "none",
   "suggested_next_action": "continue" | "ceasefire"
 }`;
@@ -1679,14 +1709,16 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         required: ["killed", "wounded", "civilians", "aircraft_lost", "tanks_lost", "ships_lost"]
       },
       winner_advantage: { type: Type.STRING, description: "Which country got upper hand: 'attacker', 'defender', 'none'." },
-      suggested_next_action: { type: Type.STRING, description: "Next recommended action: 'continue' or 'ceasefire'." }
+      suggested_next_action: { type: Type.STRING, description: "Next recommended action: 'continue' or 'ceasefire'." },
+      territory_conquered_percent: { type: Type.NUMBER, description: "Percentage of defender territory conquered (0-100)." }
     },
     required: [
       "narrative", "attacker_loss", "defender_loss", 
       "attacker_economy_damage", "defender_economy_damage",
       "attacker_resource_loss", "defender_resource_loss",
       "attacker_casualties", "defender_casualties",
-      "winner_advantage", "suggested_next_action"
+      "winner_advantage", "suggested_next_action",
+      "territory_conquered_percent"
     ]
   };
 
@@ -1804,7 +1836,7 @@ app.post("/api/diplomacy/battle-round", checkRateLimit, async (req, res) => {
         username: "اتاق_جنگ",
         countryName: "system",
         flagUrl: "",
-        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🪦 تلفات مهاجم:\nکشته: ${parsed.attacker_casualties?.killed || 0} | زخمی: ${parsed.attacker_casualties?.wounded || 0}\nغیرنظامی: ${parsed.attacker_casualties?.civilians || 0}\nجنگنده: ${parsed.attacker_casualties?.aircraft_lost || 0} | تانک: ${parsed.attacker_casualties?.tanks_lost || 0}\n\n🪦 تلفات مدافع:\nکشته: ${parsed.defender_casualties?.killed || 0} | زخمی: ${parsed.defender_casualties?.wounded || 0}\nغیرنظامی: ${parsed.defender_casualties?.civilians || 0}\nجنگنده: ${parsed.defender_casualties?.aircraft_lost || 0} | تانک: ${parsed.defender_casualties?.tanks_lost || 0}\n\n🔴 ${attacker.country.name} MP: ${attacker.country.assets.militaryPower} | 🛡️ ${defender.country.name} MP: ${defender.country.assets.militaryPower}`,
+        text: `⚔️ گزارش راند ${roundNum} جنگ\n\n${attacker.country.name} 🆚 ${defender.country.name}\n\n📜 دلیل: ${war.casusBelli}\n\n💥 ${parsed.narrative}\n\n📊 نتیجه راند:\n${parsed.winner_advantage === "attacker" ? `🏆 برتری: ${attacker.country.name}` : parsed.winner_advantage === "defender" ? `🏆 برتری: ${defender.country.name}` : "⚖️ تساوی"}\n\n🌍 درصد فتح: ${parsed.territory_conquered_percent || 0}%\n\n🪦 تلفات مهاجم:\nکشته: ${parsed.attacker_casualties?.killed || 0} | زخمی: ${parsed.attacker_casualties?.wounded || 0}\nغیرنظامی: ${parsed.attacker_casualties?.civilians || 0}\nجنگنده: ${parsed.attacker_casualties?.aircraft_lost || 0} | تانک: ${parsed.attacker_casualties?.tanks_lost || 0}\n\n🪦 تلفات مدافع:\nکشته: ${parsed.defender_casualties?.killed || 0} | زخمی: ${parsed.defender_casualties?.wounded || 0}\nغیرنظامی: ${parsed.defender_casualties?.civilians || 0}\nجنگنده: ${parsed.defender_casualties?.aircraft_lost || 0} | تانک: ${parsed.defender_casualties?.tanks_lost || 0}\n\n🔴 ${attacker.country.name} MP: ${attacker.country.assets.militaryPower} | 🛡️ ${defender.country.name} MP: ${defender.country.assets.militaryPower}`,
         timestamp: new Date().toISOString(),
         likes: [],
         comments: []

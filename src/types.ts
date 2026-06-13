@@ -106,6 +106,7 @@ export interface CombatRoundResponse {
   defender_casualties: CasualtyReport;
   winner_advantage: 'attacker' | 'defender' | 'none';
   suggested_next_action: 'continue' | 'ceasefire';
+  territory_conquered_percent?: number;
 }
 
 export interface WarReasonSubmission {

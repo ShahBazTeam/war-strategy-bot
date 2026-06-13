@@ -411,6 +411,15 @@ export default function Diplomacy({
                               </div>
                               <p className="text-slate-300 leading-relaxed font-sans">{r.resolution.narrative}</p>
                               
+                              {r.resolution.territory_conquered_percent !== undefined && r.resolution.territory_conquered_percent > 0 && (
+                                <div className="bg-amber-950/20 border border-amber-500/20 rounded p-2 text-[10px]">
+                                  <span className="text-amber-400 font-bold">🌍 درصد فتح سرزمین: {r.resolution.territory_conquered_percent}%</span>
+                                  <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
+                                    <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${Math.min(100, r.resolution.territory_conquered_percent)}%` }} />
+                                  </div>
+                                </div>
+                              )}
+                              
                               <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400 font-mono mt-1 border-t border-slate-900/50 pt-1">
                                 <div>
                                   <p className="font-semibold text-rose-400">تلفات مهاجم:</p>
