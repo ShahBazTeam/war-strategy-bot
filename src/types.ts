@@ -50,6 +50,8 @@ export interface EquipmentItem {
   isInvention?: boolean;
   inventorUsername?: string;
   inventorCountryName?: string;
+  sellPrice?: number; // Price inventor sets for selling to others
+  isForSale?: boolean; // Is inventor selling this?
 }
 
 export interface TradeOffer {

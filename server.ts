@@ -831,6 +831,11 @@ const buyWeaponHandler = (req, res) => {
   
   if (!config && !inventedItem) return res.status(400).json({ error: "نوع تجهیزات معتبر نیست" });
 
+  // Block non-inventors from buying inventions directly - they must buy from inventor shop
+  if (!config && inventedItem && inventedItem.inventorUsername !== user.username) {
+    return res.status(403).json({ error: `این اختراع متعلق به ${inventedItem.inventorUsername} است. برای خرید باید از فروشگاه اختراعات خریداری کنید.` });
+  }
+
   if (config && config.tags && config.tags.length > 0) {
     const userCountryFa = user.country.name.toLowerCase();
     const userCountryEn = user.country.originalName ? user.country.originalName.toLowerCase() : "";
@@ -2532,6 +2537,72 @@ app.post("/api/admin/delete-all-users", (req, res) => {
 
 app.get("/api/inventions", (req, res) => {
   res.json({ inventions: db.inventions || [] });
+});
+
+// Set invention sell price (inventor only)
+app.post("/api/inventions/:id/set-price", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { id } = req.params;
+  const { sellPrice, isForSale } = req.body;
+
+  const inv = db.inventions.find(i => i.id === id);
+  if (!inv) return res.status(404).json({ error: "اختراع یافت نشد" });
+  if (inv.inventorUsername !== user.username) return res.status(403).json({ error: "فقط مخترع می‌تواند قیمت تعیین کند" });
+
+  inv.sellPrice = Math.max(10, Math.min(5000, Number(sellPrice) || 100));
+  inv.isForSale = isForSale !== false;
+
+  saveDatabase();
+  res.json({ success: true, invent: inv, message: `قیمت فروش ${inv.name}: ${inv.sellPrice} طلا` });
+});
+
+// Buy invention from another user's inventor shop
+app.post("/api/inventions/:id/buy", checkRateLimit, (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user) return res.status(401).json({ error: "ورود لغو شد" });
+
+  const { id } = req.params;
+  const { quantity } = req.body;
+  const q = Math.max(1, Math.min(99, Number(quantity) || 1));
+
+  const inv = db.inventions.find(i => i.id === id);
+  if (!inv) return res.status(404).json({ error: "اختراع یافت نشد" });
+  if (!inv.isForSale) return res.status(400).json({ error: "این اختراع فروشی نیست" });
+  if (inv.inventorUsername === user.username) return res.status(400).json({ error: "شما خودتان مخترع این اختراع هستید! از انبار خود خریداری کنید." });
+
+  const sellPrice = inv.sellPrice || 100;
+  const totalCost = sellPrice * q;
+
+  if (user.country.assets.gold < totalCost) {
+    return res.status(400).json({ error: `هزینه: ${totalCost} طلا. طلا کافی ندارید.` });
+  }
+
+  // Find inventor user
+  const inventor = db.users.find(u => u.username === inv.inventorUsername);
+  if (!inventor) return res.status(400).json({ error: "مخترع یافت نشد" });
+
+  // Transfer gold
+  user.country.assets.gold -= totalCost;
+  inventor.country.assets.gold += totalCost;
+
+  // Add to buyer's warehouse
+  if (!user.warehouse[id]) user.warehouse[id] = 0;
+  user.warehouse[id] += q;
+
+  if (user.equipmentSlots.length < 15 && !user.equipmentSlots.includes(id)) {
+    user.equipmentSlots.push(id);
+  }
+
+  updateAndLogUserAssets(user);
+  updateAndLogUserAssets(inventor);
+  saveDatabase();
+
+  res.json({ 
+    user, 
+    message: `${q} عدد ${inv.name} از ${inventor.username} خریداری شد. هزینه: ${totalCost} طلا` 
+  });
 });
 
 // CRON-LIKE FORCE UPDATE OF PRICES USING GEMINI VALUE FORECASTING

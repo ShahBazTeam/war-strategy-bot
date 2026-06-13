@@ -42,6 +42,9 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [scrapModal, setScrapModal] = useState<{ id: string; name: string; maxQty: number } | null>(null);
   const [scrapQty, setScrapQty] = useState(1);
+  const [priceModal, setPriceModal] = useState<{ id: string; name: string; currentPrice: number } | null>(null);
+  const [newPrice, setNewPrice] = useState(100);
+  const [shopQty, setShopQty] = useState<Record<string, number>>({});
   
   const getWeaponDetails = (id: string) => {
     // First check warehouseNames (from server buy response)
@@ -117,8 +120,8 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
     if (currentlyActive) {
       newActive = newActive.filter(x => x !== id);
     } else {
-      if (newActive.length >= 6) {
-        alert("جعبه تسلیحات فعال شما پر است! حداکثر ۶ اسلات فعال مجاز است.");
+      if (newActive.length >= 15) {
+        alert("جعبه تسلیحات فعال شما پر است! حداکثر ۱۵ اسلات فعال مجاز است.");
         return;
       }
       if (!newActive.includes(id)) {
@@ -150,6 +153,43 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
     }
     setScrapModal(null);
     setScrapQty(1);
+  };
+
+  const handleSetPrice = async () => {
+    if (!priceModal) return;
+    try {
+      const res = await fetch(`/api/inventions/${priceModal.id}/set-price`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-id": user.id },
+        body: JSON.stringify({ sellPrice: newPrice, isForSale: true })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setPriceModal(null);
+      } else {
+        alert(data.error);
+      }
+    } catch { alert("خطا در ثبت قیمت"); }
+  };
+
+  const handleBuyFromInventor = async (invId: string) => {
+    const qty = shopQty[invId] || 1;
+    try {
+      const res = await fetch(`/api/inventions/${invId}/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-id": user.id },
+        body: JSON.stringify({ quantity: qty })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        // Refresh page to update user data
+        window.location.reload();
+      } else {
+        alert(data.error);
+      }
+    } catch { alert("خطا در خرید"); }
   };
 
   const incrementQty = (id: string) => {
@@ -211,6 +251,50 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
                 className="flex-1 py-2.5 rounded-lg border border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold cursor-pointer"
               >
                 اسقاط {scrapQty} عدد
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Price Setting Modal for Inventors */}
+      {priceModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setPriceModal(null)}>
+          <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-6 w-full max-w-sm space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-amber-400">💰 تعیین قیمت فروش</h3>
+              <button onClick={() => setPriceModal(null)} className="text-slate-400 hover:text-white cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-300">{priceModal.name}</p>
+            <p className="text-[10px] text-slate-500">قیمت فعلی: {priceModal.currentPrice} طلا</p>
+            
+            <div>
+              <label className="block text-[10px] text-slate-400 mb-1">قیمت جدید (طلا)</label>
+              <input
+                type="number"
+                min="10"
+                max="5000"
+                value={newPrice}
+                onChange={(e) => setNewPrice(Math.max(10, parseInt(e.target.value) || 100))}
+                className="w-full bg-black/50 border border-amber-500/20 rounded-lg p-2 text-white font-mono text-sm"
+                inputMode="numeric"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPriceModal(null)}
+                className="flex-1 py-2.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold cursor-pointer"
+              >
+                انصراف
+              </button>
+              <button
+                onClick={handleSetPrice}
+                className="flex-1 py-2.5 rounded-lg border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-bold cursor-pointer"
+              >
+                ثبت قیمت
               </button>
             </div>
           </div>
@@ -310,6 +394,17 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
                           <span className="text-[10px] text-amber-400 font-mono font-bold">{item.cost} طلا</span>
                         </div>
                         <p className="text-slate-400 text-xs mt-2.5 leading-relaxed font-serif text-slate-300">{item.desc}</p>
+                        {item.isInvention && item.inventorUsername === user.username && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <button
+                              onClick={() => { setPriceModal({ id: item.id, name: item.name, currentPrice: item.cost }); setNewPrice(item.cost); }}
+                              className="text-[9px] px-2 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 cursor-pointer"
+                            >
+                              💰 تعیین قیمت فروش
+                            </button>
+                            <span className="text-[9px] text-amber-300/60">شما مخترع هستید</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-2 mt-4">
@@ -447,6 +542,42 @@ export default function Armory({ user, inventions, warehouseNames, onBuyWeapon, 
           )}
         </div>
       </div>
+
+      {/* INVENTION SHOP - Other users' inventions for sale */}
+      {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice).length > 0 && (
+        <div className="rounded-lg border border-amber-500/20 bg-amber-950/10 p-6">
+          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-400 mb-4 font-sans">🏪 فروشگاه اختراعات</h2>
+          <p className="text-[10px] text-slate-400 mb-4">اختراعات سایر کشورها برای خرید</p>
+          <div className="space-y-2">
+            {inventions.filter(inv => inv.inventorUsername !== user.username && inv.isForSale && inv.sellPrice).map(inv => {
+              const qty = shopQty[inv.id] || 1;
+              const totalCost = (inv.sellPrice || 100) * qty;
+              const canAfford = user.country.assets.gold >= totalCost;
+              return (
+                <div key={inv.id} className="flex items-center justify-between gap-3 p-3 rounded border border-amber-500/10 bg-black/20">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-white font-bold truncate">{inv.name}</p>
+                    <p className="text-[9px] text-slate-400">مخترع: {inv.inventorUsername} | 🇰 {inv.inventorCountryName}</p>
+                    <p className="text-[9px] text-amber-400 font-mono">+{inv.militaryGained} MP | {inv.sellPrice} طلا/عدد</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => setShopQty(prev => ({ ...prev, [inv.id]: Math.max(1, qty - 1) }))} className="w-6 h-6 rounded bg-white/5 flex items-center justify-center text-white cursor-pointer">-</button>
+                    <span className="text-xs text-white font-mono w-6 text-center">{qty}</span>
+                    <button onClick={() => setShopQty(prev => ({ ...prev, [inv.id]: qty + 1 }))} className="w-6 h-6 rounded bg-white/5 flex items-center justify-center text-white cursor-pointer">+</button>
+                    <button
+                      onClick={() => handleBuyFromInventor(inv.id)}
+                      disabled={!canAfford}
+                      className={`px-3 py-1.5 rounded text-[9px] font-bold cursor-pointer ${canAfford ? "bg-amber-500/20 border border-amber-500/40 text-amber-400 hover:bg-amber-500/30" : "bg-white/5 text-slate-500 cursor-not-allowed"}`}
+                    >
+                      {canAfford ? `خرید ${totalCost}💰` : "کمبود طلا"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
