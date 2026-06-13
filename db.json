@@ -822,11 +822,11 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 2500,
+          "gold": 3420,
           "militaryPower": 48047,
           "economicPower": 167,
           "resources": {
-            "oil": 76.5,
+            "oil": 26.5,
             "steel": 23.5,
             "food": 86.5
           },
@@ -857,36 +857,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۰:۱۶:۵۲",
-          "gold": 582.6,
-          "military": 47975,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۱۶:۵۹",
-          "gold": 689.5,
-          "military": 47975,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۱۸:۰۲",
-          "gold": 796.4,
-          "military": 47975,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۱۸:۴۳",
-          "gold": 76.4,
-          "military": 48047,
-          "economy": 167
-        },
-        {
-          "timestamp": "۲۰:۱۹:۰۵",
-          "gold": 183.3,
-          "military": 48047,
-          "economy": 167
-        },
         {
           "timestamp": "۲۰:۱۹:۳۶",
           "gold": 485.3,
@@ -944,6 +914,36 @@
         {
           "timestamp": "۲۰:۲۲:۳۹",
           "gold": 2500,
+          "military": 48047,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۲۲:۴۰",
+          "gold": 2684,
+          "military": 48047,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۲۲:۴۰",
+          "gold": 2868,
+          "military": 48047,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۲۲:۴۰",
+          "gold": 3052,
+          "military": 48047,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۲۲:۴۰",
+          "gold": 3236,
+          "military": 48047,
+          "economy": 167
+        },
+        {
+          "timestamp": "۲۰:۲۲:۴۰",
+          "gold": 3420,
           "military": 48047,
           "economy": 167
         }
