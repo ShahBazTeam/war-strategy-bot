@@ -405,11 +405,11 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 10347.5,
+          "gold": 8007.5,
           "militaryPower": 37932,
           "economicPower": 140,
           "resources": {
-            "oil": 3229.3,
+            "oil": 3329.3,
             "steel": 2280.7,
             "food": 2360.3
           },
@@ -441,12 +441,6 @@
         "chn_nuke": 35
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۳۶:۴۰",
-          "gold": 14967.5,
-          "military": 37932,
-          "economy": 140
-        },
         {
           "timestamp": "۲۱:۳۶:۴۲",
           "gold": 13587.5,
@@ -528,6 +522,12 @@
         {
           "timestamp": "۲۱:۴۱:۲۲",
           "gold": 10347.5,
+          "military": 37932,
+          "economy": 140
+        },
+        {
+          "timestamp": "۲۱:۴۱:۳۹",
+          "gold": 8007.5,
           "military": 37932,
           "economy": 140
         }
@@ -822,15 +822,15 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 4391.3,
+          "gold": 2891.3,
           "militaryPower": 48047,
-          "economicPower": 227,
+          "economicPower": 247,
           "resources": {
             "oil": 8674.5,
             "steel": 8721.5,
             "food": 9234.5
           },
-          "techLevel": 3,
+          "techLevel": 4,
           "factoryLevel": 10,
           "lastIncomeUpdate": 1781386858616
         }
@@ -858,12 +858,6 @@
         "rus_nuke": 45
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۳۵:۴۵",
-          "gold": 9410.2,
-          "military": 48047,
-          "economy": 197
-        },
         {
           "timestamp": "۲۱:۳۵:۴۶",
           "gold": 11230.2,
@@ -947,6 +941,12 @@
           "gold": 4391.3,
           "military": 48047,
           "economy": 227
+        },
+        {
+          "timestamp": "۲۱:۴۱:۳۱",
+          "gold": 2891.3,
+          "military": 48047,
+          "economy": 247
         }
       ]
     },
