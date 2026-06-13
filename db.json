@@ -1558,7 +1558,8 @@
       "actionType": "ceasefire",
       "sourceUserId": "user_1781376553710_mgz8a2x",
       "votesYes": [
-        "user_1781376553710_mgz8a2x"
+        "user_1781376553710_mgz8a2x",
+        "user_1781376457938_dt68hxp"
       ],
       "votesNo": [],
       "status": "active",
