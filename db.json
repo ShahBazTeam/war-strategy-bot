@@ -10,17 +10,17 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 50840,
+          "gold": 50900,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 514,
-            "steel": 640,
-            "food": 640
+            "oil": 515,
+            "steel": 650,
+            "food": 650
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781371721163
+          "lastIncomeUpdate": 1781371781163
         }
       },
       "equipmentSlots": [],
@@ -109,6 +109,12 @@
           "gold": 50840,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۳۰:۲۷",
+          "gold": 50900,
+          "military": 100,
+          "economy": 100
         }
       ]
     },
@@ -123,17 +129,17 @@
         "slogan": "اتحاد و عدالت و آزادی",
         "flagUrl": "🇩🇪",
         "assets": {
-          "gold": 148,
+          "gold": 154,
           "militaryPower": 622,
           "economicPower": 100,
           "resources": {
             "oil": 20,
-            "steel": 23.9,
-            "food": 22.6
+            "steel": 24.2,
+            "food": 22.8
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781371672280
+          "lastIncomeUpdate": 1781371732280
         }
       },
       "equipmentSlots": [
@@ -153,12 +159,6 @@
         "ger_iris": 1
       },
       "assetLog": [
-        {
-          "timestamp": "ثبت‌نام توسط ادمین",
-          "gold": 300,
-          "military": 594,
-          "economy": 100
-        },
         {
           "timestamp": "۱۷:۱۵:۵۲",
           "gold": 70,
@@ -240,6 +240,12 @@
         {
           "timestamp": "۱۷:۲۸:۲۸",
           "gold": 148,
+          "military": 622,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۷:۲۹:۲۷",
+          "gold": 154,
           "military": 622,
           "economy": 100
         }
