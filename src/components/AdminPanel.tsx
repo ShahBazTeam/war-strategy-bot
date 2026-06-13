@@ -186,20 +186,41 @@ export default function AdminPanel({
           <h2 className="text-sm font-bold text-amber-300 flex items-center gap-1.5">
             <Users className="h-5 w-5" /> مدیریت کاربران و کشورها
           </h2>
-          <button
-            onClick={async () => {
-              if (!confirm("⚠️ هشدار: تمام کشورها، کاربران، جنگ‌ها، اتحادها، معاملات، اختراعات، توییت‌ها و قیمت‌ها پاک می‌شوند!\n\nآیا کاملاً مطمئنید؟")) return;
-              if (!confirm("最后一次 تایید: تمام داده‌ها برای همیشه حذف می‌شوند!")) return;
-              setIsProcessing("delete_all");
-              await onAdminDeleteAllUsers();
-              setIsProcessing(null);
-            }}
-            disabled={isProcessing === "delete_all"}
-            className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
-          >
-            <AlertTriangle className="h-3.5 w-3.5" />
-            {isProcessing === "delete_all" ? "در حال ریست کامل..." : "🔄 ریست کامل بازی (حذف همه چیز)"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                if (!confirm("آیا MP همه کاربران بر اساس تجهیزات فعلی بازمحاسبه شود؟")) return;
+                setIsProcessing("recalc_mp");
+                try {
+                  const resp = await fetch("/api/admin/recalculate-mp", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+                  });
+                  const data = await resp.json();
+                  alert(data.message || "انجام شد");
+                } catch { alert("خطا"); }
+                setIsProcessing(null);
+              }}
+              disabled={isProcessing === "recalc_mp"}
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
+            >
+              {isProcessing === "recalc_mp" ? "در حال بازمحاسبه..." : "🔄 بازمحاسبه MP همه کاربران"}
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm("⚠️ هشدار: تمام کشورها، کاربران، جنگ‌ها، اتحادها، معاملات، اختراعات، توییت‌ها و قیمت‌ها پاک می‌شوند!\n\nآیا کاملاً مطمئنید؟")) return;
+                if (!confirm("最后一次 تایید: تمام داده‌ها برای همیشه حذف می‌شوند!")) return;
+                setIsProcessing("delete_all");
+                await onAdminDeleteAllUsers();
+                setIsProcessing(null);
+              }}
+              disabled={isProcessing === "delete_all"}
+              className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 text-white text-xs font-bold rounded transition cursor-pointer"
+            >
+              <AlertTriangle className="h-3.5 w-3.5" />
+              {isProcessing === "delete_all" ? "در حال ریست کامل..." : "🔄 ریست کامل بازی (حذف همه چیز)"}
+            </button>
+          </div>
         </div>
 
         {allUsers.length === 0 ? (

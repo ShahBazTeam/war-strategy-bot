@@ -2892,6 +2892,28 @@ app.post("/api/admin/override-war", (req, res) => {
   res.json({ war, message: "فایل جنگ بازنویسی شد" });
 });
 
+// RECALCULATE ALL USERS MP FROM WAREHOUSE (uses current CATALOG values)
+app.post("/api/admin/recalculate-mp", (req, res) => {
+  const user = getCurrentUser(req);
+  if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });
+
+  let updated = 0;
+  for (const u of db.users) {
+    let totalMp = 0;
+    for (const [wpnId, count] of Object.entries(u.warehouse)) {
+      const wpnConfig = CATALOG.find(c => c.id === wpnId);
+      if (wpnConfig && count > 0) {
+        totalMp += wpnConfig.mp * (count as number);
+      }
+    }
+    u.country.assets.militaryPower = totalMp;
+    updated++;
+  }
+
+  saveDatabase();
+  res.json({ message: `MP ${updated} کاربر بازمحاسبه شد بر اساس تجهیزات فعلی.`, updated });
+});
+
 app.post("/api/admin/broadcast", (req, res) => {
   const user = getCurrentUser(req);
   if (!user || !user.isAdmin) return res.status(403).json({ error: "ورود لغو شد" });

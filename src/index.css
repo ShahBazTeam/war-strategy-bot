@@ -46,3 +46,24 @@ body {
   animation: pulse-glow 3s infinite;
 }
 
+/* Marquee Ticker Animation */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+@keyframes marquee-rtl {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-marquee {
+  animation: marquee-rtl 20s linear infinite;
+  white-space: nowrap;
+  min-width: max-content;
+}
+@media (max-width: 640px) {
+  .animate-marquee {
+    animation-duration: 15s;
+    font-size: 9px;
+  }
+}
+

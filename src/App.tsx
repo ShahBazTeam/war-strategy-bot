@@ -891,13 +891,13 @@ export default function App() {
         <div className="flex flex-col min-h-screen">
           
           {/* IMPECCABLE NEW BALANCE ROLLBOARD (global event tracker ticker banner) */}
-          <div className="bg-black border-b border-white/10 py-2.5 text-[10px] overflow-hidden whitespace-nowrap relative z-20 shadow-sm">
-            <div className="flex items-center gap-3.5 px-6 shrink-0 inline-flex animate-marquee">
-              <span className="font-bold text-cyan-400 flex items-center gap-1 uppercase tracking-widest">
-                <BellRing className="h-3 w-3 text-cyan-400" /> پیجر راداری زنده ملل:
+          <div className="bg-black border-b border-white/10 py-2.5 text-[10px] overflow-hidden relative z-20 shadow-sm">
+            <div className="flex items-center gap-3.5 px-4 sm:px-6 shrink-0 inline-flex animate-marquee">
+              <span className="font-bold text-cyan-400 flex items-center gap-1 uppercase tracking-widest whitespace-nowrap">
+                <BellRing className="h-3 w-3 text-cyan-400 shrink-0" /> <span className="hidden sm:inline">پیجر راداری زنده ملل:</span><span className="sm:hidden">رادار:</span>
               </span>
-              <span className="text-slate-400 font-mono tracking-wider">
-                {announcementText || "صلح در تمام قاره‌ها برقرار گردیده است. مجمع عمومی سازمان ملل فعال و ناظر بر امور است."}
+              <span className="text-slate-400 font-mono tracking-wider whitespace-nowrap">
+                {announcementText || "صلح در تمام قاره‌ها برقرار گردیده است."}
               </span>
             </div>
           </div>
