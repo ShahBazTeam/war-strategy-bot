@@ -961,12 +961,12 @@
         "slogan": "حق من و خداوند من",
         "flagUrl": "🇬🇧",
         "assets": {
-          "gold": 8548,
+          "gold": 9140.8,
           "militaryPower": 22847,
           "economicPower": 100,
           "resources": {
             "oil": 17.8,
-            "steel": 91.2,
+            "steel": 72.2,
             "food": 190.2
           },
           "techLevel": 1,
@@ -997,12 +997,6 @@
         "uk_nuke": 22
       },
       "assetLog": [
-        {
-          "timestamp": "۲۱:۱۹:۰۴",
-          "gold": 3554,
-          "military": 22847,
-          "economy": 100
-        },
         {
           "timestamp": "۲۱:۱۹:۰۹",
           "gold": 3158.8,
@@ -1084,6 +1078,12 @@
         {
           "timestamp": "۲۱:۲۰:۲۳",
           "gold": 8548,
+          "military": 22847,
+          "economy": 100
+        },
+        {
+          "timestamp": "۲۱:۲۰:۲۴",
+          "gold": 9140.8,
           "military": 22847,
           "economy": 100
         }
