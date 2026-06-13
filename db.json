@@ -214,6 +214,51 @@
           "economy": 100
         }
       ]
+    },
+    {
+      "id": "user_1781376404703_cctxvbo",
+      "username": "kia",
+      "password": "8931",
+      "isAdmin": false,
+      "country": {
+        "name": "استرالیا",
+        "originalName": "Australia",
+        "slogan": "پیش به سوی جلو استرالیا",
+        "flagUrl": "🇦🇺",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 450,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781376404703
+        }
+      },
+      "equipmentSlots": [
+        "aus_abrams",
+        "aus_f35",
+        "aus_hobart",
+        "aus_collins"
+      ],
+      "warehouse": {
+        "aus_abrams": 1,
+        "aus_f35": 5,
+        "aus_hobart": 1,
+        "aus_collins": 1
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 450,
+          "economy": 100
+        }
+      ]
     }
   ],
   "tradeOffers": [],
@@ -230,6 +275,7 @@
     "lastUpdated": "2026-06-13T18:42:22.167Z"
   },
   "globalAnnouncements": [
+    "🎮 کشور جدید: استرالیا (kia) به نقشه جهان پیوست!",
     "🎮 کشور جدید: چین (yuki) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ژاپن (aidy) به نقشه جهان پیوست!",
     "🎮 کشور جدید: ایران (mohsen) به نقشه جهان پیوست!",
