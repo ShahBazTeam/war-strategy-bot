@@ -126,7 +126,7 @@ export default function Market({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "x-user-id": user.id
         },
         body: JSON.stringify({ amount })
       });
