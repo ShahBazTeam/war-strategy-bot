@@ -33,65 +33,6 @@
           "economy": 100
         }
       ]
-    },
-    {
-      "id": "user_1781376224131_hjvokp4",
-      "username": "mosen",
-      "password": "eAb4FMyqPLKde9NeiAdp",
-      "isAdmin": false,
-      "country": {
-        "name": "ایران",
-        "originalName": "Iran",
-        "slogan": "استقلال، آزادی، جمهوری اسلامی",
-        "flagUrl": "🇮🇷",
-        "assets": {
-          "gold": 300,
-          "militaryPower": 1479,
-          "economicPower": 100,
-          "resources": {
-            "oil": 20,
-            "steel": 20,
-            "food": 20
-          },
-          "techLevel": 1,
-          "factoryLevel": 1,
-          "lastIncomeUpdate": 1781376224131
-        }
-      },
-      "equipmentSlots": [
-        "irn_karrar",
-        "irn_bmp2",
-        "irn_kowsar",
-        "irn_chopper",
-        "irn_jamaran",
-        "irn_submarine",
-        "irn_bavar",
-        "irn_khorramshahr",
-        "irn_fattah",
-        "irn_hoveyzeh",
-        "irn_shahed"
-      ],
-      "warehouse": {
-        "irn_karrar": 15,
-        "irn_bmp2": 10,
-        "irn_kowsar": 3,
-        "irn_chopper": 1,
-        "irn_jamaran": 1,
-        "irn_submarine": 1,
-        "irn_bavar": 1,
-        "irn_khorramshahr": 5,
-        "irn_fattah": 2,
-        "irn_hoveyzeh": 3,
-        "irn_shahed": 20
-      },
-      "assetLog": [
-        {
-          "timestamp": "ثبت‌نام توسط ادمین",
-          "gold": 300,
-          "military": 1479,
-          "economy": 100
-        }
-      ]
     }
   ],
   "tradeOffers": [],
