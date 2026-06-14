@@ -272,17 +272,17 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 205706,
+          "gold": 207786,
           "militaryPower": 10605,
           "economicPower": 650,
           "resources": {
             "oil": null,
-            "steel": 757.1,
-            "food": 609.5
+            "steel": 1095.1,
+            "food": 879.9
           },
           "techLevel": 19,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781432314409
+          "lastIncomeUpdate": 1781432434409
         }
       },
       "equipmentSlots": [
@@ -308,18 +308,6 @@
         "chn_nuke": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۱۰:۱۵:۱۱",
-          "gold": 365306,
-          "military": 10605,
-          "economy": 570
-        },
-        {
-          "timestamp": "۱۰:۱۵:۱۱",
-          "gold": 349406,
-          "military": 10605,
-          "economy": 580
-        },
         {
           "timestamp": "۱۰:۱۵:۱۱",
           "gold": 332306,
@@ -395,6 +383,18 @@
         {
           "timestamp": "۱۰:۱۹:۲۶",
           "gold": 205706,
+          "military": 10605,
+          "economy": 650
+        },
+        {
+          "timestamp": "۱۰:۱۹:۳۸",
+          "gold": 206746,
+          "military": 10605,
+          "economy": 650
+        },
+        {
+          "timestamp": "۱۰:۲۰:۳۴",
+          "gold": 207786,
           "military": 10605,
           "economy": 650
         }
