@@ -272,17 +272,17 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 419,
+          "gold": 427,
           "militaryPower": 10605,
           "economicPower": 100,
           "resources": {
-            "oil": "28.4100.260.260.260.260.260.26",
-            "steel": 69.39999999999999,
-            "food": 59.44
+            "oil": "28.4100.260.260.260.260.260.260.26",
+            "steel": 70.69999999999999,
+            "food": 60.48
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781431534409
+          "lastIncomeUpdate": 1781431594409
         }
       },
       "equipmentSlots": [
@@ -471,16 +471,16 @@
         "slogan": "حقیقت به تنهایی پیروز می‌شود",
         "flagUrl": "🇮🇳",
         "assets": {
-          "gold": 2803.8,
+          "gold": 103.8,
           "militaryPower": 8588,
-          "economicPower": 100,
+          "economicPower": 110,
           "resources": {
             "oil": 1.9,
             "steel": 0.6,
             "food": 5.3
           },
           "techLevel": 1,
-          "factoryLevel": 1,
+          "factoryLevel": 2,
           "lastIncomeUpdate": 1781431542566
         }
       },
@@ -505,12 +505,6 @@
         "ind_nuke": 4
       },
       "assetLog": [
-        {
-          "timestamp": "۱۰:۰۲:۲۸",
-          "gold": 1389,
-          "military": 8590,
-          "economy": 100
-        },
         {
           "timestamp": "۱۰:۰۲:۳۲",
           "gold": 1672,
@@ -594,6 +588,12 @@
           "gold": 2803.8,
           "military": 8588,
           "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۰۶:۳۸",
+          "gold": 103.8,
+          "military": 8588,
+          "economy": 110
         }
       ]
     },
