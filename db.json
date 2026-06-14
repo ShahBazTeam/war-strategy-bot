@@ -255,12 +255,12 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 148,
+          "gold": 431,
           "militaryPower": 4707,
           "economicPower": 100,
           "resources": {
             "oil": "20.110100.0078000000000000005",
-            "steel": "17.8100.65",
+            "steel": null,
             "food": 23.46
           },
           "techLevel": 1,
@@ -650,17 +650,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 115,
+          "gold": 28423,
           "militaryPower": 12040,
           "economicPower": 100,
           "resources": {
-            "oil": 24,
-            "steel": "2410",
-            "food": 24
+            "oil": 24.8,
+            "steel": 23100.8,
+            "food": 24.8
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781430024609
+          "lastIncomeUpdate": 1781430084609
         }
       },
       "equipmentSlots": [
@@ -713,6 +713,12 @@
         {
           "timestamp": "۹:۴۰:۳۲",
           "gold": 340,
+          "military": 12040,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۴۱:۵۹",
+          "gold": 28423,
           "military": 12040,
           "economy": 100
         }
