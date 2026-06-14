@@ -933,17 +933,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 23935.5,
-          "militaryPower": 2027,
-          "economicPower": 330,
+          "gold": 1009.3,
+          "militaryPower": 2025,
+          "economicPower": 378,
           "resources": {
-            "oil": 0,
-            "steel": 43.8,
-            "food": 29.5
+            "oil": 0.1,
+            "steel": 63.5,
+            "food": 39.3
           },
-          "techLevel": 6,
+          "techLevel": 8,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781439153831
+          "lastIncomeUpdate": 1781439213831
         }
       },
       "equipmentSlots": [
@@ -969,24 +969,6 @@
         "isr_nuke": 1
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۱۳:۲۰",
-          "gold": 183467.5,
-          "military": 2027,
-          "economy": 114
-        },
-        {
-          "timestamp": "۱۲:۱۳:۲۰",
-          "gold": 173048.5,
-          "military": 2027,
-          "economy": 126
-        },
-        {
-          "timestamp": "۱۲:۱۳:۲۰",
-          "gold": 161694.5,
-          "military": 2027,
-          "economy": 138
-        },
         {
           "timestamp": "۱۲:۱۳:۲۱",
           "gold": 149402.5,
@@ -1058,6 +1040,24 @@
           "gold": 23935.5,
           "military": 2027,
           "economy": 330
+        },
+        {
+          "timestamp": "۱۲:۱۳:۲۵",
+          "gold": 14532.5,
+          "military": 2027,
+          "economy": 354
+        },
+        {
+          "timestamp": "۱۲:۱۳:۲۵",
+          "gold": 404.5,
+          "military": 2027,
+          "economy": 378
+        },
+        {
+          "timestamp": "۱۲:۱۳:۳۹",
+          "gold": 1009.3,
+          "military": 2025,
+          "economy": 378
         }
       ],
       "loan": {
