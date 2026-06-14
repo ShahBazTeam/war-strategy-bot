@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 103360,
+          "gold": 103440,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2234.2,
-            "steel": 17842,
-            "food": 17842
+            "oil": 2236.8,
+            "steel": 17868,
+            "food": 17868
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429604579
+          "lastIncomeUpdate": 1781429664579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۵۵:۴۸",
-          "gold": 52320,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۶:۴۸",
           "gold": 52400,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۳۳:۲۶",
           "gold": 103360,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۳۴:۲۹",
+          "gold": 103440,
           "military": 100,
           "economy": 100
         }
@@ -489,6 +489,116 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 2004,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429613831_qtz7mpb",
+      "username": "mahdi",
+      "password": "8QWABm1U",
+      "isAdmin": false,
+      "country": {
+        "name": "اسرائیل",
+        "originalName": "Israel",
+        "slogan": "آزادی و بازیابی اقتدار تاریخی",
+        "flagUrl": "🇮🇱",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 2249,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429613831
+        }
+      },
+      "equipmentSlots": [
+        "isr_merkava",
+        "isr_namer",
+        "isr_f35i",
+        "isr_apache",
+        "isr_saar",
+        "isr_dolphin",
+        "isr_iron_dome",
+        "isr_jericho",
+        "isr_nuke"
+      ],
+      "warehouse": {
+        "isr_merkava": 10,
+        "isr_namer": 8,
+        "isr_f35i": 5,
+        "isr_apache": 4,
+        "isr_saar": 3,
+        "isr_dolphin": 2,
+        "isr_iron_dome": 4,
+        "isr_jericho": 1,
+        "isr_nuke": 1
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 2249,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429664465_6lk0tp9",
+      "username": "aylin",
+      "password": "7vTicp98",
+      "isAdmin": false,
+      "country": {
+        "name": "فرانسه",
+        "originalName": "France",
+        "slogan": "آزادی، برابری، برادری",
+        "flagUrl": "🇫🇷",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 2952,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429664464
+        }
+      },
+      "equipmentSlots": [
+        "fra_leclerc",
+        "fra_vbci",
+        "fra_rafale",
+        "fra_charles",
+        "fra_horizon",
+        "fra_suffren",
+        "fra_samp",
+        "fra_m51",
+        "fra_nuke"
+      ],
+      "warehouse": {
+        "fra_leclerc": 20,
+        "fra_vbci": 40,
+        "fra_rafale": 10,
+        "fra_charles": 1,
+        "fra_horizon": 3,
+        "fra_suffren": 2,
+        "fra_samp": 3,
+        "fra_m51": 2,
+        "fra_nuke": 1
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 2952,
           "economy": 100
         }
       ]
