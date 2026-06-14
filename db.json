@@ -1337,6 +1337,17 @@
   ],
   "tweets": [
     {
+      "id": "ce8oi16",
+      "userId": "user_1781429724609_o5bvhju",
+      "username": "sorena",
+      "countryName": "روسیه",
+      "flagUrl": "🇷🇺",
+      "text": "ائتلاف ناتو تاسیس شد از علاقه مندان درخواست میکنیم به ائتلاف ما بپیوندید",
+      "timestamp": "2026-06-14T12:26:00.927Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "news_1781439907561_q4zl",
       "userId": "news_system",
       "username": "خبرنگار_بین‌المللی",
