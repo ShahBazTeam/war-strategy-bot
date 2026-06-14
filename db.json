@@ -965,17 +965,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 1549.8,
+          "gold": 1254.6,
           "militaryPower": 18153,
           "economicPower": 128,
           "resources": {
-            "oil": 1037.9,
-            "steel": 429.8,
-            "food": 1099
+            "oil": 987.9,
+            "steel": 406.5,
+            "food": 1102.3
           },
           "techLevel": 8,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781446353831
+          "lastIncomeUpdate": 1781446413831
         }
       },
       "equipmentSlots": [
@@ -1004,7 +1004,6 @@
         "isr_dolphin": 2,
         "isr_iron_dome": 4,
         "isr_jericho": 1,
-        "isr_nuke": 1,
         "inv_n14zagv": 974,
         "inv_5vatolb": 589,
         "inv_q3ngger": 518,
@@ -1013,12 +1012,6 @@
         "inv_l5x1z29": 38
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۰۲:۳۶",
-          "gold": 8151.8,
-          "military": 56403,
-          "economy": 378
-        },
         {
           "timestamp": "۱۴:۰۳:۳۹",
           "gold": 8756.6,
@@ -1102,6 +1095,12 @@
           "gold": 1549.8,
           "military": 18153,
           "economy": 128
+        },
+        {
+          "timestamp": "۱۴:۱۳:۴۰",
+          "gold": 1254.6,
+          "military": 18153,
+          "economy": 128
         }
       ],
       "loan": {
@@ -1176,13 +1175,13 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 3902.6,
-          "militaryPower": 28894,
-          "economicPower": 540,
+          "gold": 2732.6,
+          "militaryPower": 11558,
+          "economicPower": 324,
           "resources": {
-            "oil": 84.2,
-            "steel": 214.8,
-            "food": 338.8
+            "oil": 42.1,
+            "steel": 107.4,
+            "food": 169.4
           },
           "techLevel": 16,
           "factoryLevel": 20,
@@ -1390,7 +1389,10 @@
       ],
       "timestamp": "2026-06-14T12:58:28.293Z",
       "defenderDefenseScenario": "آماده‌باش دفاع همه‌جانبه دفاع بدون شرح",
-      "pendingScenarios": {}
+      "pendingScenarios": {},
+      "nuclearLaunched": [
+        "user_1781429613831_qtz7mpb"
+      ]
     }
   ],
   "alliances": [
