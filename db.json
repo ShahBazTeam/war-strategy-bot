@@ -10,46 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 676505,
+          "gold": 616415,
           "militaryPower": 100,
-          "economicPower": 178,
+          "economicPower": 230,
           "resources": {
             "oil": 2512.4,
             "steel": 614,
             "food": 20624
           },
           "techLevel": 5,
-          "factoryLevel": 16,
+          "factoryLevel": 20,
           "lastIncomeUpdate": 1781436024579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۱۱:۲۰:۴۳",
-          "gold": 490235,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۱:۲۰:۴۳",
-          "gold": 521735,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۱:۲۰:۴۳",
-          "gold": 553235,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۱:۲۰:۴۴",
-          "gold": 584735,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۱۱:۲۰:۴۴",
           "gold": 616235,
@@ -115,6 +91,30 @@
           "gold": 676505,
           "military": 100,
           "economy": 178
+        },
+        {
+          "timestamp": "۱۱:۲۰:۵۶",
+          "gold": 662709,
+          "military": 100,
+          "economy": 191
+        },
+        {
+          "timestamp": "۱۱:۲۰:۵۶",
+          "gold": 648097,
+          "military": 100,
+          "economy": 204
+        },
+        {
+          "timestamp": "۱۱:۲۰:۵۷",
+          "gold": 632666,
+          "military": 100,
+          "economy": 217
+        },
+        {
+          "timestamp": "۱۱:۲۰:۵۸",
+          "gold": 616415,
+          "military": 100,
+          "economy": 230
         }
       ]
     },
@@ -530,17 +530,17 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 81171.2,
+          "gold": 81178.4,
           "militaryPower": 15760,
           "economicPower": 90,
           "resources": {
-            "oil": 161.6,
-            "steel": 133.1,
-            "food": 133.1
+            "oil": 162.8,
+            "steel": 134,
+            "food": 134
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781435996588
+          "lastIncomeUpdate": 1781436056588
         }
       },
       "equipmentSlots": [
@@ -623,6 +623,12 @@
         {
           "timestamp": "۱۱:۲۰:۱۱",
           "gold": 81171.2,
+          "military": 15760,
+          "economy": 90
+        },
+        {
+          "timestamp": "۱۱:۲۰:۵۷",
+          "gold": 81178.4,
           "military": 15760,
           "economy": 90
         }
