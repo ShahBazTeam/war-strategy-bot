@@ -530,7 +530,7 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 73573,
+          "gold": 50573,
           "militaryPower": 15760,
           "economicPower": 160,
           "resources": {
@@ -566,12 +566,6 @@
         "usa_nuke": 5
       },
       "assetLog": [
-        {
-          "timestamp": "۱۱:۲۱:۵۹",
-          "gold": 85406.6,
-          "military": 15760,
-          "economy": 90
-        },
         {
           "timestamp": "۱۱:۲۲:۵۶",
           "gold": 85413.8,
@@ -653,6 +647,12 @@
         {
           "timestamp": "۱۲:۱۱:۰۳",
           "gold": 73573,
+          "military": 15760,
+          "economy": 160
+        },
+        {
+          "timestamp": "۱۲:۱۱:۲۲",
+          "gold": 50573,
           "military": 15760,
           "economy": 160
         }
@@ -933,9 +933,9 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 330.7,
+          "gold": 23330.7,
           "militaryPower": 2031,
-          "economicPower": 130,
+          "economicPower": 135,
           "resources": {
             "oil": 0,
             "steel": 38.2,
@@ -969,12 +969,6 @@
         "isr_nuke": 1
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۰۲:۳۴",
-          "gold": 8924.1,
-          "military": 2047,
-          "economy": 80
-        },
         {
           "timestamp": "۱۲:۰۳:۳۷",
           "gold": 8943.3,
@@ -1058,6 +1052,12 @@
           "gold": 330.7,
           "military": 2031,
           "economy": 130
+        },
+        {
+          "timestamp": "۱۲:۱۱:۲۲",
+          "gold": 23330.7,
+          "military": 2031,
+          "economy": 135
         }
       ],
       "loan": {
@@ -1132,17 +1132,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 284044.6,
+          "gold": 287820.6,
           "militaryPower": 14270,
           "economicPower": 590,
           "resources": {
-            "oil": 442.2,
-            "steel": 518.2,
-            "food": 442.2
+            "oil": 810.4,
+            "steel": 886.4,
+            "food": 810.4
           },
           "techLevel": 16,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781438844609
+          "lastIncomeUpdate": 1781439084609
         }
       },
       "equipmentSlots": [
@@ -1170,12 +1170,6 @@
         "inv_cxhbojo": 100
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۰۶:۱۶",
-          "gold": 43756.6,
-          "military": 14270,
-          "economy": 590
-        },
         {
           "timestamp": "۱۲:۰۶:۲۶",
           "gold": 44700.6,
@@ -1257,6 +1251,12 @@
         {
           "timestamp": "۱۲:۰۷:۲۹",
           "gold": 284044.6,
+          "military": 14270,
+          "economy": 590
+        },
+        {
+          "timestamp": "۱۲:۱۱:۳۰",
+          "gold": 287820.6,
           "military": 14270,
           "economy": 590
         }
