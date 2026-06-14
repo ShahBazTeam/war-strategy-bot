@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 104000,
+          "gold": 104320,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2255,
-            "steel": 18050,
-            "food": 18050
+            "oil": 2265.4,
+            "steel": 18154,
+            "food": 18154
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781430084579
+          "lastIncomeUpdate": 1781430324579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۳:۱۲:۳۰",
-          "gold": 53680,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۹:۲۵:۳۰",
           "gold": 102720,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۴۱:۲۷",
           "gold": 104000,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۴۵:۳۲",
+          "gold": 104320,
           "military": 100,
           "economy": 100
         }
@@ -255,17 +255,17 @@
         "slogan": "کوشش هوشمندانه و حرکت به جلو",
         "flagUrl": "🇯🇵",
         "assets": {
-          "gold": 1304,
+          "gold": 1312,
           "militaryPower": 4707,
           "economicPower": 100,
           "resources": {
-            "oil": "20.110100.00780000000000000050.00780000000000000050.00780000000000000050.0078000000000000005",
+            "oil": "20.110100.00780000000000000050.00780000000000000050.00780000000000000050.00780000000000000050.0078000000000000005",
             "steel": null,
-            "food": 24.240000000000006
+            "food": 24.500000000000007
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781430260629
+          "lastIncomeUpdate": 1781430320629
         }
       },
       "equipmentSlots": [
