@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 103280,
+          "gold": 103360,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2231.6,
-            "steel": 17816,
-            "food": 17816
+            "oil": 2234.2,
+            "steel": 17842,
+            "food": 17842
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429544579
+          "lastIncomeUpdate": 1781429604579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۵۴:۴۸",
-          "gold": 52240,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۵:۴۸",
           "gold": 52320,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۳۲:۳۰",
           "gold": 103280,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۳۳:۲۶",
+          "gold": 103360,
           "military": 100,
           "economy": 100
         }
@@ -440,6 +440,55 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 5155,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429572049_hm7vcv4",
+      "username": "Adolfhitler",
+      "password": "123456789",
+      "isAdmin": false,
+      "country": {
+        "name": "آلمان",
+        "originalName": "Germany",
+        "slogan": "اتحاد و عدالت و آزادی",
+        "flagUrl": "🇩🇪",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 2004,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429572049
+        }
+      },
+      "equipmentSlots": [
+        "ger_leopard",
+        "ger_puma",
+        "ger_typhoon",
+        "ger_sachsen",
+        "ger_type212",
+        "ger_iris"
+      ],
+      "warehouse": {
+        "ger_leopard": 28,
+        "ger_puma": 45,
+        "ger_typhoon": 8,
+        "ger_sachsen": 3,
+        "ger_type212": 3,
+        "ger_iris": 5
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 2004,
           "economy": 100
         }
       ]
