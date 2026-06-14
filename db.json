@@ -933,17 +933,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 6673.8,
+          "gold": 7278.6,
           "militaryPower": 19019,
           "economicPower": 378,
           "resources": {
-            "oil": 203.6,
-            "steel": 276,
-            "food": 382.3
+            "oil": 203.7,
+            "steel": 295.7,
+            "food": 392.1
           },
           "techLevel": 8,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781441313831
+          "lastIncomeUpdate": 1781441373831
         }
       },
       "equipmentSlots": [
@@ -981,12 +981,6 @@
         "inv_l5x1z29": 38
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۳۷:۵۰",
-          "gold": 697,
-          "military": 18499,
-          "economy": 378
-        },
         {
           "timestamp": "۱۲:۳۷:۵۳",
           "gold": 671,
@@ -1068,6 +1062,12 @@
         {
           "timestamp": "۱۲:۴۸:۳۹",
           "gold": 6673.8,
+          "military": 19019,
+          "economy": 378
+        },
+        {
+          "timestamp": "۱۲:۴۹:۳۵",
+          "gold": 7278.6,
           "military": 19019,
           "economy": 378
         }
@@ -1378,6 +1378,15 @@
           "flagUrl": "🇮🇱",
           "text": "میع",
           "timestamp": "2026-06-14T12:48:55.292Z"
+        },
+        {
+          "id": "comment_snphd0n",
+          "userId": "user_1781429724609_o5bvhju",
+          "username": "sorena",
+          "countryName": "روسیه",
+          "flagUrl": "🇷🇺",
+          "text": "هشدار به من میدی؟",
+          "timestamp": "2026-06-14T12:49:30.480Z"
         }
       ],
       "isAiGenerated": true,
