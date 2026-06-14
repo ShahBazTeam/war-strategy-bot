@@ -1144,17 +1144,17 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 296316.6,
+          "gold": 341360.6,
           "militaryPower": 14270,
           "economicPower": 590,
           "resources": {
-            "oil": 1638.8,
-            "steel": 1714.8,
-            "food": 1638.8
+            "oil": 1730.8,
+            "steel": 406.8,
+            "food": 1730.8
           },
           "techLevel": 16,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781439624609
+          "lastIncomeUpdate": 1781439684609
         }
       },
       "equipmentSlots": [
@@ -1182,18 +1182,6 @@
         "inv_cxhbojo": 100
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۰۶:۲۶",
-          "gold": 76200.6,
-          "military": 14270,
-          "economy": 590
-        },
-        {
-          "timestamp": "۱۲:۰۶:۲۷",
-          "gold": 107700.6,
-          "military": 14270,
-          "economy": 590
-        },
         {
           "timestamp": "۱۲:۰۶:۲۷",
           "gold": 139200.6,
@@ -1269,6 +1257,18 @@
         {
           "timestamp": "۱۲:۲۱:۰۸",
           "gold": 296316.6,
+          "military": 14270,
+          "economy": 590
+        },
+        {
+          "timestamp": "۱۲:۲۱:۲۹",
+          "gold": 297260.6,
+          "military": 14270,
+          "economy": 590
+        },
+        {
+          "timestamp": "۱۲:۲۱:۲۹",
+          "gold": 341360.6,
           "military": 14270,
           "economy": 590
         }
