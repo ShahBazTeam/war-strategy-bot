@@ -1337,6 +1337,17 @@
   ],
   "tweets": [
     {
+      "id": "54y74lt",
+      "userId": "user_1781429724609_o5bvhju",
+      "username": "sorena",
+      "countryName": "روسیه",
+      "flagUrl": "🇷🇺",
+      "text": "مرگ بر اسراییل ما اورشلیم را بمب باران خواهیم کرد.",
+      "timestamp": "2026-06-14T12:57:05.828Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "news_gen_1781441751295_jd4b",
       "userId": "news_system",
       "username": "خبرگزاری_جهانی",
