@@ -129,17 +129,17 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 9280.3,
-          "militaryPower": 2341,
-          "economicPower": 132,
+          "gold": 8346.4,
+          "militaryPower": 2339,
+          "economicPower": 156,
           "resources": {
-            "oil": 8.2,
-            "steel": 7,
-            "food": 261.2
+            "oil": 9,
+            "steel": 7.7,
+            "food": 262.6
           },
-          "techLevel": 2,
+          "techLevel": 3,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781446540085
+          "lastIncomeUpdate": 1781446600085
         }
       },
       "equipmentSlots": [
@@ -169,18 +169,6 @@
         "irn_shahed": 30
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۰۵:۰۴",
-          "gold": 8229.3,
-          "military": 2363,
-          "economy": 108
-        },
-        {
-          "timestamp": "۱۴:۰۵:۲۵",
-          "gold": 11007,
-          "military": 2363,
-          "economy": 108
-        },
         {
           "timestamp": "۱۴:۰۵:۴۲",
           "gold": 11024.3,
@@ -258,6 +246,18 @@
           "gold": 9280.3,
           "military": 2341,
           "economy": 132
+        },
+        {
+          "timestamp": "۱۴:۱۶:۴۰",
+          "gold": 9301.4,
+          "military": 2339,
+          "economy": 132
+        },
+        {
+          "timestamp": "۱۴:۱۶:۴۰",
+          "gold": 8346.4,
+          "military": 2339,
+          "economy": 156
         }
       ]
     },
@@ -1470,7 +1470,7 @@
       "votesNo": [
         "user_1781429613831_qtz7mpb"
       ],
-      "status": "active",
+      "status": "rejected",
       "createdAt": "2026-06-14T14:15:12.407Z",
       "durationMs": 3600000
     },
