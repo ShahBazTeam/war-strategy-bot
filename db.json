@@ -1337,6 +1337,17 @@
   ],
   "tweets": [
     {
+      "id": "glvt2yg",
+      "userId": "user_1781429613831_qtz7mpb",
+      "username": "mahdi",
+      "countryName": "اسرائیل",
+      "flagUrl": "🇮🇱",
+      "text": "کیرمو بخور",
+      "timestamp": "2026-06-14T12:57:46.158Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "news_1781441830400_irq5",
       "userId": "news_system",
       "username": "خبرنگار_بین‌المللی",
