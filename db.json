@@ -972,111 +972,27 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 33,
-          "militaryPower": 10,
-          "economicPower": 0,
+          "gold": 300,
+          "militaryPower": 100,
+          "economicPower": 100,
           "resources": {
-            "oil": 1,
-            "steel": 2,
-            "food": 556.2
+            "oil": 20,
+            "steel": 20,
+            "food": 20
           },
-          "techLevel": 8,
-          "factoryLevel": 20,
-          "lastIncomeUpdate": 1781447073831
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781447096187
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
         {
-          "timestamp": "۱۴:۲۰:۴۰",
-          "gold": 96,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۱:۳۶",
-          "gold": 112,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۳۹",
-          "gold": 128,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۴۲",
-          "gold": 26,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۴۴",
-          "gold": 6,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۴۷",
-          "gold": 2,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۵۶",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۲:۵۹",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۰۰",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۰۶",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۰۸",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۰۹",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۰۹",
-          "gold": 1,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۳:۳۵",
-          "gold": 17,
-          "military": 10,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۲۴:۳۸",
-          "gold": 33,
-          "military": 10,
-          "economy": 0
+          "timestamp": "ریست",
+          "gold": 300,
+          "military": 100,
+          "economy": 100
         }
       ],
       "loan": {
