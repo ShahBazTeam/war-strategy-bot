@@ -826,17 +826,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 10942.2,
-          "militaryPower": 2199,
-          "economicPower": 78,
+          "gold": 10963.1,
+          "militaryPower": 2197,
+          "economicPower": 77,
           "resources": {
             "oil": 0.1,
-            "steel": 0.5,
-            "food": 0.7
+            "steel": 0.6,
+            "food": 0.9
           },
           "techLevel": 1,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781433993831
+          "lastIncomeUpdate": 1781434053831
         }
       },
       "equipmentSlots": [
@@ -862,30 +862,6 @@
         "isr_nuke": 1
       },
       "assetLog": [
-        {
-          "timestamp": "۱۰:۳۷:۳۶",
-          "gold": 601.2,
-          "military": 2217,
-          "economy": 97
-        },
-        {
-          "timestamp": "۱۰:۳۸:۳۳",
-          "gold": 616.7,
-          "military": 2215,
-          "economy": 96
-        },
-        {
-          "timestamp": "۱۰:۳۹:۳۴",
-          "gold": 632.1,
-          "military": 2213,
-          "economy": 95
-        },
-        {
-          "timestamp": "۱۰:۴۰:۳۷",
-          "gold": 647.3,
-          "military": 2211,
-          "economy": 94
-        },
         {
           "timestamp": "۱۰:۴۱:۴۰",
           "gold": 662.3,
@@ -951,6 +927,30 @@
           "gold": 10942.2,
           "military": 2199,
           "economy": 78
+        },
+        {
+          "timestamp": "۱۰:۴۷:۳۵",
+          "gold": 10954.7,
+          "military": 2197,
+          "economy": 77
+        },
+        {
+          "timestamp": "۱۰:۴۷:۳۵",
+          "gold": 10957.5,
+          "military": 2197,
+          "economy": 77
+        },
+        {
+          "timestamp": "۱۰:۴۷:۴۴",
+          "gold": 10960.3,
+          "military": 2197,
+          "economy": 77
+        },
+        {
+          "timestamp": "۱۰:۴۷:۴۴",
+          "gold": 10963.1,
+          "military": 2197,
+          "economy": 77
         }
       ],
       "loan": {
