@@ -530,12 +530,12 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 81178.4,
+          "gold": 85399.4,
           "militaryPower": 15760,
           "economicPower": 90,
           "resources": {
             "oil": 162.8,
-            "steel": 134,
+            "steel": 0,
             "food": 134
           },
           "techLevel": 1,
@@ -629,6 +629,12 @@
         {
           "timestamp": "۱۱:۲۰:۵۷",
           "gold": 81178.4,
+          "military": 15760,
+          "economy": 90
+        },
+        {
+          "timestamp": "۱۱:۲۱:۵۴",
+          "gold": 85399.4,
           "military": 15760,
           "economy": 90
         }
@@ -891,17 +897,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 13714.1,
-          "militaryPower": 2131,
-          "economicPower": 85,
+          "gold": 13734.5,
+          "militaryPower": 2129,
+          "economicPower": 84,
           "resources": {
             "oil": 0,
-            "steel": 1.7,
-            "food": 8.4
+            "steel": 2.4,
+            "food": 8.7
           },
           "techLevel": 2,
           "factoryLevel": 3,
-          "lastIncomeUpdate": 1781436033831
+          "lastIncomeUpdate": 1781436093831
         }
       },
       "equipmentSlots": [
@@ -927,12 +933,6 @@
         "isr_nuke": 1
       },
       "assetLog": [
-        {
-          "timestamp": "۱۱:۱۱:۵۵",
-          "gold": 1977.4,
-          "military": 2149,
-          "economy": 72
-        },
         {
           "timestamp": "۱۱:۱۲:۱۳",
           "gold": 3392.4,
@@ -1016,6 +1016,12 @@
           "gold": 13714.1,
           "military": 2131,
           "economy": 85
+        },
+        {
+          "timestamp": "۱۱:۲۱:۳۷",
+          "gold": 13734.5,
+          "military": 2129,
+          "economy": 84
         }
       ],
       "loan": {
