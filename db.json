@@ -272,7 +272,7 @@
         "slogan": "احیای مجدد ملت بزرگ چین",
         "flagUrl": "🇨🇳",
         "assets": {
-          "gold": 1813298,
+          "gold": 2738298,
           "militaryPower": 10605,
           "economicPower": 100,
           "resources": {
@@ -308,36 +308,6 @@
         "chn_nuke": 3
       },
       "assetLog": [
-        {
-          "timestamp": "۱۰:۱۳:۳۱",
-          "gold": 240790,
-          "military": 10605,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۰:۱۳:۳۲",
-          "gold": 259290,
-          "military": 10605,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۰:۱۳:۳۳",
-          "gold": 277790,
-          "military": 10605,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۰:۱۳:۳۵",
-          "gold": 277798,
-          "military": 10605,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۰:۱۳:۳۵",
-          "gold": 296298,
-          "military": 10605,
-          "economy": 100
-        },
         {
           "timestamp": "۱۰:۱۳:۳۶",
           "gold": 314798,
@@ -395,6 +365,36 @@
         {
           "timestamp": "۱۰:۱۴:۰۹",
           "gold": 1813298,
+          "military": 10605,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۱۴:۰۹",
+          "gold": 1998298,
+          "military": 10605,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۱۴:۰۹",
+          "gold": 2183298,
+          "military": 10605,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۱۴:۰۹",
+          "gold": 2368298,
+          "military": 10605,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۱۴:۰۹",
+          "gold": 2553298,
+          "military": 10605,
+          "economy": 100
+        },
+        {
+          "timestamp": "۱۰:۱۴:۱۰",
+          "gold": 2738298,
           "military": 10605,
           "economy": 100
         }
