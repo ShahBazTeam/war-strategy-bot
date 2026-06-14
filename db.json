@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 103120,
+          "gold": 103200,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2226.4,
-            "steel": 17764,
-            "food": 17764
+            "oil": 2229,
+            "steel": 17790,
+            "food": 17790
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429424579
+          "lastIncomeUpdate": 1781429484579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۵۲:۴۸",
-          "gold": 52080,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۳:۴۸",
           "gold": 52160,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۳۰:۲۶",
           "gold": 103120,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۳۱:۲۷",
+          "gold": 103200,
           "military": 100,
           "economy": 100
         }
@@ -277,6 +277,61 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 4707,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429456588_qutgmby",
+      "username": "kiarash",
+      "password": "89318931",
+      "isAdmin": false,
+      "country": {
+        "name": "ایالات متحده آمریکا",
+        "originalName": "USA",
+        "slogan": "In God We Trust",
+        "flagUrl": "🇺🇸",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 15760,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429456588
+        }
+      },
+      "equipmentSlots": [
+        "usa_abrams",
+        "usa_bradley",
+        "usa_f35",
+        "usa_apache",
+        "usa_nimitz",
+        "usa_arleigh",
+        "usa_patriot",
+        "usa_minuteman",
+        "usa_nuke"
+      ],
+      "warehouse": {
+        "usa_abrams": 140,
+        "usa_bradley": 220,
+        "usa_f35": 30,
+        "usa_apache": 30,
+        "usa_nimitz": 8,
+        "usa_arleigh": 12,
+        "usa_patriot": 12,
+        "usa_minuteman": 8,
+        "usa_nuke": 5
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 15760,
           "economy": 100
         }
       ]
