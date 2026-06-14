@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 102960,
+          "gold": 103040,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2221.2,
-            "steel": 17712,
-            "food": 17712
+            "oil": 2223.8,
+            "steel": 17738,
+            "food": 17738
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429304579
+          "lastIncomeUpdate": 1781429364579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۵۰:۴۸",
-          "gold": 51920,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۱:۴۸",
           "gold": 52000,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۲۸:۲۴",
           "gold": 102960,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۲۹:۲۷",
+          "gold": 103040,
           "military": 100,
           "economy": 100
         }
@@ -277,6 +277,59 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 4707,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429364130_gin1z0s",
+      "username": "kiakia",
+      "password": "8931",
+      "isAdmin": false,
+      "country": {
+        "name": "هند",
+        "originalName": "India",
+        "slogan": "حقیقت به تنهایی پیروز می‌شود",
+        "flagUrl": "🇮🇳",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 8590,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429364130
+        }
+      },
+      "equipmentSlots": [
+        "ind_arjun",
+        "ind_su30",
+        "ind_vikrant",
+        "ind_kolkata",
+        "ind_arihant",
+        "ind_akash",
+        "ind_agni",
+        "ind_nuke"
+      ],
+      "warehouse": {
+        "ind_arjun": 100,
+        "ind_su30": 25,
+        "ind_vikrant": 2,
+        "ind_kolkata": 5,
+        "ind_arihant": 3,
+        "ind_akash": 10,
+        "ind_agni": 5,
+        "ind_nuke": 4
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 8590,
           "economy": 100
         }
       ]
