@@ -965,17 +965,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 1254.6,
-          "militaryPower": 18153,
-          "economicPower": 128,
+          "gold": 1001.8,
+          "militaryPower": 7262,
+          "economicPower": 77,
           "resources": {
-            "oil": 987.9,
-            "steel": 406.5,
-            "food": 1102.3
+            "oil": 494,
+            "steel": 207.3,
+            "food": 553.2
           },
           "techLevel": 8,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781446413831
+          "lastIncomeUpdate": 1781446473831
         }
       },
       "equipmentSlots": [
@@ -1012,12 +1012,6 @@
         "inv_l5x1z29": 38
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۰۳:۳۹",
-          "gold": 8756.6,
-          "military": 56403,
-          "economy": 378
-        },
         {
           "timestamp": "۱۴:۰۴:۳۵",
           "gold": 9361.4,
@@ -1101,6 +1095,12 @@
           "gold": 1254.6,
           "military": 18153,
           "economy": 128
+        },
+        {
+          "timestamp": "۱۴:۱۴:۳۶",
+          "gold": 1001.8,
+          "military": 7262,
+          "economy": 77
         }
       ],
       "loan": {
@@ -1175,12 +1175,12 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 3251,
+          "gold": 2751,
           "militaryPower": 11558,
           "economicPower": 324,
           "resources": {
-            "oil": 92.6,
-            "steel": 157.9,
+            "oil": 42.599999999999994,
+            "steel": 127.9,
             "food": 219.9
           },
           "techLevel": 16,
@@ -1209,7 +1209,7 @@
         "rus_kilo": 13,
         "rus_s400": 48,
         "rus_sarmat": 21,
-        "rus_nuke": 4,
+        "rus_nuke": 3,
         "inv_cxhbojo": 1507
       },
       "assetLog": [
@@ -1391,7 +1391,8 @@
       "defenderDefenseScenario": "آماده‌باش دفاع همه‌جانبه دفاع بدون شرح",
       "pendingScenarios": {},
       "nuclearLaunched": [
-        "user_1781429613831_qtz7mpb"
+        "user_1781429613831_qtz7mpb",
+        "user_1781429724609_o5bvhju"
       ]
     }
   ],
