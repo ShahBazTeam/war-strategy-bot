@@ -1390,6 +1390,17 @@
   ],
   "tweets": [
     {
+      "id": "srnw706",
+      "userId": "user_1781429613831_qtz7mpb",
+      "username": "mahdi",
+      "countryName": "اسرائیل",
+      "flagUrl": "🇮🇱",
+      "text": "ویع ویع ویع ویع ویع",
+      "timestamp": "2026-06-14T13:54:40.999Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "news_1781445250000_mi1q",
       "userId": "news_system",
       "username": "خبرنگار_بین‌المللی",
