@@ -1306,6 +1306,17 @@
   ],
   "tweets": [
     {
+      "id": "rwm319v",
+      "userId": "user_1781429613831_qtz7mpb",
+      "username": "mahdi",
+      "countryName": "اسرائیل",
+      "flagUrl": "🇮🇱",
+      "text": "رای گیری ای در سازمان ملل راه انداخته ام ممنون میشم رای مثبت دهید تا صلح در جهان ثابت باشد",
+      "timestamp": "2026-06-14T12:03:45.682Z",
+      "likes": [],
+      "comments": []
+    },
+    {
       "id": "news_1781438520273_b4vz",
       "userId": "news_system",
       "username": "خبرنگار_بین‌المللی",
