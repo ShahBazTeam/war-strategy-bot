@@ -129,17 +129,17 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 1351.4,
+          "gold": 1384,
           "militaryPower": 3199,
           "economicPower": 204,
           "resources": {
-            "oil": 15.5,
-            "steel": 13.2,
-            "food": 273.1
+            "oil": 16.8,
+            "steel": 14.3,
+            "food": 275.2
           },
           "techLevel": 5,
           "factoryLevel": 2,
-          "lastIncomeUpdate": 1781446900085
+          "lastIncomeUpdate": 1781446960085
         }
       },
       "equipmentSlots": [
@@ -171,12 +171,6 @@
         "inv_38c9d9u": 40
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۱۵:۴۴",
-          "gold": 9757.3,
-          "military": 2341,
-          "economy": 108
-        },
         {
           "timestamp": "۱۴:۱۶:۳۱",
           "gold": 9280.3,
@@ -258,6 +252,12 @@
         {
           "timestamp": "۱۴:۲۱:۴۱",
           "gold": 1351.4,
+          "military": 3199,
+          "economy": 204
+        },
+        {
+          "timestamp": "۱۴:۲۲:۴۵",
+          "gold": 1384,
           "military": 3199,
           "economy": 204
         }
@@ -967,12 +967,12 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 128,
+          "gold": 6,
           "militaryPower": 0,
           "economicPower": 0,
           "resources": {
-            "oil": 294,
-            "steel": 4,
+            "oil": 12,
+            "steel": 1,
             "food": 555.6
           },
           "techLevel": 8,
@@ -980,52 +980,9 @@
           "lastIncomeUpdate": 1781446953831
         }
       },
-      "equipmentSlots": [
-        "isr_merkava",
-        "isr_namer",
-        "isr_f35i",
-        "isr_apache",
-        "isr_saar",
-        "isr_dolphin",
-        "isr_iron_dome",
-        "isr_jericho",
-        "isr_nuke",
-        "inv_n14zagv",
-        "inv_5vatolb",
-        "inv_q3ngger",
-        "inv_venwc8g",
-        "inv_d5fdbb0",
-        "inv_l5x1z29"
-      ],
-      "warehouse": {
-        "isr_merkava": 10,
-        "isr_namer": 8,
-        "isr_f35i": 5,
-        "isr_apache": 4,
-        "isr_saar": 3,
-        "isr_dolphin": 2,
-        "isr_iron_dome": 4,
-        "isr_jericho": 1,
-        "inv_n14zagv": 974,
-        "inv_5vatolb": 589,
-        "inv_q3ngger": 518,
-        "inv_venwc8g": 818,
-        "inv_d5fdbb0": 388,
-        "inv_l5x1z29": 38
-      },
+      "equipmentSlots": [],
+      "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۱۴:۱۲:۳۷",
-          "gold": 13799.8,
-          "military": 11403,
-          "economy": 128
-        },
-        {
-          "timestamp": "۱۴:۱۲:۵۱",
-          "gold": 10549.8,
-          "military": 13903,
-          "economy": 128
-        },
         {
           "timestamp": "۱۴:۱۲:۵۲",
           "gold": 6049.8,
@@ -1103,6 +1060,18 @@
           "gold": 128,
           "military": 0,
           "economy": 0
+        },
+        {
+          "timestamp": "۱۴:۲۲:۴۲",
+          "gold": 26,
+          "military": 0,
+          "economy": 0
+        },
+        {
+          "timestamp": "۱۴:۲۲:۴۴",
+          "gold": 6,
+          "military": 0,
+          "economy": 0
         }
       ],
       "loan": {
@@ -1177,12 +1146,12 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 8008.8,
+          "gold": 8130.8,
           "militaryPower": 10403,
           "economicPower": 292,
           "resources": {
-            "oil": 564.5,
-            "steel": 670.2,
+            "oil": 846.5,
+            "steel": 673.2,
             "food": 594.9
           },
           "techLevel": 16,
@@ -1215,18 +1184,6 @@
         "inv_cxhbojo": 1507
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۰۸:۵۱",
-          "gold": 22022.6,
-          "military": 32986,
-          "economy": 590
-        },
-        {
-          "timestamp": "۱۴:۰۸:۵۱",
-          "gold": 18386.6,
-          "military": 34804,
-          "economy": 590
-        },
         {
           "timestamp": "۱۴:۰۸:۵۲",
           "gold": 14750.6,
@@ -1302,6 +1259,18 @@
         {
           "timestamp": "۱۴:۲۲:۲۷",
           "gold": 8008.8,
+          "military": 10403,
+          "economy": 292
+        },
+        {
+          "timestamp": "۱۴:۲۲:۴۲",
+          "gold": 8110.8,
+          "military": 10403,
+          "economy": 292
+        },
+        {
+          "timestamp": "۱۴:۲۲:۴۴",
+          "gold": 8130.8,
           "military": 10403,
           "economy": 292
         }
@@ -1440,7 +1409,8 @@
       ],
       "winnerId": "user_1781429724609_o5bvhju",
       "winnerSide": "attacker",
-      "peaceTermsNarrative": "تیم روسیه به عنوان فاتح شناخته شد. غرامتی معادل 0 طلا منتقل گردید."
+      "peaceTermsNarrative": "🔴 مستعمره کامل: روسیه تمام منابع اسرائیل را مصادره کرد. 20 طلا، 47 نفت، 0 فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.",
+      "resolution": "colonize"
     }
   ],
   "alliances": [
@@ -1494,6 +1464,28 @@
     }
   ],
   "tweets": [
+    {
+      "id": "warroom_end_1781446964816_2jzd7zi8j",
+      "userId": "warroom_system",
+      "username": "اتاق_جنگ",
+      "countryName": "system",
+      "flagUrl": "",
+      "text": "🏁 پایان جنگ!\n\nروسیه 🏆 پیروز شد!\n\n🔴 مستعمره کامل: روسیه تمام منابع اسرائیل را مصادره کرد. 20 طلا، 47 نفت، 0 فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.\n\n📊 آمار نهایی:\n🔴 روسیه MP: 10403\n🛡️ اسرائیل MP: 0",
+      "timestamp": "2026-06-14T14:22:44.816Z",
+      "likes": [],
+      "comments": []
+    },
+    {
+      "id": "warroom_end_1781446962159_okdefnq0n",
+      "userId": "warroom_system",
+      "username": "اتاق_جنگ",
+      "countryName": "system",
+      "flagUrl": "",
+      "text": "🏁 پایان جنگ!\n\nروسیه 🏆 پیروز شد!\n\n🔴 مستعمره کامل: روسیه تمام منابع اسرائیل را مصادره کرد. 102 طلا، 235 نفت، 3 فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.\n\n📊 آمار نهایی:\n🔴 روسیه MP: 10403\n🛡️ اسرائیل MP: 0",
+      "timestamp": "2026-06-14T14:22:42.159Z",
+      "likes": [],
+      "comments": []
+    },
     {
       "id": "warroom_1781446497428_azxkmwk4r",
       "userId": "warroom_system",
