@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 103440,
+          "gold": 103520,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2236.8,
-            "steel": 17868,
-            "food": 17868
+            "oil": 2239.4,
+            "steel": 17894,
+            "food": 17894
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429664579
+          "lastIncomeUpdate": 1781429724579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۵۶:۴۸",
-          "gold": 52400,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۷:۴۸",
           "gold": 52480,
@@ -113,6 +107,12 @@
         {
           "timestamp": "۹:۳۴:۲۹",
           "gold": 103440,
+          "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۳۵:۲۴",
+          "gold": 103520,
           "military": 100,
           "economy": 100
         }
@@ -599,6 +599,61 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 2952,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429724609_o5bvhju",
+      "username": "sorena",
+      "password": "12345678@",
+      "isAdmin": false,
+      "country": {
+        "name": "روسیه",
+        "originalName": "Russia",
+        "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
+        "flagUrl": "🇷🇺",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 12040,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429724609
+        }
+      },
+      "equipmentSlots": [
+        "rus_t14",
+        "rus_bmp3",
+        "rus_su57",
+        "rus_ka52",
+        "rus_kuznetsov",
+        "rus_kilo",
+        "rus_s400",
+        "rus_sarmat",
+        "rus_nuke"
+      ],
+      "warehouse": {
+        "rus_t14": 150,
+        "rus_bmp3": 200,
+        "rus_su57": 20,
+        "rus_ka52": 30,
+        "rus_kuznetsov": 1,
+        "rus_kilo": 10,
+        "rus_s400": 15,
+        "rus_sarmat": 5,
+        "rus_nuke": 4
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 12040,
           "economy": 100
         }
       ]
