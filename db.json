@@ -530,17 +530,17 @@
         "slogan": "In God We Trust",
         "flagUrl": "🇺🇸",
         "assets": {
-          "gold": 11813.2,
+          "gold": 11989.2,
           "militaryPower": 15760,
           "economicPower": 220,
           "resources": {
-            "oil": 265.7,
-            "steel": 213.3,
-            "food": 564.3
+            "oil": 294.3,
+            "steel": 236.2,
+            "food": 587.2
           },
           "techLevel": 3,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781439656588
+          "lastIncomeUpdate": 1781439716588
         }
       },
       "equipmentSlots": [
@@ -566,12 +566,6 @@
         "usa_nuke": 5
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۱۰:۵۷",
-          "gold": 78673,
-          "military": 15760,
-          "economy": 150
-        },
         {
           "timestamp": "۱۲:۱۱:۰۳",
           "gold": 73573,
@@ -653,6 +647,12 @@
         {
           "timestamp": "۱۲:۲۱:۱۸",
           "gold": 11813.2,
+          "military": 15760,
+          "economy": 220
+        },
+        {
+          "timestamp": "۱۲:۲۲:۰۰",
+          "gold": 11989.2,
           "military": 15760,
           "economy": 220
         }
@@ -1144,13 +1144,13 @@
         "slogan": "توسعه، اقتدار ملی و صلح همیشگی",
         "flagUrl": "🇷🇺",
         "assets": {
-          "gold": 374850.6,
+          "gold": 389130.6,
           "militaryPower": 14270,
           "economicPower": 590,
           "resources": {
             "oil": 30.8,
             "steel": 406.8,
-            "food": 1730.8
+            "food": 30.8
           },
           "techLevel": 16,
           "factoryLevel": 20,
@@ -1182,12 +1182,6 @@
         "inv_cxhbojo": 100
       },
       "assetLog": [
-        {
-          "timestamp": "۱۲:۰۶:۲۷",
-          "gold": 170700.6,
-          "military": 14270,
-          "economy": 590
-        },
         {
           "timestamp": "۱۲:۰۶:۲۹",
           "gold": 190400.6,
@@ -1269,6 +1263,12 @@
         {
           "timestamp": "۱۲:۲۱:۴۲",
           "gold": 374850.6,
+          "military": 14270,
+          "economy": 590
+        },
+        {
+          "timestamp": "۱۲:۲۱:۴۳",
+          "gold": 389130.6,
           "military": 14270,
           "economy": 590
         }
