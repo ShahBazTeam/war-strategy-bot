@@ -965,8 +965,8 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 6049.8,
-          "militaryPower": 16403,
+          "gold": 1549.8,
+          "militaryPower": 18153,
           "economicPower": 128,
           "resources": {
             "oil": 1037.9,
@@ -1008,17 +1008,11 @@
         "inv_n14zagv": 974,
         "inv_5vatolb": 589,
         "inv_q3ngger": 518,
-        "inv_venwc8g": 693,
+        "inv_venwc8g": 818,
         "inv_d5fdbb0": 388,
         "inv_l5x1z29": 38
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۰۱:۳۹",
-          "gold": 7547,
-          "military": 56403,
-          "economy": 378
-        },
         {
           "timestamp": "۱۴:۰۲:۳۶",
           "gold": 8151.8,
@@ -1101,6 +1095,12 @@
           "timestamp": "۱۴:۱۲:۵۲",
           "gold": 6049.8,
           "military": 16403,
+          "economy": 128
+        },
+        {
+          "timestamp": "۱۴:۱۲:۵۴",
+          "gold": 1549.8,
+          "military": 18153,
           "economy": 128
         }
       ],
