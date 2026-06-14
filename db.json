@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 102800,
+          "gold": 102880,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2216,
-            "steel": 17660,
-            "food": 17660
+            "oil": 2218.6,
+            "steel": 17686,
+            "food": 17686
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429184579
+          "lastIncomeUpdate": 1781429244579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۴۸:۴۸",
-          "gold": 51760,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۴۹:۴۸",
           "gold": 51840,
@@ -114,6 +108,71 @@
           "timestamp": "۹:۲۶:۲۶",
           "gold": 102800,
           "military": 100,
+          "economy": 100
+        },
+        {
+          "timestamp": "۹:۲۷:۲۸",
+          "gold": 102880,
+          "military": 100,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429200085_0trenty",
+      "username": "mohsen",
+      "password": "eAb4FMyqPLKde9NeiAdp",
+      "isAdmin": false,
+      "country": {
+        "name": "ایران",
+        "originalName": "Iran",
+        "slogan": "استقلال، آزادی، جمهوری اسلامی",
+        "flagUrl": "🇮🇷",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 2385,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429200085
+        }
+      },
+      "equipmentSlots": [
+        "irn_karrar",
+        "irn_bmp2",
+        "irn_kowsar",
+        "irn_chopper",
+        "irn_jamaran",
+        "irn_submarine",
+        "irn_bavar",
+        "irn_khorramshahr",
+        "irn_fattah",
+        "irn_hoveyzeh",
+        "irn_shahed"
+      ],
+      "warehouse": {
+        "irn_karrar": 28,
+        "irn_bmp2": 35,
+        "irn_kowsar": 10,
+        "irn_chopper": 10,
+        "irn_jamaran": 3,
+        "irn_submarine": 3,
+        "irn_bavar": 5,
+        "irn_khorramshahr": 4,
+        "irn_fattah": 2,
+        "irn_hoveyzeh": 2,
+        "irn_shahed": 30
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 2385,
           "economy": 100
         }
       ]
