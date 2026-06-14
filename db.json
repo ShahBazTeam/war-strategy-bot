@@ -129,9 +129,9 @@
         "slogan": "استقلال، آزادی، جمهوری اسلامی",
         "flagUrl": "🇮🇷",
         "assets": {
-          "gold": 1384,
+          "gold": 501384,
           "militaryPower": 3199,
-          "economicPower": 204,
+          "economicPower": 194,
           "resources": {
             "oil": 16.8,
             "steel": 14.3,
@@ -171,12 +171,6 @@
         "inv_38c9d9u": 40
       },
       "assetLog": [
-        {
-          "timestamp": "۱۴:۱۶:۳۱",
-          "gold": 9280.3,
-          "military": 2341,
-          "economy": 132
-        },
         {
           "timestamp": "۱۴:۱۶:۴۰",
           "gold": 9301.4,
@@ -260,8 +254,19 @@
           "gold": 1384,
           "military": 3199,
           "economy": 204
+        },
+        {
+          "timestamp": "۱۴:۲۳:۲۹",
+          "gold": 501384,
+          "military": 3199,
+          "economy": 194
         }
-      ]
+      ],
+      "loan": {
+        "amount": 500000,
+        "borrowedAt": 1781447009481,
+        "repaid": false
+      }
     },
     {
       "id": "user_1781429254409_uz9s5fw",
@@ -967,40 +972,22 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 1,
-          "militaryPower": 0,
+          "gold": 17,
+          "militaryPower": 10,
           "economicPower": 0,
           "resources": {
             "oil": 1,
-            "steel": 1,
-            "food": 555.6
+            "steel": 1.5,
+            "food": 555.9
           },
           "techLevel": 8,
           "factoryLevel": 20,
-          "lastIncomeUpdate": 1781446953831
+          "lastIncomeUpdate": 1781447013831
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۱۴:۱۶:۳۴",
-          "gold": 32,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۱۷:۳۸",
-          "gold": 48,
-          "military": 0,
-          "economy": 0
-        },
-        {
-          "timestamp": "۱۴:۱۸:۳۴",
-          "gold": 64,
-          "military": 0,
-          "economy": 0
-        },
         {
           "timestamp": "۱۴:۱۹:۳۷",
           "gold": 80,
@@ -1071,6 +1058,24 @@
           "timestamp": "۱۴:۲۳:۰۸",
           "gold": 1,
           "military": 0,
+          "economy": 0
+        },
+        {
+          "timestamp": "۱۴:۲۳:۰۹",
+          "gold": 1,
+          "military": 0,
+          "economy": 0
+        },
+        {
+          "timestamp": "۱۴:۲۳:۰۹",
+          "gold": 1,
+          "military": 0,
+          "economy": 0
+        },
+        {
+          "timestamp": "۱۴:۲۳:۳۵",
+          "gold": 17,
+          "military": 10,
           "economy": 0
         }
       ],
@@ -1185,18 +1190,6 @@
       },
       "assetLog": [
         {
-          "timestamp": "۱۴:۱۱:۴۸",
-          "gold": 3038.6,
-          "military": 28894,
-          "economy": 540
-        },
-        {
-          "timestamp": "۱۴:۱۲:۳۳",
-          "gold": 3902.6,
-          "military": 28894,
-          "economy": 540
-        },
-        {
           "timestamp": "۱۴:۱۴:۰۰",
           "gold": 3251,
           "military": 11558,
@@ -1270,6 +1263,18 @@
         },
         {
           "timestamp": "۱۴:۲۳:۰۸",
+          "gold": 8135.8,
+          "military": 10403,
+          "economy": 292
+        },
+        {
+          "timestamp": "۱۴:۲۳:۰۹",
+          "gold": 8135.8,
+          "military": 10403,
+          "economy": 292
+        },
+        {
+          "timestamp": "۱۴:۲۳:۰۹",
           "gold": 8135.8,
           "military": 10403,
           "economy": 292
@@ -1464,6 +1469,28 @@
     }
   ],
   "tweets": [
+    {
+      "id": "warroom_end_1781446989540_syumhddvg",
+      "userId": "warroom_system",
+      "username": "اتاق_جنگ",
+      "countryName": "system",
+      "flagUrl": "",
+      "text": "🏁 پایان جنگ!\n\nروسیه 🏆 پیروز شد!\n\n🔴 مستعمره کامل: روسیه تمام منابع اسرائیل را مصادره کرد. 0 طلا، 0 نفت، 0 فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.\n\n📊 آمار نهایی:\n🔴 روسیه MP: 10403\n🛡️ اسرائیل MP: 0",
+      "timestamp": "2026-06-14T14:23:09.540Z",
+      "likes": [],
+      "comments": []
+    },
+    {
+      "id": "warroom_end_1781446989240_ism4vq971",
+      "userId": "warroom_system",
+      "username": "اتاق_جنگ",
+      "countryName": "system",
+      "flagUrl": "",
+      "text": "🏁 پایان جنگ!\n\nروسیه 🏆 پیروز شد!\n\n🔴 مستعمره کامل: روسیه تمام منابع اسرائیل را مصادره کرد. 0 طلا، 0 نفت، 0 فولاد غارت شد. ارتش بازنده نابود شد و کشور رسماً مستعمره اعلام گردید.\n\n📊 آمار نهایی:\n🔴 روسیه MP: 10403\n🛡️ اسرائیل MP: 0",
+      "timestamp": "2026-06-14T14:23:09.240Z",
+      "likes": [],
+      "comments": []
+    },
     {
       "id": "warroom_end_1781446988420_vf78t7k5p",
       "userId": "warroom_system",
