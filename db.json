@@ -10,28 +10,22 @@
         "slogan": "صلح جهانی",
         "flagUrl": "🇺🇳",
         "assets": {
-          "gold": 102880,
+          "gold": 102960,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
-            "oil": 2218.6,
-            "steel": 17686,
-            "food": 17686
+            "oil": 2221.2,
+            "steel": 17712,
+            "food": 17712
           },
           "techLevel": 5,
           "factoryLevel": 10,
-          "lastIncomeUpdate": 1781429244579
+          "lastIncomeUpdate": 1781429304579
         }
       },
       "equipmentSlots": [],
       "warehouse": {},
       "assetLog": [
-        {
-          "timestamp": "۲۲:۴۹:۴۸",
-          "gold": 51840,
-          "military": 100,
-          "economy": 100
-        },
         {
           "timestamp": "۲۲:۵۰:۴۸",
           "gold": 51920,
@@ -115,6 +109,12 @@
           "gold": 102880,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۹:۲۸:۲۴",
+          "gold": 102960,
+          "military": 100,
+          "economy": 100
         }
       ]
     },
@@ -173,6 +173,110 @@
           "timestamp": "ثبت‌نام توسط ادمین",
           "gold": 300,
           "military": 2385,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429254409_uz9s5fw",
+      "username": "yuki",
+      "password": "By3WjdfEJtU",
+      "isAdmin": false,
+      "country": {
+        "name": "چین",
+        "originalName": "China",
+        "slogan": "احیای مجدد ملت بزرگ چین",
+        "flagUrl": "🇨🇳",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 10605,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429254409
+        }
+      },
+      "equipmentSlots": [
+        "chn_type99",
+        "chn_zbd04",
+        "chn_j20",
+        "chn_z10",
+        "chn_liaoning",
+        "chn_type055",
+        "chn_hq9",
+        "chn_df41",
+        "chn_nuke"
+      ],
+      "warehouse": {
+        "chn_type99": 140,
+        "chn_zbd04": 120,
+        "chn_j20": 25,
+        "chn_z10": 25,
+        "chn_liaoning": 3,
+        "chn_type055": 10,
+        "chn_hq9": 10,
+        "chn_df41": 5,
+        "chn_nuke": 3
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 10605,
+          "economy": 100
+        }
+      ]
+    },
+    {
+      "id": "user_1781429300629_4gwrajp",
+      "username": "aidy",
+      "password": "8ZqRYYTVTYv0u0E",
+      "isAdmin": false,
+      "country": {
+        "name": "ژاپن",
+        "originalName": "Japan",
+        "slogan": "کوشش هوشمندانه و حرکت به جلو",
+        "flagUrl": "🇯🇵",
+        "assets": {
+          "gold": 300,
+          "militaryPower": 4707,
+          "economicPower": 100,
+          "resources": {
+            "oil": 20,
+            "steel": 20,
+            "food": 20
+          },
+          "techLevel": 1,
+          "factoryLevel": 1,
+          "lastIncomeUpdate": 1781429300629
+        }
+      },
+      "equipmentSlots": [
+        "jp_type10",
+        "jp_f35",
+        "jp_maya",
+        "jp_soryu",
+        "jp_patriot",
+        "jp_type12"
+      ],
+      "warehouse": {
+        "jp_type10": 80,
+        "jp_f35": 25,
+        "jp_maya": 8,
+        "jp_soryu": 10,
+        "jp_patriot": 12,
+        "jp_type12": 10
+      },
+      "assetLog": [
+        {
+          "timestamp": "ثبت‌نام توسط ادمین",
+          "gold": 300,
+          "military": 4707,
           "economy": 100
         }
       ]
