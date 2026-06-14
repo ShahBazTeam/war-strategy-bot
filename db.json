@@ -972,17 +972,17 @@
         "slogan": "آزادی و بازیابی اقتدار تاریخی",
         "flagUrl": "🇮🇱",
         "assets": {
-          "gold": 324,
+          "gold": 300,
           "militaryPower": 100,
           "economicPower": 100,
           "resources": {
             "oil": 20,
-            "steel": 20.9,
-            "food": 20.3
+            "steel": 20,
+            "food": 20
           },
           "techLevel": 1,
           "factoryLevel": 1,
-          "lastIncomeUpdate": 1781447560708
+          "lastIncomeUpdate": 1781447582052
         }
       },
       "equipmentSlots": [],
@@ -991,24 +991,6 @@
         {
           "timestamp": "ریست",
           "gold": 300,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۴:۳۰:۴۲",
-          "gold": 308,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۴:۳۱:۴۵",
-          "gold": 316,
-          "military": 100,
-          "economy": 100
-        },
-        {
-          "timestamp": "۱۴:۳۲:۴۱",
-          "gold": 324,
           "military": 100,
           "economy": 100
         }
