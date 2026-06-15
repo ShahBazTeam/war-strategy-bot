@@ -174,12 +174,6 @@
       },
       "assetLog": [
         {
-          "timestamp": "۰:۰۱:۴۰",
-          "gold": 1045027.4,
-          "military": 3199,
-          "economy": 410
-        },
-        {
           "timestamp": "۰:۰۲:۴۳",
           "gold": 1045683.4,
           "military": 3199,
@@ -259,6 +253,12 @@
         },
         {
           "timestamp": "۰:۱۰:۴۶",
+          "gold": 805171.4,
+          "military": 34678,
+          "economy": 410
+        },
+        {
+          "timestamp": "۰:۱۱:۱۹",
           "gold": 805171.4,
           "military": 34678,
           "economy": 410
@@ -1043,6 +1043,12 @@
           "gold": 364,
           "military": 100,
           "economy": 100
+        },
+        {
+          "timestamp": "۰:۱۱:۱۹",
+          "gold": 364,
+          "military": 100,
+          "economy": 100
         }
       ],
       "loan": {
@@ -1267,7 +1273,7 @@
         "steel": 0,
         "food": 0
       },
-      "status": "pending",
+      "status": "accepted",
       "timestamp": "2026-06-14T10:53:13.961Z"
     }
   ],
